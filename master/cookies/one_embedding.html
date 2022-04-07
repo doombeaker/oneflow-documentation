@@ -687,8 +687,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#make_table" class="md-nav__link">
-    使用 make_table 创建词表
+  <a href="#make_table_options" class="md-nav__link">
+    使用 make_table_options 配置词表
   </a>
   
 </li>
@@ -830,8 +830,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#make_table" class="md-nav__link">
-    使用 make_table 创建词表
+  <a href="#make_table_options" class="md-nav__link">
+    使用 make_table_options 配置词表
   </a>
   
 </li>
@@ -905,10 +905,11 @@
 <div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">oneflow</span> <span class="k">as</span> <span class="nn">flow</span>
 <span class="n">indices</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">9</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
-<span class="n">embed</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-<span class="n">y</span> <span class="o">=</span> <span class="n">embed</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
+<span class="n">embedding</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">embedding</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
 </code></pre></div>
-<p>OneFlow 为了解决大规模深度推荐系统的问题，还提供了大规模 Embedding 的方案：OneEmbedding。与普通的算子相比，OneEmbedding 有以下特点：</p>
+<p>OneFlow 为了解决大规模深度推荐系统的问题，还提供了大规模 Embedding 的方案：OneEmbedding。</p>
+<p>与普通的算子相比，OneEmbedding 有以下特点：</p>
 <ol>
 <li>
 <p>灵活的分层存储，支持将 Embedding table 放置在 GPU显存、CPU内存 、或者 SSD 上面，使用高速设备作为低速设备的缓存，实现速度与容量的兼顾。</p>
@@ -920,13 +921,13 @@
 <h2 id="oneembedding">快速上手 OneEmbedding<a class="headerlink" href="#oneembedding" title="Permanent link">&para;</a></h2>
 <p>我们将展示一个快速上手 OneEmbedding 的例子，它包括以下几个基本步骤：</p>
 <ul>
-<li>使用 <code>make_table</code> 创建词表</li>
+<li>使用 <code>make_table_options</code> 配置词表</li>
 <li>配置词表的存储属性</li>
 <li>实例化 Embedding</li>
 <li>构造 Graph 进行训练</li>
 </ul>
-<h3 id="make_table">使用 <code>make_table</code> 创建词表<a class="headerlink" href="#make_table" title="Permanent link">&para;</a></h3>
-<p>以下代码，导入相关包，并使用 <code>make_table</code> 创建词表。OneEmbedding 支持同时创建多个词表，以下代码创建了三个词表，初始时的特征长度为 <code>128</code>，各个表的大小（行）分别为：<code>39884407</code>、<code>39043</code>、<code>17289</code>。</p>
+<h3 id="make_table_options">使用 <code>make_table_options</code> 配置词表<a class="headerlink" href="#make_table_options" title="Permanent link">&para;</a></h3>
+<p>以下代码，导入相关包，并使用 <code>make_table_options</code> 配置词表。OneEmbedding 支持同时创建多个词表，以下代码配置了三个词表，特征长度为 <code>128</code>，各个表的大小（行）分别为：<code>39884407</code>、<code>39043</code>、<code>17289</code>。</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">oneflow</span> <span class="k">as</span> <span class="nn">flow</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">oneflow.nn</span> <span class="k">as</span> <span class="nn">nn</span>
@@ -938,14 +939,14 @@
 <span class="n">scales</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">table_size_array</span><span class="p">))</span>
 
 <span class="n">tables</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">flow</span><span class="o">.</span><span class="n">one_embedding</span><span class="o">.</span><span class="n">make_table</span><span class="p">(</span>
+    <span class="n">flow</span><span class="o">.</span><span class="n">one_embedding</span><span class="o">.</span><span class="n">make_table_options</span><span class="p">(</span>
         <span class="n">flow</span><span class="o">.</span><span class="n">one_embedding</span><span class="o">.</span><span class="n">make_uniform_initializer</span><span class="p">(</span><span class="n">low</span><span class="o">=-</span><span class="n">scale</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">scale</span><span class="p">)</span>
     <span class="p">)</span>
     <span class="k">for</span> <span class="n">scale</span> <span class="ow">in</span> <span class="n">scales</span>
 <span class="p">]</span>
 </code></pre></div>
-<p><code>make_table</code> 用于创建词表，在创建的同时可以指定初始化的方式。以上代码采用 <code>uniform</code> 方式初始化词表。创建的词表保存在 <code>tables</code> 变量中。</p>
-<p>点击 <a href="">make_table</a> 及 <a href="">make_uniform_initializer</a> 可以查看有关它们的更详细说明。</p>
+<p><code>make_table_options</code> 配置词表时需要指定初始化的方式，以上代码采用 <code>uniform</code> 方式初始化词表。配置词表的结果保存在 <code>tables</code> 变量中。</p>
+<p>点击 <a href="">make_table_options</a> 及 <a href="">make_uniform_initializer</a> 可以查看有关它们的更详细说明。</p>
 <h3 id="_1">配置词表的存储属性<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
 <p>接着运行以下代码，用于配置词表的存储属性：</p>
 <div class="highlight"><pre><span></span><code><span class="n">store_options</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">one_embedding</span><span class="o">.</span><span class="n">make_cached_ssd_store_options</span><span class="p">(</span>
@@ -971,7 +972,7 @@
 
 <span class="n">embedding</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
 </code></pre></div>
-<p>其中，<code>tables</code> 是之前通过 <code>make_table</code> 构造的词表，<code>store_options</code> 是之前配置的存储属性，<code>embedding_dim</code> 是特征维度，<code>dtype</code> 是特征向量的数据类型，<code>key_type</code> 是特征 ID 的数据类型。</p>
+<p>其中，<code>tables</code> 是之前通过 <code>make_table_options</code> 配置的词表属性，<code>store_options</code> 是之前配置的存储属性，<code>embedding_dim</code> 是特征维度，<code>dtype</code> 是特征向量的数据类型，<code>key_type</code> 是特征 ID 的数据类型。</p>
 <p>更详细的信息，可以参阅 <a href="">one_embedding.MultiTableEmbedding</a></p>
 <h3 id="graph">使用 Graph 训练<a class="headerlink" href="#graph" title="Permanent link">&para;</a></h3>
 <p>目前 OneEmbedding 仅支持在 Graph 模式下使用。</p>
