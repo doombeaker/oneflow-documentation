@@ -727,6 +727,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#id" class="md-nav__link">
+    动态插入新的特征 ID
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#dlrm" class="md-nav__link">
     扩展阅读：DLRM
   </a>
@@ -859,6 +866,13 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#id" class="md-nav__link">
+    动态插入新的特征 ID
+  </a>
   
 </li>
       
@@ -1002,6 +1016,9 @@
 </code></pre></div>
 <p>如果想从已保存的快照中加载词表，则应该调用 <code>MultiTableEmbedding.load_snapshot</code>。</p>
 <p>更详细的信息请参阅 <a href="">MultiTableEmbedding.save_snapshot</a> 及 <a href="">MultiTableEmbedding.load_snapshot</a>。</p>
+<h2 id="id">动态插入新的特征 ID<a class="headerlink" href="#id" title="Permanent link">&para;</a></h2>
+<p>需要重点说明，OneEmbedding 支持动态插入新的特征 ID，只要存储介质的容量足够，特征 ID 的数目是没有上限的。具体体现在，进行查询时，特征 ID 可以超越创建词表时的范围。</p>
+<p>如以上代码中，创建词表时的大小为 <code>39940739</code> （<code>vocab_size = sum(table_size_array)</code>），但在训练时，<code>embedding = self.embedding_lookup(ids)</code> 中 <code>ids</code> 即使超过 <code>39940739</code> 也是合法的。</p>
 <h2 id="dlrm">扩展阅读：DLRM<a class="headerlink" href="#dlrm" title="Permanent link">&para;</a></h2>
 <p>本文展示了如何快速上手 OneEmbedding。</p>
 <p>OneFlow 模型仓库中准备了关于 OneEmbedding 在 DLRM 任务的实际例子，可供参考：<a href="https://github.com/Oneflow-Inc/models/tree/main/RecommenderSystems/dlrm">https://github.com/Oneflow-Inc/models/tree/main/RecommenderSystems/dlrm</a></p>
