@@ -887,7 +887,7 @@
                 
                 
                 <h1 id="embedding-oneembedding">大规模 Embedding 方案： OneEmbedding<a class="headerlink" href="#embedding-oneembedding" title="Permanent link">&para;</a></h1>
-<p>Embedding 方法已经成为推荐系统的基本操作，也扩散到了推荐系统外的许多领域。各个框架都提供了进行 embedding 的基础算子，比如，可以使用 OneFlow 中的 <code>flow.nn.Embedding</code>：</p>
+<p>Embedding 已经成为推荐系统的基本操作，也扩散到了推荐系统外的许多领域。各个框架都提供了进行 embedding 的基础算子，比如，可以使用 OneFlow 中的 <code>flow.nn.Embedding</code>：</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">oneflow</span> <span class="k">as</span> <span class="nn">flow</span>
 <span class="n">indices</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">9</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
