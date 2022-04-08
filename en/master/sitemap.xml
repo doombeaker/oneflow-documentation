@@ -46,6 +46,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://docs.oneflow.org/master/cookies/one_embedding.html</loc>
+         <lastmod>2022-04-08</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://docs.oneflow.org/master/cookies/oneflow2onnnx.html</loc>
          <lastmod>2022-04-08</lastmod>
          <changefreq>daily</changefreq>
