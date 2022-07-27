@@ -14,7 +14,7 @@
         <link rel="canonical" href="https://docs.oneflow.org/master/parallelism/02_sbp.html">
       
       <link rel="icon" href="../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.1.11">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.1.11">
     
     
       
@@ -251,7 +251,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../cookies/oneflow2onnnx.html" class="md-tabs__link">
+      <a href="../cookies/global_tensor.html" class="md-tabs__link">
         实践指南
       </a>
     </li>
@@ -267,7 +267,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="https://start.oneflow.org/oneflow-api-cn/" class="md-tabs__link">
+      <a href="https://oneflow.readthedocs.io/en/master/" class="md-tabs__link">
         API
       </a>
     </li>
@@ -691,6 +691,18 @@
   
   
     <li class="md-nav__item">
+      <a href="../cookies/global_tensor.html" class="md-nav__link">
+        使用 Global Tensor 进行多机多设备编程 基础操作
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../cookies/oneflow2onnnx.html" class="md-nav__link">
         OneFlow 与 ONNX 交互
       </a>
@@ -715,6 +727,30 @@
   
   
     <li class="md-nav__item">
+      <a href="../cookies/amp.html" class="md-nav__link">
+        自动混合精度训练
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cookies/activation_checkpointing.html" class="md-nav__link">
+        Activation Checkpointing
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../cookies/torch2flow.html" class="md-nav__link">
         将 PyTorch 预训练模型转为 OneFlow 格式
       </a>
@@ -727,8 +763,32 @@
   
   
     <li class="md-nav__item">
+      <a href="../cookies/transfer_learning.html" class="md-nav__link">
+        计算机视觉迁移学习
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../cookies/one_embedding.html" class="md-nav__link">
         大规模 Embedding 方案： OneEmbedding
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cookies/zero.html" class="md-nav__link">
+        Zero Redundancy Optimizer (ZeRO)
       </a>
     </li>
   
@@ -769,7 +829,7 @@
   
   
     <li class="md-nav__item">
-      <a href="https://start.oneflow.org/oneflow-api-cn/" class="md-nav__link">
+      <a href="https://oneflow.readthedocs.io/en/master/" class="md-nav__link">
         API
       </a>
     </li>
@@ -988,7 +1048,7 @@ B &amp;= concat&amp;(B_0 ,&amp; B_1) \\
 <span class="n">B0</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="n">P0</span><span class="p">,</span> <span class="n">sbp</span><span class="o">=</span><span class="n">b0_sbp</span><span class="p">)</span>
 <span class="n">Y0</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">A0</span><span class="p">,</span> <span class="n">B0</span><span class="p">)</span>
 
-<span class="n">Y0</span><span class="o">.</span><span class="n">to_global</span><span class="p">(</span><span class="n">placement</span><span class="o">=</span><span class="n">P1</span><span class="p">,</span> <span class="n">sbp</span><span class="o">=</span><span class="n">y0_sbp</span><span class="p">)</span>
+<span class="n">Y0</span> <span class="o">=</span> <span class="n">Y0</span><span class="o">.</span><span class="n">to_global</span><span class="p">(</span><span class="n">placement</span><span class="o">=</span><span class="n">P1</span><span class="p">,</span> <span class="n">sbp</span><span class="o">=</span><span class="n">y0_sbp</span><span class="p">)</span>
 <span class="n">B1</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="n">P1</span><span class="p">,</span> <span class="n">sbp</span><span class="o">=</span><span class="n">b1_sbp</span><span class="p">)</span>
 <span class="n">Y2</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">Y0</span><span class="p">,</span> <span class="n">B1</span><span class="p">)</span>
 </code></pre></div>

@@ -14,7 +14,7 @@
         <link rel="canonical" href="https://docs.oneflow.org/master/basics/02_tensor.html">
       
       <link rel="icon" href="../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.1.11">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.1.11">
     
     
       
@@ -251,7 +251,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../cookies/oneflow2onnnx.html" class="md-tabs__link">
+      <a href="../cookies/global_tensor.html" class="md-tabs__link">
         Cookbook
       </a>
     </li>
@@ -698,8 +698,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../cookies/global_tensor.html" class="md-nav__link">
+        Basic Operations for Using Global Tensor to Program on Cluster
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../cookies/oneflow2onnnx.html" class="md-nav__link">
-        Onelow with ONNX
+        OneFlow with ONNX
       </a>
     </li>
   
@@ -722,8 +734,68 @@
   
   
     <li class="md-nav__item">
+      <a href="../cookies/amp.html" class="md-nav__link">
+        Automatic Mixed Precision Training
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cookies/activation_checkpointing.html" class="md-nav__link">
+        Activation Checkpointing
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../cookies/torch2flow.html" class="md-nav__link">
         Converting Pre-trained Model from PyTorch to OneFlow
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cookies/transfer_learning.html" class="md-nav__link">
+        Transfer Learning in Computer Vision
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cookies/one_embedding.html" class="md-nav__link">
+        Large-Scale Embedding Solution OneEmbedding
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cookies/zero.html" class="md-nav__link">
+        Zero Redundancy Optimizer (ZeRO)
       </a>
     </li>
   
@@ -969,17 +1041,17 @@ cpu:0
 </code></pre></div>
 <p>The output shows the shape, the data type, and the device (on CPU No. 0, CPUs were numbered because OneFlow naturally supports distribution, see <a href="../parallelism/03_consistent_tensor.html">Global Tensor</a>).</p>
 <p>The shape of the tensor can be changed by the <a href="https://oneflow.readthedocs.io/en/master/oneflow.html?highlight=oneflow.reshape#oneflow.reshape">reshape</a> method, and the data type and device of the tensor can be changed by the <a href="https://oneflow.readthedocs.io/en/master/tensor.html?highlight=Tensor.to#oneflow.Tensor.to">to</a> method:</p>
-<div class="highlight"><pre><span></span><code>x10 = x9.reshape(2, 2)
-x11 = x10.to(dtype=flow.int32, device=flow.device(&quot;cuda&quot;))
-print(x10.shape)
-print(x11.dtype, x11.device)
+<div class="highlight"><pre><span></span><code><span class="n">x10</span> <span class="o">=</span> <span class="n">x9</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">x11</span> <span class="o">=</span> <span class="n">x10</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x10</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x11</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">x11</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
 </code></pre></div>
 <p>Out:</p>
-<div class="highlight"><pre><span></span><code>flow.Size([2, 2])
+<div class="highlight"><pre><span></span><code>oneflow.Size([2, 2])
 oneflow.int32 cuda:0
 </code></pre></div>
 <h2 id="operations-on-tensors">Operations on Tensors<a class="headerlink" href="#operations-on-tensors" title="Permanent link">&para;</a></h2>
-<p>A large number of operators are provided in OneFlow, most of which are in the namespaces of <a href="https://oneflow.readthedocs.io/en/master/oneflow.html">oneflow</a>, <a href="https://oneflow.readthedocs.io/en/master/nn.html">oneflow.nn</a>, and <a href="https://oneflow.readthedocs.io/en/master/functional.html">oneflow.nn.functional</a>.</p>
+<p>A large number of operators are provided in OneFlow, most of which are in the namespaces of <a href="https://oneflow.readthedocs.io/en/master/oneflow.html">oneflow</a>, <a href="https://oneflow.readthedocs.io/en/master/nn.html">oneflow.nn</a>, and <a href="https://oneflow.readthedocs.io/en/v0.8.1/nn.functional.html">oneflow.nn.functional</a>.</p>
 <p>Tensors in OneFlow are as easy to use as the NumPy arrays. For example, slicing in NumPy style is supported:</p>
 <div class="highlight"><pre><span></span><code><span class="n">tensor</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;First row: &#39;</span><span class="p">,</span><span class="n">tensor</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>

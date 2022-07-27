@@ -14,11 +14,11 @@
         <link rel="canonical" href="https://docs.oneflow.org/master/cookies/one_embedding.html">
       
       <link rel="icon" href="../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.1.11">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.1.11">
     
     
       
-        <title>Large-Scale Embedding Solution: OneEmbedding - OneFlow</title>
+        <title>Large-Scale Embedding Solution OneEmbedding - OneFlow</title>
       
     
     
@@ -104,7 +104,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Large-Scale Embedding Solution: OneEmbedding
+              Large-Scale Embedding Solution OneEmbedding
             
           </span>
         </div>
@@ -243,13 +243,15 @@
         
   
   
+    
+  
 
 
   
   
   
     <li class="md-tabs__item">
-      <a href="oneflow2onnnx.html" class="md-tabs__link">
+      <a href="global_tensor.html" class="md-tabs__link md-tabs__link--active">
         Cookbook
       </a>
     </li>
@@ -583,12 +585,14 @@
 
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" checked>
       
       <label class="md-nav__link" for="__nav_4">
         Cookbook
@@ -606,8 +610,20 @@
   
   
     <li class="md-nav__item">
+      <a href="global_tensor.html" class="md-nav__link">
+        Basic Operations for Using Global Tensor to Program on Cluster
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="oneflow2onnnx.html" class="md-nav__link">
-        Onelow with ONNX
+        OneFlow with ONNX
       </a>
     </li>
   
@@ -630,8 +646,190 @@
   
   
     <li class="md-nav__item">
+      <a href="amp.html" class="md-nav__link">
+        Automatic Mixed Precision Training
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="activation_checkpointing.html" class="md-nav__link">
+        Activation Checkpointing
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="torch2flow.html" class="md-nav__link">
         Converting Pre-trained Model from PyTorch to OneFlow
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="transfer_learning.html" class="md-nav__link">
+        Transfer Learning in Computer Vision
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Large-Scale Embedding Solution OneEmbedding
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="one_embedding.html" class="md-nav__link md-nav__link--active">
+        Large-Scale Embedding Solution OneEmbedding
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#get-start-to-oneembedding-quickly" class="md-nav__link">
+    Get Start to OneEmbedding Quickly
+  </a>
+  
+    <nav class="md-nav" aria-label="Get Start to OneEmbedding Quickly">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configure-embedding-table-with-make_table_options" class="md-nav__link">
+    Configure Embedding Table with make_table_options
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configure-the-storage-attribute-of-the-embedding-table" class="md-nav__link">
+    Configure the Storage Attribute of the Embedding Table
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#instantiate-embedding" class="md-nav__link">
+    Instantiate Embedding
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#construct-graph-for-training" class="md-nav__link">
+    Construct Graph for Training
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-features-of-oneembedding" class="md-nav__link">
+    The Features of OneEmbedding
+  </a>
+  
+    <nav class="md-nav" aria-label="The Features of OneEmbedding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#feature-id-and-dynamic-insertion" class="md-nav__link">
+    Feature ID and Dynamic Insertion
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#feature-id-and-multi-table-query" class="md-nav__link">
+    Feature ID and Multi-Table Query
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-to-choose-the-proper-storage-configuration" class="md-nav__link">
+    How to Choose the Proper Storage Configuration
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#distributed-training" class="md-nav__link">
+    Distributed Training
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#extended-reading-dlrm" class="md-nav__link">
+    Extended Reading: DLRM
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="zero.html" class="md-nav__link">
+        Zero Redundancy Optimizer (ZeRO)
       </a>
     </li>
   
@@ -719,8 +917,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#creat-embedding-table-with-make_table" class="md-nav__link">
-    Creat Embedding Table with make_table
+  <a href="#configure-embedding-table-with-make_table_options" class="md-nav__link">
+    Configure Embedding Table with make_table_options
   </a>
   
 </li>
@@ -746,22 +944,49 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#storage-and-loading" class="md-nav__link">
-    Storage and Loading
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#dynamically-insert-new-feature-id" class="md-nav__link">
-    Dynamically insert New Feature ID
+  <a href="#the-features-of-oneembedding" class="md-nav__link">
+    The Features of OneEmbedding
   </a>
+  
+    <nav class="md-nav" aria-label="The Features of OneEmbedding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#feature-id-and-dynamic-insertion" class="md-nav__link">
+    Feature ID and Dynamic Insertion
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#feature-id-and-multi-table-query" class="md-nav__link">
+    Feature ID and Multi-Table Query
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-to-choose-the-proper-storage-configuration" class="md-nav__link">
+    How to Choose the Proper Storage Configuration
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#distributed-training" class="md-nav__link">
+    Distributed Training
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -790,17 +1015,17 @@
                 
                 
                 <h1 id="large-scale-embedding-solution-oneembedding">Large-Scale Embedding Solution: OneEmbedding<a class="headerlink" href="#large-scale-embedding-solution-oneembedding" title="Permanent link">&para;</a></h1>
-<p>Embedding has become the foundamental opeartion in recommender systems, and it has also spread to many fields outside recommender systems. Each framework provides basic operators for embedding, for example, you can use <code>flow.nn.Embedding</code> in OneFlow:</p>
+<p>Embedding is an important component of recommender system, and it has also spread to many fields outside recommender systems. Each framework provides basic operators for Embedding, for example, <code>flow.nn.Embedding</code> in OneFlow:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">oneflow</span> <span class="k">as</span> <span class="nn">flow</span>
 <span class="n">indices</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">9</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
-<span class="n">embed</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-<span class="n">y</span> <span class="o">=</span> <span class="n">embed</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
+<span class="n">embedding</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">embedding</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
 </code></pre></div>
 <p>OneEmbedding is the large-scale Embedding solution that OneFlow provides to solve the problem of large-scale deep recommender systems. OneEmbedding has the following advantages compared to ordionary opeartors:</p>
 <ol>
 <li>
-<p>With Flexible hierarchical storage, OneEmbedding can place the Embedding table on GPU memory, CPU memory, or SSD, and uses high-speed devices as caches for low-speed devices to achieve both speed and capacity.</p>
+<p>With Flexible hierarchical storage, OneEmbedding can place the Embedding table on GPU memory, CPU memory or SSD, and allow high-speed devices to be used as caches for low-speed devices to achieve both speed and capacity.</p>
 </li>
 <li>
 <p>OneEmbedding supports dynamic expansion.</p>
@@ -809,47 +1034,47 @@
 <h2 id="get-start-to-oneembedding-quickly">Get Start to OneEmbedding Quickly<a class="headerlink" href="#get-start-to-oneembedding-quickly" title="Permanent link">&para;</a></h2>
 <p>The following steps is an example of getting started with OneEmbeeding quickly: </p>
 <ul>
-<li>Creat Embedding table with <code>make_table</code></li>
+<li>Configure Embedding table with <code>make_table_options</code></li>
 <li>Configure the storage attribute of the Embedding table</li>
 <li>Instantiate Embedding</li>
 <li>Construct Graph for training</li>
 </ul>
-<h3 id="creat-embedding-table-with-make_table">Creat Embedding Table with <code>make_table</code><a class="headerlink" href="#creat-embedding-table-with-make_table" title="Permanent link">&para;</a></h3>
-<p>By importing relevant package and the following codes, you can creat Embedding table with <code>make_table</code>.OneEmbedding supports simultaneous creation of multiple Embedding table. The following codes creat three Embedding table, with an initial feature length of <code>128</code>, and the size (rows) of each table are: <code>39884407</code>, <code>39043</code> and <code>17289</code>.</p>
+<h3 id="configure-embedding-table-with-make_table_options">Configure Embedding Table with <code>make_table_options</code><a class="headerlink" href="#configure-embedding-table-with-make_table_options" title="Permanent link">&para;</a></h3>
+<p>By importing relevant package and the following codes, you can configure Embedding table with <code>make_table_options</code>.OneEmbedding supports simultaneous creation of multiple Embedding table. The following codes configured three Embedding table.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">oneflow</span> <span class="k">as</span> <span class="nn">flow</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">oneflow.nn</span> <span class="k">as</span> <span class="nn">nn</span>
-
-<span class="n">table_size_array</span> <span class="o">=</span> <span class="p">[</span><span class="mi">39884407</span><span class="p">,</span> <span class="mi">39043</span><span class="p">,</span> <span class="mi">17289</span><span class="p">]</span>
-<span class="n">vocab_size</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">table_size_array</span><span class="p">)</span>
-<span class="n">num_tables</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">table_size_array</span><span class="p">)</span>
-<span class="n">embedding_size</span> <span class="o">=</span> <span class="mi">128</span>    
-<span class="n">scales</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">table_size_array</span><span class="p">))</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="n">tables</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">flow</span><span class="o">.</span><span class="n">one_embedding</span><span class="o">.</span><span class="n">make_table</span><span class="p">(</span>
-        <span class="n">flow</span><span class="o">.</span><span class="n">one_embedding</span><span class="o">.</span><span class="n">make_uniform_initializer</span><span class="p">(</span><span class="n">low</span><span class="o">=-</span><span class="n">scale</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">scale</span><span class="p">)</span>
-    <span class="p">)</span>
-    <span class="k">for</span> <span class="n">scale</span> <span class="ow">in</span> <span class="n">scales</span>
+    <span class="n">flow</span><span class="o">.</span><span class="n">one_embedding</span><span class="o">.</span><span class="n">make_table_options</span><span class="p">(</span>
+        <span class="n">flow</span><span class="o">.</span><span class="n">one_embedding</span><span class="o">.</span><span class="n">make_uniform_initializer</span><span class="p">(</span><span class="n">low</span><span class="o">=-</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="p">),</span>
+    <span class="n">flow</span><span class="o">.</span><span class="n">one_embedding</span><span class="o">.</span><span class="n">make_table_options</span><span class="p">(</span>
+        <span class="n">flow</span><span class="o">.</span><span class="n">one_embedding</span><span class="o">.</span><span class="n">make_uniform_initializer</span><span class="p">(</span><span class="n">low</span><span class="o">=-</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+    <span class="p">),</span>
+    <span class="n">flow</span><span class="o">.</span><span class="n">one_embedding</span><span class="o">.</span><span class="n">make_table_options</span><span class="p">(</span>
+        <span class="n">flow</span><span class="o">.</span><span class="n">one_embedding</span><span class="o">.</span><span class="n">make_uniform_initializer</span><span class="p">(</span><span class="n">low</span><span class="o">=-</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">0.15</span><span class="p">)</span>
+    <span class="p">),</span>
 <span class="p">]</span>
 </code></pre></div>
-<p>You can specify the initialization method when create Embedding table with <code>make_table</code>. The above codes initialize Embedding table with the method <code>uniform</code>. The created Embedding table will be stored in variable <code>tables</code>. </p>
-<p>Click <a href="">make_table</a> and <a href="">make_uniform_initializer</a> to check more detailed description.</p>
+<p>When configuring the Embedding table, you need to specify the initialization method. The above Embedding tables are initialized in the <code>uniform</code> method. The result of configuring the Embedding table is stored in the <code>tables</code> variable</p>
+<p>Click <a href="https://oneflow.readthedocs.io/en/master/one_embedding.html#oneflow.one_embedding.make_table_options">make_table_options</a> and <a href="https://oneflow.readthedocs.io/en/master/one_embedding.html#oneflow.one_embedding.make_uniform_initializer">make_uniform_initializer</a> to check more detailed information.</p>
 <h3 id="configure-the-storage-attribute-of-the-embedding-table">Configure the Storage Attribute of the Embedding Table<a class="headerlink" href="#configure-the-storage-attribute-of-the-embedding-table" title="Permanent link">&para;</a></h3>
 <p>Then run the following codes to configure the storage attribute of the Embedding table:</p>
 <div class="highlight"><pre><span></span><code><span class="n">store_options</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">one_embedding</span><span class="o">.</span><span class="n">make_cached_ssd_store_options</span><span class="p">(</span>
     <span class="n">cache_budget_mb</span><span class="o">=</span><span class="mi">8142</span><span class="p">,</span>
     <span class="n">persistent_path</span><span class="o">=</span><span class="s2">&quot;/your_path_to_ssd&quot;</span><span class="p">,</span> 
-    <span class="n">capacity</span><span class="o">=</span><span class="n">vocab_size</span><span class="p">,</span>
+    <span class="n">capacity</span><span class="o">=</span><span class="mi">40000000</span><span class="p">,</span>
     <span class="n">size_factor</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>              
     <span class="n">physical_block_size</span><span class="o">=</span><span class="mi">512</span>
 <span class="p">)</span>
 </code></pre></div>
-<p>By calling <code>make_cached_ssd_store_options</code> here, you can store Embedding table on SSD and use GPU as cache. For the meaning of specific parameters, please refer to <a href="">make_cached_ssd_store_options API 文档</a>.</p>
-<p>In addition, you can use pure GPU as storage; or use CPU memory to store Embedding table, but use GPU as cache. For more details, please refer to <a href="">make_cached_ssd_store_options</a> and <a href="">make_cached_host_mem_store_option</a>.</p>
+<p>By calling <code>make_cached_ssd_store_options</code> here, you can store Embedding table on SSD and use GPU as cache. For the meaning of specific parameters, please refer to <a href="https://oneflow.readthedocs.io/en/master/one_embedding.html#oneflow.one_embedding.make_cached_ssd_store_options">make_cached_ssd_store_options API 文档</a>.</p>
+<p>In addition, you can use pure GPU as storage; or use CPU memory to store Embedding table, but use GPU as cache. For more details, please refer to <a href="https://oneflow.readthedocs.io/en/master/one_embedding.html#oneflow.one_embedding.make_device_mem_store_options">make_device_mem_store_options</a> and <a href="https://oneflow.readthedocs.io/en/master/one_embedding.html#oneflow.one_embedding.make_cached_host_mem_store_options">make_cached_host_mem_store_option</a>.</p>
 <h3 id="instantiate-embedding">Instantiate Embedding<a class="headerlink" href="#instantiate-embedding" title="Permanent link">&para;</a></h3>
 <p>After the above configuration is completed, you can use <code>MultiTableEmbedding</code> to get the instantiated Embedding layer.</p>
-<div class="highlight"><pre><span></span><code><span class="n">embedding</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">one_embedding</span><span class="o">.</span><span class="n">MultiTableEmbedding</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="n">embedding_size</span> <span class="o">=</span> <span class="mi">128</span>
+<span class="n">embedding</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">one_embedding</span><span class="o">.</span><span class="n">MultiTableEmbedding</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my_embedding&quot;</span><span class="p">,</span>
     <span class="n">embedding_dim</span><span class="o">=</span><span class="n">embedding_size</span><span class="p">,</span>
     <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">float</span><span class="p">,</span>
@@ -860,12 +1085,13 @@
 
 <span class="n">embedding</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
 </code></pre></div>
-<p>Among them, <code>tables</code> is the Embedding table previously constructed by <code>make_table</code>, <code>store_options</code> is the previously configured storage attribute, <code>embedding_dim</code> is the feature dimension, <code>dtype</code> is the data type of the feature vector, <code>key_type</code> is the data type of feature ID.</p>
-<p>For more detailes, please refer to <a href="">one_embedding.MultiTableEmbedding</a>.</p>
+<p>Among them, <code>tables</code> is the Embedding table attribute previously configured by <code>make_table_options</code>, <code>store_options</code> is the previously configured storage attribute, <code>embedding_dim</code> is the feature dimension, <code>dtype</code> is the data type of the feature vector, <code>key_type</code> is the data type of feature ID.</p>
+<p>If two OneEmbeddings are created at the same time, different name and persistent path parameters are needed to be set during instantiation. For more detailes, please refer to <a href="https://oneflow.readthedocs.io/en/master/one_embedding.html#oneflow.one_embedding.MultiTableEmbedding">one_embedding.MultiTableEmbedding</a>.</p>
 <h3 id="construct-graph-for-training">Construct Graph for Training<a class="headerlink" href="#construct-graph-for-training" title="Permanent link">&para;</a></h3>
 <p>Currently, OneEmbedding is only supported in Graph mode. </p>
 <p>In the following example, we construct a simple Graph class that includes <code>embedding</code> and <code>mlp</code> layers.</p>
-<div class="highlight"><pre><span></span><code><span class="n">mlp</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">FusedMLP</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="n">num_tables</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">mlp</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">FusedMLP</span><span class="p">(</span>
     <span class="n">in_features</span><span class="o">=</span><span class="n">embedding_size</span> <span class="o">*</span> <span class="n">num_tables</span><span class="p">,</span>
     <span class="n">hidden_features</span><span class="o">=</span><span class="p">[</span><span class="mi">512</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="mi">128</span><span class="p">],</span>
     <span class="n">out_features</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -899,15 +1125,54 @@
 <span class="nb">print</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
 </code></pre></div>
 <p>For the detailed information on using Graph, please refer to <a href="../basics/08_nn_graph.html">静态图模块 nn.Graph</a>. </p>
-<h3 id="storage-and-loading">Storage and Loading<a class="headerlink" href="#storage-and-loading" title="Permanent link">&para;</a></h3>
-<p>You can store Embedding table with the method of <code>MultiTableEmbedding.save_snapshot</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="n">embedding</span><span class="o">.</span><span class="n">save_snapshot</span><span class="p">(</span><span class="s1">&#39;./my_snapshot&#39;</span><span class="p">)</span>
+<h2 id="the-features-of-oneembedding">The Features of OneEmbedding<a class="headerlink" href="#the-features-of-oneembedding" title="Permanent link">&para;</a></h2>
+<h3 id="feature-id-and-dynamic-insertion">Feature ID and Dynamic Insertion<a class="headerlink" href="#feature-id-and-dynamic-insertion" title="Permanent link">&para;</a></h3>
+<p>OneEmbedding supports dynamic insertion of new feature ID. As long as the storage medium has sufficient capacity, there is no upper limit on the number of feature IDs. This is why when you use <code>make_table_options</code>, you only need to specify the initialization method, not the total number of feature IDs (Embedding table lines).</p>
+<h3 id="feature-id-and-multi-table-query">Feature ID and Multi-Table Query<a class="headerlink" href="#feature-id-and-multi-table-query" title="Permanent link">&para;</a></h3>
+<p><strong>Feature ID cannot be repeated</strong></p>
+<p>OneEmbedding users who make datasets need to pay special attention: When using <code>MultiTableEmbedding</code> to create multiple tables at the same time,multiple Embedding Tables only have different initialization parameters, and other parameters are the same,at this time, <strong>feature IDs in multiple tables cannot be repeated</strong>.</p>
+<p><strong>Multi-table query</strong></p>
+<p>The query method is no different from the normal Embedding query method if you only use <code>MultiTableEmbedding</code> to configure one table. You can call it directly and pass the feature ID, such as <code>embedding_lookup(ids)</code>.</p>
+<p>If you use <code>MultiTableEmbedding</code> to configure more than one tables, then you need to specify in which to query for a feature ID with the following two methods:</p>
+<p>Method 1: Pass an <code>ids</code> of shape <code>(batch_size, number of Embedding table)</code>  for query, then the column of this <code>ids</code> corresponds to a Embedding table in turn.</p>
+<p>For example:
+<div class="highlight"><pre><span></span><code><span class="n">ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">488</span><span class="p">,</span> <span class="mi">333</span><span class="p">,</span> <span class="mi">220</span><span class="p">],</span> <span class="p">[</span><span class="mi">18</span><span class="p">,</span> <span class="mi">568</span><span class="p">,</span> <span class="mi">508</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+<span class="c1"># This means to query `[[488], [18]]` in the zeroth table, `[[333], [568]]` in the first table, and the corresponding feature vector of `[[220], [508]]` in the second table.</span>
+<span class="n">embedding_lookup</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+</code></pre></div></p>
+<p>Method 2:When passing the <code>ids</code> parameter, pass a <code>table_ids</code> parameter, which has the exact same shape as <code>ids</code>, and specifies the ordinal number of the table in <code>table_ids</code>.</p>
+<p>For example:
+<div class="highlight"><pre><span></span><code><span class="n">ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">488</span><span class="p">,</span> <span class="mi">333</span><span class="p">,</span> <span class="mi">220</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">568</span><span class="p">,</span> <span class="mi">508</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+<span class="c1"># table_ids has the exact same shape as `ids`</span>
+<span class="n">table_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="c1"># This means to query `488, 18` in the zeroth table, `333, 568` in the first table, and the corresponding feature vector of `220, 508` in the second table.</span>
+<span class="n">embedding_lookup</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">table_ids</span><span class="p">)</span>
 </code></pre></div>
-<p>If you want to load a Embedding table from a stored snapshot, you should call <code>MultiTableEmbedding.load_snapshot</code>.</p>
-<p>For more detailed information, please refer to <a href="">MultiTableEmbedding.save_snapshot</a> and <a href="">MultiTableEmbedding.load_snapshot</a>.</p>
-<h2 id="dynamically-insert-new-feature-id">Dynamically insert New Feature ID<a class="headerlink" href="#dynamically-insert-new-feature-id" title="Permanent link">&para;</a></h2>
-<p>It is important to note that OneEmbedding supports dynamic insertion of new feature ID. As long as the storage medium has sufficient capacity, there is no upper limit on the number of feature IDs. Specifically, when querying, the feature ID can go beyond the scope when the Embedding table was created.</p>
-<p>For example, in the above codes, the Embedding table was cerated with the size of <code>39940739</code> （<code>vocab_size = sum(table_size_array)</code>), but during training, it is legal even if the <code>ids</code> in <code>embedding = self.embedding_lookup(ids)</code> exceeds <code>39940739</code>.</p>
+For more details, please refer to  <a href="https://oneflow.readthedocs.io/en/master/one_embedding.html#oneflow.one_embedding.MultiTableEmbedding.forward">MultiTableEmbedding.forward</a>.</p>
+<h3 id="how-to-choose-the-proper-storage-configuration">How to Choose the Proper Storage Configuration<a class="headerlink" href="#how-to-choose-the-proper-storage-configuration" title="Permanent link">&para;</a></h3>
+<p>OneEmbedding provides three storage options configurations,they are pure GPU storage, use CPU memory to store and GPU memory as cache and use SSD to store and GPU memory as cache.</p>
+<ul>
+<li>
+<p>Pure GPU storage</p>
+<p>When the size of Embedding table is smaller than the GPU memory, it is the fastest to place all the Embedding table on the GPU memory. In this case, it is recommended to select the pure GPU storage configuration.</p>
+</li>
+<li>
+<p>Use CPU memory to store and GPU memory as cache</p>
+<p>When the size of Embedding table is larger than the GPU memory, but smaller than the CPU memory, it is recommended to store the Embedding table in the CPU memory and use the GPU memory as cache. </p>
+</li>
+<li>
+<p>Use SSD to store and GPU memory as cache</p>
+<p>When the size of Embedding table is larger than both the GPU memory and the system memory, if you have a high-speed SSD, you can choose to store the Embedding table in the SSD and use the GPU memory as a cache. In this case, frequent data reading and writing will be performed on the stored vocabulary during the training process, so the random reading and writing speed of files under the path set by <code>persistent_path</code> has a great impact on the overall performance. It is strongly recommended to use a high-performance SSD. If you use a normal disk, it will have a great negative impact on the overall performance.</p>
+</li>
+</ul>
+<h3 id="distributed-training">Distributed Training<a class="headerlink" href="#distributed-training" title="Permanent link">&para;</a></h3>
+<p>Similar to other modules of OneFlow, OneEmbedding supports distributed expansion natively. Users can refer to the README in <a href="https://github.com/Oneflow-Inc/models/tree/main/RecommenderSystems/dlrm">#dlrm</a> to start DLRM distributed training. You can also refer to <a href="../parallelism/03_consistent_tensor.html">Global Tensor</a> for necessary prerequisites.</p>
+<p>When using the OneEmbedding module for distributed expansion, please be careful:</p>
+<ul>
+<li>Currently, OneEmbedding only supports placement on all devices, and the parallelism must be the same as the world size. For example, when training with 4 cards in parallel, the parallelism of the Embedding table must be 4. It is not supported when the network is trained with 4 cards but the Embedding table parallelism is 2.</li>
+<li>The <code>persistent_path</code> parameter in the <code>store_options</code> configuration specifies the path of the storage. In parallel scenarios, it can be either a string representing a path or a <code>list</code>. If configured as a string representing a path, it represents the root directory under each rank in distributed parallelism. OneFlow will create a storage path based on the number of each rank under this root path, and the name format is <code>rank_id-num_rank</code>. If <code>persistent_path</code> is a <code>list</code>, rank will be configured individually for each item in the list.</li>
+<li>In parallel scenarios, the <code>capacity</code> in the <code>store_options</code> configuration represents the capacity of total Embedding table, but not the capacity of each rank. <code>cache_budget_mb</code> represents the video memory per GPU device.</li>
+</ul>
 <h2 id="extended-reading-dlrm">Extended Reading: DLRM<a class="headerlink" href="#extended-reading-dlrm" title="Permanent link">&para;</a></h2>
 <p>This article shows how to get started with OneEmbedding quickly.</p>
 <p>Practical examples of OneEmbedding in DLRM tasks are prepared in the OneFlow model repository, please refer to <a href="https://github.com/Oneflow-Inc/models/tree/main/RecommenderSystems/dlrm">https://github.com/Oneflow-Inc/models/tree/main/RecommenderSystems/dlrm</a></p>
@@ -931,6 +1196,41 @@
       
         
 <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="transfer_learning.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: Transfer Learning in Computer Vision" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Transfer Learning in Computer Vision
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="zero.html" class="md-footer__link md-footer__link--next" aria-label="Next: Zero Redundancy Optimizer (ZeRO)" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Zero Redundancy Optimizer (ZeRO)
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">

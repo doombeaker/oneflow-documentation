@@ -14,7 +14,7 @@
         <link rel="canonical" href="https://docs.oneflow.org/master/parallelism/04_2d-sbp.html">
       
       <link rel="icon" href="../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.1.11">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.1.11">
     
     
       
@@ -251,7 +251,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../cookies/oneflow2onnnx.html" class="md-tabs__link">
+      <a href="../cookies/global_tensor.html" class="md-tabs__link">
         实践指南
       </a>
     </li>
@@ -267,7 +267,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="https://start.oneflow.org/oneflow-api-cn/" class="md-tabs__link">
+      <a href="https://oneflow.readthedocs.io/en/master/" class="md-tabs__link">
         API
       </a>
     </li>
@@ -671,6 +671,18 @@
   
   
     <li class="md-nav__item">
+      <a href="../cookies/global_tensor.html" class="md-nav__link">
+        使用 Global Tensor 进行多机多设备编程 基础操作
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../cookies/oneflow2onnnx.html" class="md-nav__link">
         OneFlow 与 ONNX 交互
       </a>
@@ -695,6 +707,30 @@
   
   
     <li class="md-nav__item">
+      <a href="../cookies/amp.html" class="md-nav__link">
+        自动混合精度训练
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cookies/activation_checkpointing.html" class="md-nav__link">
+        Activation Checkpointing
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../cookies/torch2flow.html" class="md-nav__link">
         将 PyTorch 预训练模型转为 OneFlow 格式
       </a>
@@ -707,8 +743,32 @@
   
   
     <li class="md-nav__item">
+      <a href="../cookies/transfer_learning.html" class="md-nav__link">
+        计算机视觉迁移学习
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../cookies/one_embedding.html" class="md-nav__link">
         大规模 Embedding 方案： OneEmbedding
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cookies/zero.html" class="md-nav__link">
+        Zero Redundancy Optimizer (ZeRO)
       </a>
     </li>
   
@@ -749,7 +809,7 @@
   
   
     <li class="md-nav__item">
-      <a href="https://start.oneflow.org/oneflow-api-cn/" class="md-nav__link">
+      <a href="https://oneflow.readthedocs.io/en/master/" class="md-nav__link">
         API
       </a>
     </li>
@@ -836,7 +896,7 @@
 <p>阅读 <a href="02_sbp.html">集群的全局视角</a> 和 <a href="03_consistent_tensor.html">Global Tensor</a> 之后，相信你已经掌握了 SBP 和 SBP Signature 的基本概念，并且能够上手相关的编程任务。实际上，以上资料中涉及都是 <strong>1D SBP</strong>。</p>
 <p>本文将在读者掌握 1D SBP 的基础上，介绍 2D SBP，它能够更灵活地应对更复杂的分布式训练场景。</p>
 <h2 id="2d">2D 设备阵列<a class="headerlink" href="#2d" title="Permanent link">&para;</a></h2>
-<p>我们已经熟悉 1D SBP 的 placement 配置，在 1D SBP 的场景下，通过 <a href="https://start.oneflow.org/oneflow-api-cn/placement.html#oneflow.placement">oneflow.placement</a> 接口配置集群，比如使用集群中的第 0~3 号 GPU 显卡：</p>
+<p>我们已经熟悉 1D SBP 的 placement 配置，在 1D SBP 的场景下，通过 <a href="https://oneflow.readthedocs.io/en/v0.8.1/tensor_attributes.html?highlight=oneflow.placement#oneflow-placement">oneflow.placement</a> 接口配置集群，比如使用集群中的第 0~3 号 GPU 显卡：</p>
 <div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">placement1</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">placement</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">ranks</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
 </code></pre></div>
 <p>以上的 <code>"cuda"</code> 指定了设备类型，<code>ranks=[0, 1, 2, 3]</code> 指定了集群中的计算设备。其实，<code>ranks</code> 不仅可以是一维的int list，还可以是多维的int数组：</p>

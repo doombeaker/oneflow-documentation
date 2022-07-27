@@ -14,7 +14,7 @@
         <link rel="canonical" href="https://docs.oneflow.org/master/parallelism/03_consistent_tensor.html">
       
       <link rel="icon" href="../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.1.11">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.1.11">
     
     
       
@@ -69,7 +69,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#consistent-tensor" class="md-skip">
+        <a href="#global-tensor" class="md-skip">
           Skip to content
         </a>
       
@@ -251,7 +251,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../cookies/oneflow2onnnx.html" class="md-tabs__link">
+      <a href="../cookies/global_tensor.html" class="md-tabs__link">
         Cookbook
       </a>
     </li>
@@ -738,8 +738,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../cookies/global_tensor.html" class="md-nav__link">
+        Basic Operations for Using Global Tensor to Program on Cluster
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../cookies/oneflow2onnnx.html" class="md-nav__link">
-        Onelow with ONNX
+        OneFlow with ONNX
       </a>
     </li>
   
@@ -762,8 +774,68 @@
   
   
     <li class="md-nav__item">
+      <a href="../cookies/amp.html" class="md-nav__link">
+        Automatic Mixed Precision Training
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cookies/activation_checkpointing.html" class="md-nav__link">
+        Activation Checkpointing
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../cookies/torch2flow.html" class="md-nav__link">
         Converting Pre-trained Model from PyTorch to OneFlow
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cookies/transfer_learning.html" class="md-nav__link">
+        Transfer Learning in Computer Vision
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cookies/one_embedding.html" class="md-nav__link">
+        Large-Scale Embedding Solution OneEmbedding
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cookies/zero.html" class="md-nav__link">
+        Zero Redundancy Optimizer (ZeRO)
       </a>
     </li>
   
@@ -954,7 +1026,7 @@
                   </a>
                 
                 
-                <h1 id="consistent-tensor">CONSISTENT TENSOR<a class="headerlink" href="#consistent-tensor" title="Permanent link">&para;</a></h1>
+                <h1 id="global-tensor">GLOBAL TENSOR<a class="headerlink" href="#global-tensor" title="Permanent link">&para;</a></h1>
 <h2 id="the-mapping-between-global-view-and-physical-view">The Mapping Between Global View and Physical View<a class="headerlink" href="#the-mapping-between-global-view-and-physical-view" title="Permanent link">&para;</a></h2>
 <h2 id="create-global-tensor">Create Global Tensor<a class="headerlink" href="#create-global-tensor" title="Permanent link">&para;</a></h2>
 <p>To interactively experience global tensor on a two-GPU machine, you can launch python separately in two consoles in the following way.</p>
@@ -1081,12 +1153,12 @@ python3
 </div>
 <p><code>flow.matmul</code> supports many SBP signatures of inputs. When the SBP of <code>x</code> and <code>w</code> are <code>split(0)</code> and <code>broadcast</code> respectively, the SBP of output <code>y</code> is <code>split(0)</code> with logical shape of <code>(4, 8)</code>. Output:</p>
 <div class="tabbed-set" data-tabs="7:2"><input checked="checked" id="__tabbed_7_1" name="__tabbed_7" type="radio" /><label for="__tabbed_7_1">Terminal 0</label><div class="tabbed-content">
-<div class="highlight"><pre><span></span><code>(oneflow.sbp.split(axis=0),)
+<div class="highlight"><pre><span></span><code>(oneflow.sbp.split(dim=0),)
 flow.Size([4, 8])
 </code></pre></div>
 </div>
 <input id="__tabbed_7_2" name="__tabbed_7" type="radio" /><label for="__tabbed_7_2">Terminal 1</label><div class="tabbed-content">
-<div class="highlight"><pre><span></span><code>(oneflow.sbp.split(axis=0),)
+<div class="highlight"><pre><span></span><code>(oneflow.sbp.split(dim=0),)
 flow.Size([4, 8])
 </code></pre></div>
 </div>

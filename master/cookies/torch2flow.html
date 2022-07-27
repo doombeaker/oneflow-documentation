@@ -14,7 +14,7 @@
         <link rel="canonical" href="https://docs.oneflow.org/master/cookies/torch2flow.html">
       
       <link rel="icon" href="../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.1.11">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.1.11">
     
     
       
@@ -251,7 +251,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="oneflow2onnnx.html" class="md-tabs__link md-tabs__link--active">
+      <a href="global_tensor.html" class="md-tabs__link md-tabs__link--active">
         实践指南
       </a>
     </li>
@@ -267,7 +267,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="https://start.oneflow.org/oneflow-api-cn/" class="md-tabs__link">
+      <a href="https://oneflow.readthedocs.io/en/master/" class="md-tabs__link">
         API
       </a>
     </li>
@@ -610,6 +610,18 @@
   
   
     <li class="md-nav__item">
+      <a href="global_tensor.html" class="md-nav__link">
+        使用 Global Tensor 进行多机多设备编程 基础操作
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="oneflow2onnnx.html" class="md-nav__link">
         OneFlow 与 ONNX 交互
       </a>
@@ -624,6 +636,30 @@
     <li class="md-nav__item">
       <a href="serving.html" class="md-nav__link">
         模型部署
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="amp.html" class="md-nav__link">
+        自动混合精度训练
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="activation_checkpointing.html" class="md-nav__link">
+        Activation Checkpointing
       </a>
     </li>
   
@@ -693,8 +729,32 @@
   
   
     <li class="md-nav__item">
+      <a href="transfer_learning.html" class="md-nav__link">
+        计算机视觉迁移学习
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="one_embedding.html" class="md-nav__link">
         大规模 Embedding 方案： OneEmbedding
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="zero.html" class="md-nav__link">
+        Zero Redundancy Optimizer (ZeRO)
       </a>
     </li>
   
@@ -735,7 +795,7 @@
   
   
     <li class="md-nav__item">
-      <a href="https://start.oneflow.org/oneflow-api-cn/" class="md-nav__link">
+      <a href="https://oneflow.readthedocs.io/en/master/" class="md-nav__link">
         API
       </a>
     </li>
@@ -818,7 +878,7 @@
     <span class="n">nn</span><span class="o">.</span><span class="n">Softmax</span><span class="p">()</span>
 <span class="p">)</span>
 
-<span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">save_file</span><span class="p">)</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model_torch</span><span class="p">,</span> <span class="n">save_file</span><span class="p">)</span>
 </code></pre></div>
 <p>运行以上代码，将得到 PyTorch 模型文件 <code>model.pth</code> 。将它转为 OneFlow 版本的模型包括两个主要步骤：</p>
 <ul>
@@ -888,7 +948,7 @@
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
         
-        <a href="serving.html" class="md-footer__link md-footer__link--prev" aria-label="上一页: 模型部署" rel="prev">
+        <a href="activation_checkpointing.html" class="md-footer__link md-footer__link--prev" aria-label="上一页: Activation Checkpointing" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
           </div>
@@ -897,20 +957,20 @@
               <span class="md-footer__direction">
                 上一页
               </span>
-              模型部署
+              Activation Checkpointing
             </div>
           </div>
         </a>
       
       
         
-        <a href="one_embedding.html" class="md-footer__link md-footer__link--next" aria-label="下一页: 大规模 Embedding 方案： OneEmbedding" rel="next">
+        <a href="transfer_learning.html" class="md-footer__link md-footer__link--next" aria-label="下一页: 计算机视觉迁移学习" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 下一页
               </span>
-              大规模 Embedding 方案： OneEmbedding
+              计算机视觉迁移学习
             </div>
           </div>
           <div class="md-footer__button md-icon">

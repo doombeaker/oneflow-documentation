@@ -14,7 +14,7 @@
         <link rel="canonical" href="https://docs.oneflow.org/master/basics/01_quickstart.html">
       
       <link rel="icon" href="../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.1.11">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.1.11">
     
     
       
@@ -251,7 +251,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../cookies/oneflow2onnnx.html" class="md-tabs__link">
+      <a href="../cookies/global_tensor.html" class="md-tabs__link">
         实践指南
       </a>
     </li>
@@ -267,7 +267,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="https://start.oneflow.org/oneflow-api-cn/" class="md-tabs__link">
+      <a href="https://oneflow.readthedocs.io/en/master/" class="md-tabs__link">
         API
       </a>
     </li>
@@ -678,6 +678,18 @@
   
   
     <li class="md-nav__item">
+      <a href="../cookies/global_tensor.html" class="md-nav__link">
+        使用 Global Tensor 进行多机多设备编程 基础操作
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../cookies/oneflow2onnnx.html" class="md-nav__link">
         OneFlow 与 ONNX 交互
       </a>
@@ -702,6 +714,30 @@
   
   
     <li class="md-nav__item">
+      <a href="../cookies/amp.html" class="md-nav__link">
+        自动混合精度训练
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cookies/activation_checkpointing.html" class="md-nav__link">
+        Activation Checkpointing
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../cookies/torch2flow.html" class="md-nav__link">
         将 PyTorch 预训练模型转为 OneFlow 格式
       </a>
@@ -714,8 +750,32 @@
   
   
     <li class="md-nav__item">
+      <a href="../cookies/transfer_learning.html" class="md-nav__link">
+        计算机视觉迁移学习
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../cookies/one_embedding.html" class="md-nav__link">
         大规模 Embedding 方案： OneEmbedding
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cookies/zero.html" class="md-nav__link">
+        Zero Redundancy Optimizer (ZeRO)
       </a>
     </li>
   
@@ -756,7 +816,7 @@
   
   
     <li class="md-nav__item">
-      <a href="https://start.oneflow.org/oneflow-api-cn/" class="md-nav__link">
+      <a href="https://oneflow.readthedocs.io/en/master/" class="md-nav__link">
         API
       </a>
     </li>
@@ -888,7 +948,7 @@ Extracting data/FashionMNIST/raw/train-images-idx3-ubyte.gz to data/FashionMNIST
 ...
 </code></pre></div>
 <p>数据集下载并解压到 <code>./data</code> 目录下。</p>
-<p>利用 <a href="https://oneflow.readthedocs.io/en/master/utils.html#oneflow.utils.data.DataLoader">oneflow.utils.data.DataLoader</a> 可以将 <code>dataset</code> 封装为迭代器，方便后续训练。</p>
+<p>利用 <a href="https://oneflow.readthedocs.io/en/v0.8.1/utils.data.html?highlight=oneflow.utils.data.DataLoader#oneflow.utils.data.DataLoader">oneflow.utils.data.DataLoader</a> 可以将 <code>dataset</code> 封装为迭代器，方便后续训练。</p>
 <div class="highlight"><pre><span></span><code><span class="n">train_dataloader</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
     <span class="n">training_data</span><span class="p">,</span> <span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>

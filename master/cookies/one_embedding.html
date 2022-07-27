@@ -14,7 +14,7 @@
         <link rel="canonical" href="https://docs.oneflow.org/master/cookies/one_embedding.html">
       
       <link rel="icon" href="../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.1.11">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.1.11">
     
     
       
@@ -251,7 +251,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="oneflow2onnnx.html" class="md-tabs__link md-tabs__link--active">
+      <a href="global_tensor.html" class="md-tabs__link md-tabs__link--active">
         实践指南
       </a>
     </li>
@@ -267,7 +267,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="https://start.oneflow.org/oneflow-api-cn/" class="md-tabs__link">
+      <a href="https://oneflow.readthedocs.io/en/master/" class="md-tabs__link">
         API
       </a>
     </li>
@@ -610,6 +610,18 @@
   
   
     <li class="md-nav__item">
+      <a href="global_tensor.html" class="md-nav__link">
+        使用 Global Tensor 进行多机多设备编程 基础操作
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="oneflow2onnnx.html" class="md-nav__link">
         OneFlow 与 ONNX 交互
       </a>
@@ -634,8 +646,44 @@
   
   
     <li class="md-nav__item">
+      <a href="amp.html" class="md-nav__link">
+        自动混合精度训练
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="activation_checkpointing.html" class="md-nav__link">
+        Activation Checkpointing
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="torch2flow.html" class="md-nav__link">
         将 PyTorch 预训练模型转为 OneFlow 格式
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="transfer_learning.html" class="md-nav__link">
+        计算机视觉迁移学习
       </a>
     </li>
   
@@ -775,6 +823,18 @@
   
 
           
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="zero.html" class="md-nav__link">
+        Zero Redundancy Optimizer (ZeRO)
+      </a>
+    </li>
+  
+
+          
         </ul>
       </nav>
     </li>
@@ -810,7 +870,7 @@
   
   
     <li class="md-nav__item">
-      <a href="https://start.oneflow.org/oneflow-api-cn/" class="md-nav__link">
+      <a href="https://oneflow.readthedocs.io/en/master/" class="md-nav__link">
         API
       </a>
     </li>
@@ -955,7 +1015,7 @@
                 
                 
                 <h1 id="embedding-oneembedding">大规模 Embedding 方案： OneEmbedding<a class="headerlink" href="#embedding-oneembedding" title="Permanent link">&para;</a></h1>
-<p>Embedding 已经成为推荐系统的基本操作，也扩散到了推荐系统外的许多领域。各个框架都提供了进行 embedding 的基础算子，比如，可以使用 OneFlow 中的 <code>flow.nn.Embedding</code>：</p>
+<p>Embedding 是推荐系统的重要组件，也扩散到了推荐系统外的许多领域。各个框架都提供了进行 embedding 的基础算子，比如 OneFlow 中的 <code>flow.nn.Embedding</code>：</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">oneflow</span> <span class="k">as</span> <span class="nn">flow</span>
 <span class="n">indices</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">9</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
@@ -966,7 +1026,7 @@
 <p>与普通的算子相比，OneEmbedding 有以下特点：</p>
 <ol>
 <li>
-<p>灵活的分层存储，支持将 Embedding table 放置在 GPU显存、CPU内存 、或者 SSD 上面，使用高速设备作为低速设备的缓存，实现速度与容量的兼顾。</p>
+<p>灵活的分层存储，支持将 Embedding table 放置在 GPU 显存、 CPU 内存或者 SSD 上面，允许使用高速设备作为低速设备的缓存，实现速度与容量的兼顾。</p>
 </li>
 <li>
 <p>支持动态扩容。</p>
@@ -999,7 +1059,7 @@
 <span class="p">]</span>
 </code></pre></div>
 <p>配置词表时需要指定初始化的方式，以上词表均采用 <code>uniform</code> 方式初始化。配置词表的结果保存在 <code>tables</code> 变量中。</p>
-<p>点击 <a href="">make_table_options</a> 及 <a href="">make_uniform_initializer</a> 可以查看有关它们的更详细说明。</p>
+<p>点击 <a href="https://oneflow.readthedocs.io/en/master/one_embedding.html#oneflow.one_embedding.make_table_options">make_table_options</a> 及 <a href="https://oneflow.readthedocs.io/en/master/one_embedding.html#oneflow.one_embedding.make_uniform_initializer">make_uniform_initializer</a> 可以查看有关它们的更详细说明。</p>
 <h3 id="_1">配置词表的存储属性<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
 <p>接着运行以下代码，用于配置词表的存储属性：</p>
 <div class="highlight"><pre><span></span><code><span class="n">store_options</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">one_embedding</span><span class="o">.</span><span class="n">make_cached_ssd_store_options</span><span class="p">(</span>
@@ -1010,8 +1070,8 @@
     <span class="n">physical_block_size</span><span class="o">=</span><span class="mi">512</span>
 <span class="p">)</span>
 </code></pre></div>
-<p>这里通过调用 <code>make_cached_ssd_store_options</code>，选择将词表存储在 SSD 中，并且使用 GPU 作为高速缓存。具体参数的意义可以参阅 <a href="">make_cached_ssd_store_options API 文档</a>。</p>
-<p>此外，还可以选择使用纯 GPU 存储；或者使用 CPU 内存存储词表、但用 GPU 做高速缓存。具体可以分别参阅 <a href="">make_cached_ssd_store_options</a> 及 <a href="">make_cached_host_mem_store_option</a>。</p>
+<p>这里通过调用 <code>make_cached_ssd_store_options</code>，选择将词表存储在 SSD 中，并且使用 GPU 作为高速缓存。具体参数的意义可以参阅 <a href="https://oneflow.readthedocs.io/en/master/one_embedding.html#oneflow.one_embedding.make_cached_ssd_store_options">make_cached_ssd_store_options API 文档</a>。</p>
+<p>此外，还可以选择使用纯 GPU 存储；或者使用 CPU 内存存储词表、但用 GPU 做高速缓存。具体可以分别参阅 <a href="https://oneflow.readthedocs.io/en/master/one_embedding.html#oneflow.one_embedding.make_device_mem_store_options">make_device_mem_store_options</a> 及 <a href="https://oneflow.readthedocs.io/en/master/one_embedding.html#oneflow.one_embedding.make_cached_host_mem_store_options">make_cached_host_mem_store_options</a>。</p>
 <h3 id="embedding">实例化 Embedding<a class="headerlink" href="#embedding" title="Permanent link">&para;</a></h3>
 <p>以上配置完成后，使用 <code>MultiTableEmbedding</code> 可以得到实例化的 Embedding 层。</p>
 <div class="highlight"><pre><span></span><code><span class="n">embedding_size</span> <span class="o">=</span> <span class="mi">128</span>
@@ -1027,7 +1087,7 @@
 <span class="n">embedding</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
 </code></pre></div>
 <p>其中，<code>tables</code> 是之前通过 <code>make_table_options</code> 配置的词表属性，<code>store_options</code> 是之前配置的存储属性，<code>embedding_dim</code> 是特征维度，<code>dtype</code> 是特征向量的数据类型，<code>key_type</code> 是特征 ID 的数据类型。</p>
-<p>更详细的信息，可以参阅 <a href="">one_embedding.MultiTableEmbedding</a></p>
+<p>如果同时创建了两个 OneEmbedding，在实例化时需要设置不同的 name 和 persistent path 参数。 更详细的信息，可以参阅 <a href="https://oneflow.readthedocs.io/en/master/one_embedding.html#oneflow.one_embedding.MultiTableEmbedding">one_embedding.MultiTableEmbedding</a></p>
 <h3 id="graph">使用 Graph 训练<a class="headerlink" href="#graph" title="Permanent link">&para;</a></h3>
 <p>目前 OneEmbedding 仅支持在 Graph 模式下使用。</p>
 <p>在以下的例子中，我们构建了一个简单的 Graph 类，它包括了 <code>embedding</code> 和 <code>mlp</code> 两层。</p>
@@ -1070,31 +1130,44 @@
 <h3 id="id">特征 ID 动态扩容<a class="headerlink" href="#id" title="Permanent link">&para;</a></h3>
 <p>OneEmbedding 支持动态插入新的特征 ID，只要存储介质的容量足够，特征 ID 的数目是没有上限的。这也是为什么在使用 <code>make_table_options</code> 时，只需要指定初始化方式，不需要指定特征 ID 的总数目（词表行数）。</p>
 <h3 id="id_1">特征 ID 与多表查询<a class="headerlink" href="#id_1" title="Permanent link">&para;</a></h3>
-<p><strong>特征ID 不能重复</strong></p>
-<p>制作数据集的 OneEmbedding 用户需要格外注意：使用 <code>MultiTableEmbedding</code> 同时创建多个表时，<strong>多个表中的特征 ID 不能重复</strong> 。</p>
+<p><strong>特征 ID 不能重复</strong></p>
+<p>制作数据集的 OneEmbedding 用户需要格外注意：使用 <code>MultiTableEmbedding</code> 同时创建多个表时，多个 Embedding Table 仅初始化参数不同，其他参数一致，此时，<strong>多个表中的特征 ID 不能重复</strong> 。</p>
 <p><strong>多表查询</strong></p>
 <p>如果使用 <code>MultiTableEmbedding</code> 只配置了一个表，则查询方式与普通的 Embedding 查询方式没有区别，直接调用，并传递特征 ID 即可，如 <code>embedding_lookup(ids)</code>。</p>
 <p>如果使用 <code>MultiTableEmbedding</code> 配置了多个表，则对于某个特征 ID，需要指明在哪个表中查询，有两种方式指明：</p>
-<p>方法一：传递一个形状为 <code>(batch_size, 表格数目)</code> 的 <code>ids</code> 用于查询，则这个 <code>ids</code> 的列，依次对应一个表格。</p>
-<p>比如：<code>ids = np.array([[488, 333, 220], [18, 568, 508]], dtype=np.int64)</code>，表示在第 0 个表中查询 <code>[[488], [18]]</code>，第 1 个表中查询 <code>[[333], [568]]</code>，第 2 个表中查询 <code>[[220], [508]]</code> 对应的特征向量。</p>
+<p>方法一：传递一个形状为 <code>(batch_size, 词表数目)</code> 的 <code>ids</code> 用于查询，则这个 <code>ids</code> 的列，依次对应一个词表。</p>
+<p>比如：
+<div class="highlight"><pre><span></span><code><span class="n">ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">488</span><span class="p">,</span> <span class="mi">333</span><span class="p">,</span> <span class="mi">220</span><span class="p">],</span> <span class="p">[</span><span class="mi">18</span><span class="p">,</span> <span class="mi">568</span><span class="p">,</span> <span class="mi">508</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+<span class="c1"># 表示在第 0 个表中查询 `[[488], [18]]`，第 1 个表中查询 `[[333], [568]]`，第 2 个表中查询 `[[220], [508]]` 对应的特征向量。</span>
+<span class="n">embedding_lookup</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+</code></pre></div></p>
 <p>方法二：传递 <code>ids</code> 参数的同时，再传递一个 <code>table_ids</code> 参数，它的形状与 <code>ids</code> 完全相同，在 <code>table_ids</code> 中指定表的序号。</p>
-<p>比如：<code>ids = np.array([488, 333, 220, 18, 568, 508], dtype=np.int64)</code>，<code>table_ids = np.array([0, 1, 2, 0, 1, 2])</code>，然后调用： <code>embedding_lookup(ids, table_ids)</code>，则表示在第 0 个表中查询 <code>488, 18</code>，第 1 个表中查询 <code>333, 568</code>，第 2 个表中查询 <code>220, 508</code> 对应的特征向量。</p>
-<p>更详细的说明，可以参阅 <a href="">MultiTableEmbedding.forward</a></p>
+<p>比如：
+<div class="highlight"><pre><span></span><code><span class="n">ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">488</span><span class="p">,</span> <span class="mi">333</span><span class="p">,</span> <span class="mi">220</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">568</span><span class="p">,</span> <span class="mi">508</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+<span class="c1"># table_ids的shape与ids保持一致</span>
+<span class="n">table_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="c1"># 表示在第 0 个表中查询 `488, 18`，第 1 个表中查询 `333, 568`，第 2 个表中查询 `220, 508` 对应的特征向量。</span>
+<span class="n">embedding_lookup</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">table_ids</span><span class="p">)</span>
+</code></pre></div></p>
+<p>更详细的说明，可以参阅 <a href="https://oneflow.readthedocs.io/en/master/one_embedding.html#oneflow.one_embedding.MultiTableEmbedding.forward">MultiTableEmbedding.forward</a></p>
 <h3 id="_2">如何选择合适的存储配置<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
-<p>OneEmbedding 提供了三种存储选项配置：</p>
+<p>OneEmbedding 提供了三种存储选项配置，分别是纯 GPU 存储， 存储在 CPU 内存中并使用 GPU 显存作为高速缓存和存储在 SSD 中，并使用 GPU 显存作为高速缓存。</p>
 <ul>
-<li>纯 GPU 存储</li>
-<li>存储在 CPU 内存中，并使用 GPU 显存作为高速缓存</li>
-<li>存储在 SSD 中，并使用 GPU 显存作为告诉缓存</li>
-</ul>
-<p>用户可以根据实际情况选择最优的方案，一般选择的依据是：</p>
-<ul>
-<li>当词表大小小于 GPU 显存时，将全部词表放在 GPU 显存上是最快的，此时推荐选择纯 GPU 存储配置。</li>
-<li>当词表大于 GPU 显存，但是小于 CPU 内存时，推荐词表存储在 CPU 内存中，并使用 GPU 显存作为高速缓存。</li>
-<li>当词表大小既大于 GPU 显存，也大于系统内存时，如果有高速的 SSD，可以选择将词表存储在SSD中，并使用 GPU 显存作为高速缓存。在此情况下，训练过程中会对存储的词表进行频繁的数据读写，因此 <code>persistent_path</code> 所设置路径下的文件随机读写速度对整体性能影响很大。强烈推荐使用高性能的 SSD，如果使用普通磁盘，会对性能有很大负面影响。</li>
+<li>
+<p>纯 GPU 存储</p>
+<p>当词表大小小于 GPU 显存时，将全部词表放在 GPU 显存上是最快的，此时推荐选择纯 GPU 存储配置。</p>
+</li>
+<li>
+<p>存储在 CPU 内存中，并使用 GPU 显存作为高速缓存</p>
+<p>当词表大于 GPU 显存，但是小于 CPU 内存时，推荐词表存储在 CPU 内存中，并使用 GPU 显存作为高速缓存。</p>
+</li>
+<li>
+<p>存储在 SSD 中，并使用 GPU 显存作为高速缓存</p>
+<p>当词表大小既大于 GPU 显存，也大于系统内存时，如果有高速的 SSD，可以选择将词表存储在 SSD 中，并使用 GPU 显存作为高速缓存。在此情况下，训练过程中会对存储的词表进行频繁的数据读写，因此 <code>persistent_path</code> 所设置路径下的文件随机读写速度对整体性能影响很大。强烈推荐使用高性能的 SSD，如果使用普通磁盘，会对性能有很大负面影响。</p>
+</li>
 </ul>
 <h3 id="_3">分布式训练<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
-<p>OneEmbedding 同 OneFlow 的其它模块类似，都原生支持分布式扩展。用户可以参考 <a href="扩展阅读：DLRM">#dlrm</a> 中的 README， 启动 DLRM 分布式训练。还可以参考 <a href="../parallelism/03_consistent_tensor.html">Global Tensor</a> 了解必要的前置知识。</p>
+<p>OneEmbedding 同 OneFlow 的其它模块类似，都原生支持分布式扩展。用户可以参考 <a href="https://github.com/Oneflow-Inc/models/tree/main/RecommenderSystems/dlrm">#dlrm</a> 中的 README， 启动 DLRM 分布式训练。还可以参考 <a href="../parallelism/03_consistent_tensor.html">Global Tensor</a> 了解必要的前置知识。</p>
 <p>使用 OneEmbedding 模块进行分布式扩展，要注意：</p>
 <ul>
 <li>目前 OneEmbedding 只支持放置在全部设备上，并行度需和 world size 一致。比如，在 4 卡并行训练时，词表的并行度必须为 4，暂不支持网络使用 4 卡训练但词表并行度为 2 的场景。</li>
@@ -1102,8 +1175,8 @@
 <li>在并行场景中，<code>store_options</code> 配置中的 <code>capacity</code> 代表词表总容量，而不是每个 rank 的容量。<code>cache_budget_mb</code> 代表每个 GPU 设备的显存。</li>
 </ul>
 <h2 id="dlrm">扩展阅读：DLRM<a class="headerlink" href="#dlrm" title="Permanent link">&para;</a></h2>
-<p>本文展示了如何快速上手 OneEmbedding。</p>
-<p>OneFlow 模型仓库中准备了关于 OneEmbedding 在 DLRM 任务的实际例子，可供参考：<a href="https://github.com/Oneflow-Inc/models/tree/main/RecommenderSystems/dlrm">https://github.com/Oneflow-Inc/models/tree/main/RecommenderSystems/dlrm</a></p>
+<p>本文展示了如何快速上手 OneEmbedding。
+OneFlow 模型仓库中准备了关于 OneEmbedding 在 DLRM 任务的实际例子，可供参考：<a href="https://github.com/Oneflow-Inc/models/tree/main/RecommenderSystems/dlrm">https://github.com/Oneflow-Inc/models/tree/main/RecommenderSystems/dlrm</a></p>
                 
               
               
@@ -1128,7 +1201,7 @@
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
         
-        <a href="torch2flow.html" class="md-footer__link md-footer__link--prev" aria-label="上一页: 将 PyTorch 预训练模型转为 OneFlow 格式" rel="prev">
+        <a href="transfer_learning.html" class="md-footer__link md-footer__link--prev" aria-label="上一页: 计算机视觉迁移学习" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
           </div>
@@ -1137,11 +1210,26 @@
               <span class="md-footer__direction">
                 上一页
               </span>
-              将 PyTorch 预训练模型转为 OneFlow 格式
+              计算机视觉迁移学习
             </div>
           </div>
         </a>
       
+      
+        
+        <a href="zero.html" class="md-footer__link md-footer__link--next" aria-label="下一页: Zero Redundancy Optimizer (ZeRO)" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                下一页
+              </span>
+              Zero Redundancy Optimizer (ZeRO)
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
       
     </nav>
   

@@ -14,11 +14,11 @@
         <link rel="canonical" href="https://docs.oneflow.org/master/cookies/oneflow2onnnx.html">
       
       <link rel="icon" href="../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.1.11">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.1.11">
     
     
       
-        <title>Onelow with ONNX - OneFlow</title>
+        <title>OneFlow with ONNX - OneFlow</title>
       
     
     
@@ -104,7 +104,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Onelow with ONNX
+              OneFlow with ONNX
             
           </span>
         </div>
@@ -251,7 +251,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="oneflow2onnnx.html" class="md-tabs__link md-tabs__link--active">
+      <a href="global_tensor.html" class="md-tabs__link md-tabs__link--active">
         Cookbook
       </a>
     </li>
@@ -608,6 +608,18 @@
             
   
   
+  
+    <li class="md-nav__item">
+      <a href="global_tensor.html" class="md-nav__link">
+        Basic Operations for Using Global Tensor to Program on Cluster
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
     
   
   
@@ -620,12 +632,12 @@
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          Onelow with ONNX
+          OneFlow with ONNX
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="oneflow2onnnx.html" class="md-nav__link md-nav__link--active">
-        Onelow with ONNX
+        OneFlow with ONNX
       </a>
       
         
@@ -748,8 +760,68 @@
   
   
     <li class="md-nav__item">
+      <a href="amp.html" class="md-nav__link">
+        Automatic Mixed Precision Training
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="activation_checkpointing.html" class="md-nav__link">
+        Activation Checkpointing
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="torch2flow.html" class="md-nav__link">
         Converting Pre-trained Model from PyTorch to OneFlow
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="transfer_learning.html" class="md-nav__link">
+        Transfer Learning in Computer Vision
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="one_embedding.html" class="md-nav__link">
+        Large-Scale Embedding Solution OneEmbedding
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="zero.html" class="md-nav__link">
+        Zero Redundancy Optimizer (ZeRO)
       </a>
     </li>
   
@@ -1001,11 +1073,18 @@
 <p>In this section, the process of exporting a OneFlow model to an ONNX model and performing inference is introduced, using the common ResNet-34 model as an example.</p>
 <p>The following code uses <a href="https://github.com/Oneflow-Inc/vision">FlowVision</a>, a library built on OneFlow for computer vision tasks, which contains many models, data enhancement methods, data transformation operations, datasets, and so on. Here we directly use the ResNet-34 model provided by the FlowVision library and use its weight trained on the ImageNet dataset. </p>
 <h3 id="export-as-onnx-model">Export as ONNX Model<a class="headerlink" href="#export-as-onnx-model" title="Permanent link">&para;</a></h3>
-<p>Import related dependencies:</p>
+<p>Import related dependencies and the saved resnet34 model will be used later:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">oneflow</span> <span class="k">as</span> <span class="nn">flow</span>
 <span class="kn">from</span> <span class="nn">oneflow</span> <span class="kn">import</span> <span class="n">nn</span>
 <span class="kn">from</span> <span class="nn">flowvision.models</span> <span class="kn">import</span> <span class="n">resnet34</span>
 <span class="kn">from</span> <span class="nn">oneflow_onnx.oneflow2onnx.util</span> <span class="kn">import</span> <span class="n">convert_to_onnx_and_check</span>
+
+<span class="c1"># Model parameter storage directory</span>
+<span class="n">MODEL_PARAMS</span> <span class="o">=</span> <span class="s1">&#39;checkpoints/resnet34&#39;</span>
+
+<span class="c1"># Load &amp; save pretrained model</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">resnet34</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">flow</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">MODEL_PARAMS</span><span class="p">)</span>
 </code></pre></div>
 <p>To build a static graph model using a dynamic graph model. For details, refer to: <a href="../basics/08_nn_graph.html">Static Graph Interface: nn.Graph</a></p>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ResNet34Graph</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Graph</span><span class="p">):</span>
@@ -1017,10 +1096,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </code></pre></div>
 <p>Export OneFlow static graph models to ONNX models:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Model parameter storage directory</span>
-<span class="n">MODEL_PARAMS</span> <span class="o">=</span> <span class="s1">&#39;checkpoints/resnet34&#39;</span>
-
-<span class="n">params</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">MODEL_PARAMS</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">params</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">MODEL_PARAMS</span><span class="p">)</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">resnet34</span><span class="p">()</span>
 <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 
@@ -1125,7 +1201,7 @@
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
         
-        <a href="../parallelism/06_pipeline.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: Pipelining Parallelism" rel="prev">
+        <a href="global_tensor.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: Basic Operations for Using Global Tensor to Program on Cluster" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
           </div>
@@ -1134,7 +1210,7 @@
               <span class="md-footer__direction">
                 Previous
               </span>
-              Pipelining Parallelism
+              Basic Operations for Using Global Tensor to Program on Cluster
             </div>
           </div>
         </a>
