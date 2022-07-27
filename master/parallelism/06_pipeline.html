@@ -1002,7 +1002,7 @@
 <span class="n">P1</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">placement</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">ranks</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 </code></pre></div>
 <p><code>P0</code>、<code>P1</code> 分别代表集群的第 0 个 GPU 和第 1 个 GPU。</p>
-<p>通过调用 <a href="https://oneflow.readthedocs.io/en/v0.8.1/generated/oneflow.nn.Module.html?highlight=nn.Module">nn.Module.to_global</a> 或 <a href="https://oneflow.readthedocs.io/en/master/tensor.html?highlight=to_global#oneflow.Tensor.to_global">Tensor.to_global</a> 就可以将模型或张量分配到指定的计算设备上运行，将一个网络拆分为多个流水阶段（stage）。</p>
+<p>通过调用 <a href="https://oneflow.readthedocs.io/en/v0.8.1/generated/oneflow.nn.Module.html">nn.Module.to_global</a> 或 <a href="https://oneflow.readthedocs.io/en/v0.8.1/generated/oneflow.Tensor.to_global.html">Tensor.to_global</a> 就可以将模型或张量分配到指定的计算设备上运行，将一个网络拆分为多个流水阶段（stage）。</p>
 <p>在此我们定义了一个 <code>PipelineModule</code> 专门设置各阶段的流水。</p>
 <div class="highlight"><pre><span></span><code>    <span class="k">class</span> <span class="nc">PipelineModule</span><span class="p">(</span><span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
         <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

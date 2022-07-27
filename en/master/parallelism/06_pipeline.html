@@ -1002,7 +1002,7 @@
 <span class="n">P1</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">placement</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 </code></pre></div>
 <p><code>P0</code> and <code>P1</code> represent the 0<sup>th</sup> GPU and the 1<sup>st</sup> GPU on the 0<sup>th</sup> machine respectively.</p>
-<p>By calling <a href="https://oneflow.readthedocs.io/en/v0.8.1/generated/oneflow.nn.Module.html?highlight=nn.Module">nn.Module.to_global</a> or <a href="https://oneflow.readthedocs.io/en/master/tensor.html?highlight=to_global#oneflow.Tensor.to_global">Tensor.to_global</a>, the model or tensor will be distributed to the devices specified before, breaking a network into stages.</p>
+<p>By calling <a href="https://oneflow.readthedocs.io/en/v0.8.1/generated/oneflow.nn.Module.html">nn.Module.to_global</a> or <a href="https://oneflow.readthedocs.io/en/v0.8.1/generated/oneflow.Tensor.to_global.html">Tensor.to_global</a>, the model or tensor will be distributed to the devices specified before, breaking a network into stages.</p>
 <p>Here we define a <code>PipelineModule</code> that specifically sets the pipeline for each stage.</p>
 <div class="highlight"><pre><span></span><code>    <span class="k">class</span> <span class="nc">PipelineModule</span><span class="p">(</span><span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
         <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
