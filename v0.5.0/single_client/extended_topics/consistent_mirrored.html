@@ -1196,9 +1196,9 @@
 <p>其它的框架，如 TensorFlow、Pytorch 均支持 <code>mirroed view</code>；OneFlow 的 mirrored 视角与它们类似。</p>
 <p>在 mirrored 视角下，模型被镜像复制到每张卡上，每个节点的模型构图是完全相同的，只能采用 <strong>数据并行</strong> 。</p>
 <p>在 OneFlow 中，默认不是 mirrored 策略，需要通过 <code>flow.function_config()</code> 的 <code>default_logical_view</code> 接口来显式指定：</p>
-<div class="highlight"><pre><span></span><code>    <span class="n">func_config</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">function_config</span><span class="p">()</span>
-    <span class="n">func_config</span><span class="o">.</span><span class="n">default_logical_view</span><span class="p">(</span><span class="n">flow</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">mirrored_view</span><span class="p">())</span>
-</code></pre></div>
+<p><code>python
+    func_config = flow.function_config()
+    func_config.default_logical_view(flow.scope.mirrored_view())</code></p>
 <p>在 <code>mirrored_view</code> 下，只能采用 <strong>数据并行</strong> 的并行模式，在调用作业函数时，我们需要将数据按照训练节点的数目（显卡总数）进行平均切分，并将切分后的数据放入 <code>list</code> 中进行传递，<code>list</code> 中的每个元素，就是后分配给 <strong>各个显卡</strong> 的实际数据。</p>
 <p>训练函数的返回值类型，也变作了 <code>flow.typing.ListNumpy</code>，是一个 <code>list</code>， <code>list</code> 中的每个元素，对应了每张卡上训练结果。</p>
 <p>以上提及的 <code>list</code> 中的所有元素 <strong>拼接在一起</strong> ，才是一个完整的 BATCH。而OneFlow会自动执行这个拼接的过程，无需用户进行多余的操作。</p>
@@ -1211,45 +1211,44 @@
 <ul>
 <li>使用 <code>flow.config.gpu_device_num</code> 设置 GPU 数目为2</li>
 </ul>
-<div class="highlight"><pre><span></span><code><span class="n">flow</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">gpu_device_num</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</code></pre></div>
+<p><code>python
+flow.config.gpu_device_num(2)</code></p>
 <ul>
 <li>
 <p><code>flow.typing.ListNumpy.Placeholder</code> 定义的样本数目，是被切分后的数目，即代码中的 <code>BATCH_SIZE_PER_GPU</code> 与总样本数 <code>BATCH_SIZE</code> 的关系为：<code>BATCH_SIZE=BATCH_SIZE_PER_GPU×GPU_NUM</code>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">train_job</span><span class="p">(</span>
-    <span class="n">images</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ListNumpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE_PER_GPU</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">float</span><span class="p">),</span>
-    <span class="n">labels</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ListNumpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE_PER_GPU</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tp</span><span class="o">.</span><span class="n">ListNumpy</span><span class="p">:</span>
-</code></pre></div></p>
+<code>python
+def train_job(
+    images: tp.ListNumpy.Placeholder((BATCH_SIZE_PER_GPU, 1, 28, 28), dtype=flow.float),
+    labels: tp.ListNumpy.Placeholder((BATCH_SIZE_PER_GPU,), dtype=flow.int32),
+) -&gt; tp.ListNumpy:</code></p>
 </li>
 <li>
 <p>切分后的数据，需要保存至 <code>list</code> 中传入训练函数；<code>list</code> 中元素的个数与 <strong>参与训练的GPU数目</strong> 一致；OneFlow 将按照 <code>list</code> 中元素顺序，向各卡传递数据( <code>list</code> 中第 i 个元素对应第 i 张卡)：
-<div class="highlight"><pre><span></span><code>  <span class="n">images1</span> <span class="o">=</span> <span class="n">images</span><span class="p">[:</span><span class="n">BATCH_SIZE_PER_GPU</span><span class="p">]</span>
-  <span class="n">images2</span> <span class="o">=</span> <span class="n">images</span><span class="p">[</span><span class="n">BATCH_SIZE_PER_GPU</span><span class="p">:]</span>
-  <span class="n">labels1</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[:</span><span class="n">BATCH_SIZE_PER_GPU</span><span class="p">]</span>
-  <span class="n">labels2</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="n">BATCH_SIZE_PER_GPU</span><span class="p">:]</span>
-
-  <span class="n">imgs_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">images1</span><span class="p">,</span> <span class="n">images2</span><span class="p">]</span>
-  <span class="n">labels_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">labels1</span><span class="p">,</span> <span class="n">labels2</span><span class="p">]</span>
-
-  <span class="n">loss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">train_job</span><span class="p">(</span><span class="n">imgs_list</span><span class="p">,</span> <span class="n">labels_list</span><span class="p">))</span>
-</code></pre></div></p>
+```python
+  images1 = images[:BATCH_SIZE_PER_GPU]
+  images2 = images[BATCH_SIZE_PER_GPU:]
+  labels1 = labels[:BATCH_SIZE_PER_GPU]
+  labels2 = labels[BATCH_SIZE_PER_GPU:]</p>
 </li>
-<li>
-<p>返回的得到的结果 <code>loss</code>，是一个 <code>list</code>。正常情况下，该 <code>list</code> 中元素个数应与 <strong>参与训练的GPU数目</strong> 一致；<code>list</code> 中的第i个元素对应了第 i 张 GPU 卡上的运算结果。但由于OneFlow会在后台自动执行拼接操作，我们无需再在代码中进行多余的拼接步骤。只需将loss合并后进行计算并打印其平均值。
-<div class="highlight"><pre><span></span><code>  <span class="n">total_loss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">*</span><span class="n">loss</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">*</span><span class="n">loss</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
-  <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">20</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-      <span class="nb">print</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
-</code></pre></div></p>
-</li>
+</ul>
+<p>imgs_list = [images1, images2]
+  labels_list = [labels1, labels2]</p>
+<p>loss = np.array(train_job(imgs_list, labels_list))
+```</p>
+<ul>
+<li>返回的得到的结果 <code>loss</code>，是一个 <code>list</code>。正常情况下，该 <code>list</code> 中元素个数应与 <strong>参与训练的GPU数目</strong> 一致；<code>list</code> 中的第i个元素对应了第 i 张 GPU 卡上的运算结果。但由于OneFlow会在后台自动执行拼接操作，我们无需再在代码中进行多余的拼接步骤。只需将loss合并后进行计算并打印其平均值。
+<code>python
+  total_loss = np.array([*loss[0], *loss[1]])
+  if i % 20 == 0:
+      print(loss.mean())</code></li>
 </ul>
 <h2 id="oneflow-consistent">在 OneFlow 中使用 consistent 视角<a class="headerlink" href="#oneflow-consistent" title="Permanent link">&para;</a></h2>
 <p>我们已经了解了 mirrored 视角，知道在 <code>mirrored_view</code> 视角下，样本会被平均分配到多个完全一样的模型上进行分布式训练，各个训练节点上的结果，需要组装才能得到真正完整的 BATCH，对应了逻辑上的 op 与 Blob。</p>
 <p>除了 mirrored 视角外，OneFlow 还提供了 consistent 视角。consistent 视角是 OneFlow 的一大特色，与 mirrored 视角相比有很大的优势。</p>
 <p>默认情况下 OneFlow 采取的是 consistent 视角，如果想显式声明，也可以通过代码设置：
-<div class="highlight"><pre><span></span><code>  <span class="n">config</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">function_config</span><span class="p">()</span>
-  <span class="n">config</span><span class="o">.</span><span class="n">default_logical_view</span><span class="p">(</span><span class="n">flow</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">consistent_view</span><span class="p">())</span>
-</code></pre></div></p>
+<code>python
+  config = flow.function_config()
+  config.default_logical_view(flow.scope.consistent_view())</code></p>
 <p>之所以说 consistent 视角是 OneFlow 的一大特色，是因为在 OneFlow 的设计中，若采用 <code>consistent_view</code>，那么从用户的视角看，分布式系统中的多个设备将获得 <strong>逻辑上的统一</strong>，同样以本文开头的矩阵乘法为例，我们只需要关注<a href="#mat_mul_op">矩阵乘法</a>本身数学计算上的意义；而在工程上到底如何配置、采用模型并行还是数据并行等细节问题，可以使用 OneFlow 的接口轻松完成。OneFlow 内部会高效可靠地解决 <strong>数据并行中的数据切分</strong> 、<strong>模型并行中的模型切分</strong> 、<strong>串行逻辑</strong> 等问题。</p>
 <p>在 OneFlow 的 consistent 视角下，可以自由选择模型并行、数据并行、流水并行或者混合并行。</p>
 <h3 id="_7">代码<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
@@ -1261,25 +1260,25 @@
 <ul>
 <li>
 <p>使用 <code>flow.config.gpu_device_num</code> 设置GPU数目：
-<div class="highlight"><pre><span></span><code><span class="n">flow</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">gpu_device_num</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</code></pre></div></p>
+<code>python
+flow.config.gpu_device_num(2)</code></p>
 </li>
 <li>
 <p>使用 <code>tp.Numpy.Placeholder</code> 定义 consistent 视角下的占位符，因为 <code>Numpy.Placeholder</code> 产出的 Blob 代表逻辑上的 op 及数据占位符，因此此处的 BATCH_SIZE 就是整个分布式训练的样本总和，不需要人为切分或者组合
-<div class="highlight"><pre><span></span><code><span class="nd">@flow</span><span class="o">.</span><span class="n">global_function</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">train_job</span><span class="p">(</span>
-    <span class="n">images</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">float</span><span class="p">),</span>
-    <span class="n">labels</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">:</span>
-</code></pre></div></p>
+<code>python
+@flow.global_function(type="train")
+def train_job(
+    images: tp.Numpy.Placeholder((BATCH_SIZE, 1, 28, 28), dtype=flow.float),
+    labels: tp.Numpy.Placeholder((BATCH_SIZE,), dtype=flow.int32),
+) -&gt; tp.Numpy:</code></p>
 </li>
 <li>
 <p>调用作业函数，直接得到训练结果，训练结果已经由 OneFlow 完成分布式过程中切分与合并的工作。在 consistent 视角下，多卡的分布式训练与单卡的训练，代码差别极少，上手体验几乎一样
-<div class="highlight"><pre><span></span><code><span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">train_images</span><span class="p">,</span> <span class="n">train_labels</span><span class="p">)):</span>
-  <span class="n">loss</span> <span class="o">=</span> <span class="n">train_job</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
-  <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">20</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-      <span class="nb">print</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
-</code></pre></div></p>
+<code>python
+for i, (images, labels) in enumerate(zip(train_images, train_labels)):
+  loss = train_job(images, labels)
+  if i % 20 == 0:
+      print(loss.mean())</code></p>
 </li>
 </ul>
 <h2 id="_9">扩展<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h2>

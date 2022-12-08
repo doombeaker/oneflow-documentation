@@ -1001,9 +1001,9 @@
 <h2 id="quickstart">Quickstart<a class="headerlink" href="#quickstart" title="Permanent link">&para;</a></h2>
 <h3 id="get-dataset">Get dataset<a class="headerlink" href="#get-dataset" title="Permanent link">&para;</a></h3>
 <p>We provide <a href="https://oneflow-static.oss-cn-beijing.aliyuncs.com/oneflow-tutorial-attachments/bert_squad_dataset.zip">OFRecord dataset and relevant other files</a>, you can get and unzip it by running commands below:</p>
-<p><div class="highlight"><pre><span></span><code>wget https://oneflow-static.oss-cn-beijing.aliyuncs.com/oneflow-tutorial-attachments/bert_squad_dataset.zip
-unzip bert_squad_dataset.zip
-</code></pre></div>
+<p><code>bash
+wget https://oneflow-static.oss-cn-beijing.aliyuncs.com/oneflow-tutorial-attachments/bert_squad_dataset.zip
+unzip bert_squad_dataset.zip</code>
 The list of files is as follows:</p>
 <ul>
 <li>
@@ -1022,37 +1022,38 @@ The list of files is as follows:</p>
 <p>The above files will be used in the following pretraining tasks and squad finetune.</p>
 <h3 id="bert-pretrained">BERT pretrained<a class="headerlink" href="#bert-pretrained" title="Permanent link">&para;</a></h3>
 <p>Firstly, clone the <code>OneFlow-Benchmark</code>:</p>
-<div class="highlight"><pre><span></span><code>git clone https://github.com/Oneflow-Inc/OneFlow-Benchmark.git
-<span class="nb">cd</span> OneFlow-Benchmark/LanguageModeling/BERT/
-</code></pre></div>
+<p><code>bash
+git clone https://github.com/Oneflow-Inc/OneFlow-Benchmark.git
+cd OneFlow-Benchmark/LanguageModeling/BERT/</code></p>
 <p>Then, with the following command, we can use our pretraining model and small sample set to start the BERT pre-training.
-<div class="highlight"><pre><span></span><code>python ./run_pretraining.py<span class="se">\</span>
-    --gpu_num_per_node<span class="o">=</span><span class="m">1</span> <span class="se">\</span>
-    --learning_rate<span class="o">=</span>3e-5 <span class="se">\</span>
-    --batch_size_per_device<span class="o">=</span><span class="m">1</span> <span class="se">\</span>
-    --iter_num<span class="o">=</span><span class="m">3</span> <span class="se">\</span>
-    --loss_print_every_n_iter<span class="o">=</span><span class="m">50</span> <span class="se">\</span>
-    --seq_length<span class="o">=</span><span class="m">128</span> <span class="se">\</span>
-    --max_predictions_per_seq<span class="o">=</span><span class="m">20</span> <span class="se">\</span>
-    --num_hidden_layers<span class="o">=</span><span class="m">12</span> <span class="se">\</span>
-    --num_attention_heads<span class="o">=</span><span class="m">12</span> <span class="se">\</span>
-    --max_position_embeddings<span class="o">=</span><span class="m">512</span> <span class="se">\</span>
-    --type_vocab_size<span class="o">=</span><span class="m">2</span> <span class="se">\</span>
-    --vocab_size<span class="o">=</span><span class="m">30522</span> <span class="se">\</span>
-    --attention_probs_dropout_prob<span class="o">=</span><span class="m">0</span>.0 <span class="se">\</span>
-    --hidden_dropout_prob<span class="o">=</span><span class="m">0</span>.0 <span class="se">\</span>
-    --hidden_size_per_head<span class="o">=</span><span class="m">64</span> <span class="se">\</span>
-    --use_boxing_v2<span class="o">=</span>True <span class="se">\</span>
-    --data_dir<span class="o">=</span>./dataset/ <span class="se">\</span>
-    --data_part_num<span class="o">=</span><span class="m">1</span> <span class="se">\</span>
-    --log_dir<span class="o">=</span>./bert_regresssioin_test/of <span class="se">\</span>
-    --loss_print_every_n_iter<span class="o">=</span><span class="m">5</span> <span class="se">\</span>
-    --model_save_dir<span class="o">=</span>./bert_regresssioin_test/of <span class="se">\</span>
-    --warmup_batches <span class="m">831</span> <span class="se">\</span>
-    --save_last_snapshot True
-</code></pre></div></p>
+<code>bash
+python ./run_pretraining.py\
+    --gpu_num_per_node=1 \
+    --learning_rate=3e-5 \
+    --batch_size_per_device=1 \
+    --iter_num=3 \
+    --loss_print_every_n_iter=50 \
+    --seq_length=128 \
+    --max_predictions_per_seq=20 \
+    --num_hidden_layers=12 \
+    --num_attention_heads=12 \
+    --max_position_embeddings=512 \
+    --type_vocab_size=2 \
+    --vocab_size=30522 \
+    --attention_probs_dropout_prob=0.0 \
+    --hidden_dropout_prob=0.0 \
+    --hidden_size_per_head=64 \
+    --use_boxing_v2=True \
+    --data_dir=./dataset/ \
+    --data_part_num=1 \
+    --log_dir=./bert_regresssioin_test/of \
+    --loss_print_every_n_iter=5 \
+    --model_save_dir=./bert_regresssioin_test/of \
+    --warmup_batches 831 \
+    --save_last_snapshot True</code></p>
 <p>We will see the output similar to the following:
-<div class="highlight"><pre><span></span><code>==================================================================
+```text
+==================================================================
 Running bert: num_gpu_per_node = 1, num_nodes = 1. ==================================================================
 gpu_num_per_node = 1
 node_num = 1
@@ -1082,9 +1083,9 @@ type_vocab_size = 2
 vocab_size = 30522
 attention_probs_dropout_prob = 0.0
 hidden_dropout_prob = 0.0
-hidden_size_per_head = 64
-------------------------------------------------------------------
-Time stamp: 2020-07-06-19:09:29
+hidden_size_per_head = 64</p>
+<hr />
+<p>Time stamp: 2020-07-06-19:09:29
 I0706 19:09:29.605840639   34801 ev_epoll_linux.c:82]        Use of signals is disabled. Epoll engine will not be used
 Init model on demand
 iter 4, total_loss: 11.032, mlm_loss: 10.281, nsp_loss: 0.751, speed: 33.086(sec/batch), 0.151(sentences/sec)
@@ -1092,9 +1093,9 @@ iter 9, total_loss: 11.548, mlm_loss: 10.584, nsp_loss: 0.965, speed: 0.861(sec/
 iter 14, total_loss: 10.697, mlm_loss: 10.249, nsp_loss: 0.448, speed: 0.915(sec/batch), 5.463(sentences/sec)
 iter 19, total_loss: 10.685, mlm_loss: 10.266, nsp_loss: 0.419, speed: 1.087(sec/batch), 4.602(sentences/sec)
 Saving model to ./bert_regresssioin_test/of/last_snapshot. ------------------------------------------------------------------
-average speed: 0.556(sentences/sec)
-------------------------------------------------------------------
-</code></pre></div></p>
+average speed: 0.556(sentences/sec)</p>
+<hr />
+<p>```</p>
 <h2 id="detailed-description">Detailed description<a class="headerlink" href="#detailed-description" title="Permanent link">&para;</a></h2>
 <h3 id="scripts">Scripts<a class="headerlink" href="#scripts" title="Permanent link">&para;</a></h3>
 <table>
@@ -1220,65 +1221,63 @@ average speed: 0.556(sentences/sec)
 <p>If you want to directly use the pretrained model for finetune tasks (such as the SQuAD shown below), you can consider downloading directly it from <a href="https://github.com/google-research/bert">google-research BERT</a> and then use the script <code>convert_tf_ckpt_to_of.py</code> we provided to convert it to OneFlow model.</p>
 <p>The conversion process is as follows:</p>
 <p>Firstly, download and unzip a BERT pretrained model of specified version, eg: <code>uncased_L-12_H-768_A-12</code>.
-<div class="highlight"><pre><span></span><code>wget https://storage.googleapis.com/bert_models/2020_02_20/uncased_L-12_H-768_A-12.zip
-unzip uncased_L-12_H-768_A-12.zip -d uncased_L-12_H-768_A-12
-</code></pre></div></p>
+<code>wget https://storage.googleapis.com/bert_models/2020_02_20/uncased_L-12_H-768_A-12.zip
+unzip uncased_L-12_H-768_A-12.zip -d uncased_L-12_H-768_A-12</code></p>
 <p>And then, run commands below:
-<div class="highlight"><pre><span></span><code>cd uncased_L-12_H-768_A-12/
+<code>cd uncased_L-12_H-768_A-12/
 cat &gt; checkpoint &lt;&lt;ONEFLOW
-model_checkpoint_path: &quot;bert_model.ckpt&quot;
-all_model_checkpoint_paths: &quot;bert_model.ckpt&quot;
-ONEFLOW
-</code></pre></div></p>
+model_checkpoint_path: "bert_model.ckpt"
+all_model_checkpoint_paths: "bert_model.ckpt"
+ONEFLOW</code></p>
 <p>It will create a file named <code>checkpoint</code> in the directory and write content below into it:
-<div class="highlight"><pre><span></span><code>model_checkpoint_path: &quot;bert_model.ckpt&quot;
-all_model_checkpoint_paths: &quot;bert_model.ckpt&quot;
-</code></pre></div></p>
+<code>model_checkpoint_path: "bert_model.ckpt"
+all_model_checkpoint_paths: "bert_model.ckpt"</code></p>
 <p>Now that the TensorFlow model directory to be converted is ready, the hierarchy is:
-<div class="highlight"><pre><span></span><code>uncased_L-12_H-768_A-12
+<code>uncased_L-12_H-768_A-12
 ├── bert_config.json
 ├── bert_model.ckpt.data-00000-of-00001
 ├── bert_model.ckpt.index
 ├── checkpoint
-└── vocab.txt
-</code></pre></div></p>
+└── vocab.txt</code></p>
 <p>And then we use <code>convert_tf_ckpt_to_of.py</code> to convert model to OneFlow format:
-<div class="highlight"><pre><span></span><code>python convert_tf_ckpt_to_of.py <span class="se">\</span>
-  --tf_checkpoint_path ./uncased_L-12_H-768_A-12 <span class="se">\</span>
-  --of_dump_path ./uncased_L-12_H-768_A-12-oneflow
-</code></pre></div>
+<code>bash
+python convert_tf_ckpt_to_of.py \
+  --tf_checkpoint_path ./uncased_L-12_H-768_A-12 \
+  --of_dump_path ./uncased_L-12_H-768_A-12-oneflow</code>
 The above command saves the converted OneFlow format model in <code>./uncased_L-12_H-768_A-12-oneflow</code> directory for later use(eg: SQuAD).</p>
 <h2 id="finetune-task-squad">Finetune task: SQuAD<a class="headerlink" href="#finetune-task-squad" title="Permanent link">&para;</a></h2>
 <h3 id="extend-to-squad-model">Extend to SQuAD model<a class="headerlink" href="#extend-to-squad-model" title="Permanent link">&para;</a></h3>
 <p>We only need to add a layer of <code>output</code> on the basis of BERT's backbone and modify the expression of loss. We can see the whole code in <code>squad.py</code>, and there are key modifications:
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">SQuADTrain</span><span class="p">():</span>
-    <span class="c1">#... backbone = bert_util.BertBackbone()</span>
+```python
+def SQuADTrain():
+    #... backbone = bert_util.BertBackbone()</p>
+<div class="codehilite"><pre><span></span><code>#add a fully-connected layer base on BERT
+with flow.name_scope(&quot;cls-squad&quot;):
+    final_hidden = backbone.sequence_output()
+    final_hidden_matrix = flow.reshape(final_hidden, [-1, hidden_size])
+    logits = bert_util._FullyConnected(
+                final_hidden_matrix,
+                hidden_size,
+                units=2,
+                weight_initializer=bert_util.CreateInitializer(initializer_range),
+                name=&#39;output&#39;)
+    logits = flow.reshape(logits, [-1, seq_length, 2])
 
-    <span class="c1">#add a fully-connected layer base on BERT</span>
-    <span class="k">with</span> <span class="n">flow</span><span class="o">.</span><span class="n">name_scope</span><span class="p">(</span><span class="s2">&quot;cls-squad&quot;</span><span class="p">):</span>
-        <span class="n">final_hidden</span> <span class="o">=</span> <span class="n">backbone</span><span class="o">.</span><span class="n">sequence_output</span><span class="p">()</span>
-        <span class="n">final_hidden_matrix</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">final_hidden</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">])</span>
-        <span class="n">logits</span> <span class="o">=</span> <span class="n">bert_util</span><span class="o">.</span><span class="n">_FullyConnected</span><span class="p">(</span>
-                    <span class="n">final_hidden_matrix</span><span class="p">,</span>
-                    <span class="n">hidden_size</span><span class="p">,</span>
-                    <span class="n">units</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-                    <span class="n">weight_initializer</span><span class="o">=</span><span class="n">bert_util</span><span class="o">.</span><span class="n">CreateInitializer</span><span class="p">(</span><span class="n">initializer_range</span><span class="p">),</span>
-                    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
-        <span class="n">logits</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">seq_length</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+    start_logits = flow.slice(logits, [None, None, 0], [None, None, 1])
+    end_logits = flow.slice(logits, [None, None, 1], [None, None, 1])
 
-        <span class="n">start_logits</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-        <span class="n">end_logits</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+#redefine the loss of SQuAD
+    start_loss = _ComputeLoss(start_logits, start_positions_blob, seq_length)
+    end_loss = _ComputeLoss(end_logits, end_positions_blob, seq_length)
 
-    <span class="c1">#redefine the loss of SQuAD</span>
-        <span class="n">start_loss</span> <span class="o">=</span> <span class="n">_ComputeLoss</span><span class="p">(</span><span class="n">start_logits</span><span class="p">,</span> <span class="n">start_positions_blob</span><span class="p">,</span> <span class="n">seq_length</span><span class="p">)</span>
-        <span class="n">end_loss</span> <span class="o">=</span> <span class="n">_ComputeLoss</span><span class="p">(</span><span class="n">end_logits</span><span class="p">,</span> <span class="n">end_positions_blob</span><span class="p">,</span> <span class="n">seq_length</span><span class="p">)</span>
+    total_loss = 0.5*(start_loss + end_loss)
 
-        <span class="n">total_loss</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">start_loss</span> <span class="o">+</span> <span class="n">end_loss</span><span class="p">)</span>
+return total_loss
+</code></pre></div>
 
-    <span class="k">return</span> <span class="n">total_loss</span>
-</code></pre></div></p>
+<p>```</p>
 <p>We run the script below to start SQuAD training to get and save a initialized model.</p>
-<p><div class="highlight"><pre><span></span><code>python ./run_squad.py\
+<p><code>python ./run_squad.py\
     --gpu_num_per_node=1\
     --learning_rate=3e-5\
     --batch_size_per_device=2\
@@ -1300,22 +1299,19 @@ The above command saves the converted OneFlow format model in <code>./uncased_L-
     --log_dir=./bert_regresssioin_test/of\
     --model_save_dir=./bert_regresssioin_test/of\
     --warmup_batches 831\
-    --save_last_snapshot True
-</code></pre></div>
+    --save_last_snapshot True</code>
 There will be a initialized model in the path <code>./bert_regresssioin_test/of/last_snapshot</code>. We will merge it with pretrained BERT model and fintune it.</p>
 <h3 id="merge-pretrained-model-into-squad">Merge pretrained model into SQuAD<a class="headerlink" href="#merge-pretrained-model-into-squad" title="Permanent link">&para;</a></h3>
 <p>SQuAD is extended from pretrained model of BERT. We should merge the pretrained model into SQuAD according to the method introduced in this article<a href="../basics_topics/model_load_save.html">Loading and saving of model</a>.</p>
-<div class="highlight"><pre><span></span><code>cp -R ./bert_regresssioin_test/of/last_snapshot ./squadModel
-cp -R --remove-destination ./dataset/uncased_L-12_H-768_A-12_oneflow/* ./squadModel/
-</code></pre></div>
+<p><code>cp -R ./bert_regresssioin_test/of/last_snapshot ./squadModel
+cp -R --remove-destination ./dataset/uncased_L-12_H-768_A-12_oneflow/* ./squadModel/</code></p>
 <h3 id="problem-on-training-times">Problem on training times<a class="headerlink" href="#problem-on-training-times" title="Permanent link">&para;</a></h3>
 <p>There is a folder named <code>System-Train-TrainStep-xxx</code> in the path of pretrained model folder and the file named "out" contains the count if iterations. The <code>leraning rate</code> changes dynamically with the count of iterations.</p>
 <p>In order to prevent training of finetuning from the saved iteration affecting, the binary data in the out file should be cleared to zero.
-<div class="highlight"><pre><span></span><code>cd System-Train-TrainStep-xxx
+<code>cd System-Train-TrainStep-xxx
 xxd -r &gt; out &lt;&lt;ONEFLOW
 00000000: 0000 0000 0000 0000
-ONEFLOW
-</code></pre></div></p>
+ONEFLOW</code></p>
 <p>If you are using a pretrained model transferred from TensorFlow, you can skip this step.</p>
 <h3 id="start-squad-training">Start SQuAD training<a class="headerlink" href="#start-squad-training" title="Permanent link">&para;</a></h3>
 <p>Start SQuAD training by running the script <code>run_suqad.py</code> with configuration below:</p>
@@ -1333,7 +1329,7 @@ ONEFLOW
 <p>learning rate = 3e-5</p>
 </li>
 </ul>
-<div class="highlight"><pre><span></span><code>python ./run_squad.py\
+<p><code>python ./run_squad.py\
     --gpu_num_per_node=4\
     --learning_rate=3e-5\
     --batch_size_per_device=8\
@@ -1356,35 +1352,34 @@ ONEFLOW
     --model_save_dir=./bert_regresssioin_test/of\
     --warmup_batches 831\
     --save_last_snapshot True\
-    --model_load_dir=./squadModel
-</code></pre></div>
+    --model_load_dir=./squadModel</code></p>
 <h3 id="prediction-and-evaluatoin">Prediction and evaluatoin<a class="headerlink" href="#prediction-and-evaluatoin" title="Permanent link">&para;</a></h3>
 <p>In order to generate <a href="https://rajpurkar.github.io/SQuAD-explorer/">Preidiction File</a>, we should generate npy file fist. And then we use <code>write_predictions</code> function in <a href="https://github.com/google-research/bert/blob/master/run_squad.py">google BERT's run_squad.py</a> to convert it to json format.</p>
 <p>Run the script <code>run_squad_predict.py</code> to generate <code>all_results.npy</code>:
-<div class="highlight"><pre><span></span><code>python run_squad_predict.py <span class="se">\</span>
-  --gpu_num_per_node<span class="o">=</span><span class="m">1</span> <span class="se">\</span>
-  --batch_size_per_device<span class="o">=</span><span class="m">4</span> <span class="se">\</span>
-  --iter_num<span class="o">=</span><span class="m">2709</span> <span class="se">\</span>
-  --seq_length<span class="o">=</span><span class="m">384</span> <span class="se">\</span>
-  --max_predictions_per_seq<span class="o">=</span><span class="m">20</span> <span class="se">\</span>
-  --num_hidden_layers<span class="o">=</span><span class="m">12</span> <span class="se">\</span>
-  --num_attention_heads<span class="o">=</span><span class="m">12</span> <span class="se">\</span>
-  --max_position_embeddings<span class="o">=</span><span class="m">512</span> <span class="se">\</span>
-  --type_vocab_size<span class="o">=</span><span class="m">2</span> <span class="se">\</span>
-  --vocab_size<span class="o">=</span><span class="m">30522</span> <span class="se">\</span>
-  --attention_probs_dropout_prob<span class="o">=</span><span class="m">0</span>.0 <span class="se">\</span>
-  --hidden_dropout_prob<span class="o">=</span><span class="m">0</span>.0 <span class="se">\</span>
-  --hidden_size_per_head<span class="o">=</span><span class="m">64</span> <span class="se">\</span>
-  --use_boxing_v2<span class="o">=</span>True <span class="se">\</span>
-  --data_part_num<span class="o">=</span><span class="m">1</span> <span class="se">\</span>
-  --data_dir<span class="o">=</span>./dataset/dev-v1.1 <span class="se">\</span>
-  --log_dir<span class="o">=</span>./bert_regresssioin_test/of <span class="se">\</span>
-  --model_load_dir<span class="o">=</span>path/to/squadModel <span class="se">\</span>
-  --warmup_batches <span class="m">831</span>
-</code></pre></div>
+<code>bash
+python run_squad_predict.py \
+  --gpu_num_per_node=1 \
+  --batch_size_per_device=4 \
+  --iter_num=2709 \
+  --seq_length=384 \
+  --max_predictions_per_seq=20 \
+  --num_hidden_layers=12 \
+  --num_attention_heads=12 \
+  --max_position_embeddings=512 \
+  --type_vocab_size=2 \
+  --vocab_size=30522 \
+  --attention_probs_dropout_prob=0.0 \
+  --hidden_dropout_prob=0.0 \
+  --hidden_size_per_head=64 \
+  --use_boxing_v2=True \
+  --data_part_num=1 \
+  --data_dir=./dataset/dev-v1.1 \
+  --log_dir=./bert_regresssioin_test/of \
+  --model_load_dir=path/to/squadModel \
+  --warmup_batches 831</code>
 Attention: the <code>model_load_dir</code> should be the trained model of SQuAD.</p>
 <p>After we get the <code>all_results.npy</code>file, run the script <code>npy2json.py</code> in the repository of <a href="https://github.com/google-research/bert/">google bert</a>(the version of TensorFlow should be v1). The <code>npy2json.py</code> we provide is modified from google bert's <code>run_squad.py</code>:
-<div class="highlight"><pre><span></span><code>python npy2json.py\
+<code>python npy2json.py\
   --vocab_file=./dataset/vocab.txt \
   --bert_config_file=./dataset/bert_config.json \
   --do_train=False \
@@ -1393,39 +1388,38 @@ Attention: the <code>model_load_dir</code> should be the trained model of SQuAD.
   --predict_file=./dataset/dev-v1.1.json \
   --max_seq_length=384 \
   --doc_stride=128 \
-  --output_dir=./squad_base/
-</code></pre></div></p>
+  --output_dir=./squad_base/</code></p>
 <p>Remember to set the <code>all_results_file</code> to the path of <code>all_results.npy</code> we obtained in the last step.</p>
 <p>We will get <code>predictions.json</code> after that which can be evaluated by<a href="https://rajpurkar.github.io/SQuAD-explorer/">evaluate-v1.1.py</a>.</p>
-<div class="highlight"><pre><span></span><code>python evaluate-v1.1.py <span class="se">\</span>
-./dataset/dev-v1.1.json <span class="se">\</span>
-path/to/squad_base/predictions.json
-</code></pre></div>
+<p><code>bash
+python evaluate-v1.1.py \
+./dataset/dev-v1.1.json \
+path/to/squad_base/predictions.json</code></p>
 <h2 id="distributed-training">Distributed training<a class="headerlink" href="#distributed-training" title="Permanent link">&para;</a></h2>
 <p>As described when we introduce the command line options, we can start distributed training easily by adding the options <code>node_num</code> and <code>node_list</code>:</p>
-<div class="highlight"><pre><span></span><code>python run_squad_predict.py <span class="se">\</span>
-  --gpu_num_per_node<span class="o">=</span><span class="m">1</span> <span class="se">\</span>
-  --batch_size_per_device<span class="o">=</span><span class="m">4</span> <span class="se">\</span>
-  --iter_num<span class="o">=</span><span class="m">2709</span> <span class="se">\</span>
-  --seq_length<span class="o">=</span><span class="m">384</span> <span class="se">\</span>
-  --max_predictions_per_seq<span class="o">=</span><span class="m">20</span> <span class="se">\</span>
-  --num_hidden_layers<span class="o">=</span><span class="m">12</span> <span class="se">\</span>
-  --num_attention_heads<span class="o">=</span><span class="m">12</span> <span class="se">\</span>
-  --max_position_embeddings<span class="o">=</span><span class="m">512</span> <span class="se">\</span>
-  --type_vocab_size<span class="o">=</span><span class="m">2</span> <span class="se">\</span>
-  --vocab_size<span class="o">=</span><span class="m">30522</span> <span class="se">\</span>
-  --attention_probs_dropout_prob<span class="o">=</span><span class="m">0</span>.0 <span class="se">\</span>
-  --hidden_dropout_prob<span class="o">=</span><span class="m">0</span>.0 <span class="se">\</span>
-  --hidden_size_per_head<span class="o">=</span><span class="m">64</span> <span class="se">\</span>
-  --use_boxing_v2<span class="o">=</span>True <span class="se">\</span>
-  --data_part_num<span class="o">=</span><span class="m">1</span> <span class="se">\</span>
-  --data_dir<span class="o">=</span>./dataset/dev-v1.1 <span class="se">\</span>
-  --log_dir<span class="o">=</span>./bert_regresssioin_test/of <span class="se">\</span>
-  --model_load_dir<span class="o">=</span>path/to/squadModel <span class="se">\</span>
-  --warmup_batches <span class="m">831</span> <span class="se">\</span>
-  --node_num<span class="o">=</span><span class="m">2</span> <span class="se">\</span>
-  --node_list<span class="o">=</span><span class="s2">&quot;192.168.1.12,192.168.1.14&quot;</span>
-</code></pre></div>
+<p><code>bash
+python run_squad_predict.py \
+  --gpu_num_per_node=1 \
+  --batch_size_per_device=4 \
+  --iter_num=2709 \
+  --seq_length=384 \
+  --max_predictions_per_seq=20 \
+  --num_hidden_layers=12 \
+  --num_attention_heads=12 \
+  --max_position_embeddings=512 \
+  --type_vocab_size=2 \
+  --vocab_size=30522 \
+  --attention_probs_dropout_prob=0.0 \
+  --hidden_dropout_prob=0.0 \
+  --hidden_size_per_head=64 \
+  --use_boxing_v2=True \
+  --data_part_num=1 \
+  --data_dir=./dataset/dev-v1.1 \
+  --log_dir=./bert_regresssioin_test/of \
+  --model_load_dir=path/to/squadModel \
+  --warmup_batches 831 \
+  --node_num=2 \
+  --node_list="192.168.1.12,192.168.1.14"</code></p>
                 
               
               

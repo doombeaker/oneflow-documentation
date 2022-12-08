@@ -866,6 +866,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#average-speed-0556sentencessec" class="md-nav__link">
+    average speed: 0.556(sentences/sec)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#_5" class="md-nav__link">
     详细说明
   </a>
@@ -1142,6 +1149,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#average-speed-0556sentencessec" class="md-nav__link">
+    average speed: 0.556(sentences/sec)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#_5" class="md-nav__link">
     详细说明
   </a>
@@ -1295,9 +1309,9 @@
 <h2 id="_3">快速开始<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <h3 id="_4">获取相关数据集<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
 <p>我们提供了完成 BERT 预训练及 SQuAD 微调的 <a href="https://oneflow-static.oss-cn-beijing.aliyuncs.com/oneflow-tutorial-attachments/bert_squad_dataset.zip">OFRecord 数据集及相关数据文件</a>，可以通过以下命令下载并解压：</p>
-<p><div class="highlight"><pre><span></span><code>wget https://oneflow-static.oss-cn-beijing.aliyuncs.com/oneflow-tutorial-attachments/bert_squad_dataset.zip
-unzip bert_squad_dataset.zip
-</code></pre></div>
+<p><code>bash
+wget https://oneflow-static.oss-cn-beijing.aliyuncs.com/oneflow-tutorial-attachments/bert_squad_dataset.zip
+unzip bert_squad_dataset.zip</code>
 解压后的文件目录清单如下：</p>
 <ul>
 <li>
@@ -1316,37 +1330,38 @@ unzip bert_squad_dataset.zip
 <p>以上各个文件将在下文的预训练任务、SQuAD 微调中使用到。</p>
 <h3 id="bert">训练 BERT 模型<a class="headerlink" href="#bert" title="Permanent link">&para;</a></h3>
 <p>首先，克隆 <code>OneFlow-Benchmark</code> 仓库。</p>
-<div class="highlight"><pre><span></span><code>git clone https://github.com/Oneflow-Inc/OneFlow-Benchmark.git
-<span class="nb">cd</span> OneFlow-Benchmark/LanguageModeling/BERT/
-</code></pre></div>
+<p><code>bash
+git clone https://github.com/Oneflow-Inc/OneFlow-Benchmark.git
+cd OneFlow-Benchmark/LanguageModeling/BERT/</code></p>
 <p>然后，通过以下命令，使用我们预训练好的 pretrain 模型以及小型样本集合，开始 BERT 预训练查看效果：
-<div class="highlight"><pre><span></span><code>python ./run_pretraining.py<span class="se">\</span>
-    --gpu_num_per_node<span class="o">=</span><span class="m">1</span> <span class="se">\</span>
-    --learning_rate<span class="o">=</span>3e-5 <span class="se">\</span>
-    --batch_size_per_device<span class="o">=</span><span class="m">1</span> <span class="se">\</span>
-    --iter_num<span class="o">=</span><span class="m">3</span> <span class="se">\</span>
-    --loss_print_every_n_iter<span class="o">=</span><span class="m">50</span> <span class="se">\</span>
-    --seq_length<span class="o">=</span><span class="m">128</span> <span class="se">\</span>
-    --max_predictions_per_seq<span class="o">=</span><span class="m">20</span> <span class="se">\</span>
-    --num_hidden_layers<span class="o">=</span><span class="m">12</span> <span class="se">\</span>
-    --num_attention_heads<span class="o">=</span><span class="m">12</span> <span class="se">\</span>
-    --max_position_embeddings<span class="o">=</span><span class="m">512</span> <span class="se">\</span>
-    --type_vocab_size<span class="o">=</span><span class="m">2</span> <span class="se">\</span>
-    --vocab_size<span class="o">=</span><span class="m">30522</span> <span class="se">\</span>
-    --attention_probs_dropout_prob<span class="o">=</span><span class="m">0</span>.0 <span class="se">\</span>
-    --hidden_dropout_prob<span class="o">=</span><span class="m">0</span>.0 <span class="se">\</span>
-    --hidden_size_per_head<span class="o">=</span><span class="m">64</span> <span class="se">\</span>
-    --use_boxing_v2<span class="o">=</span>True <span class="se">\</span>
-    --data_dir<span class="o">=</span>./dataset/ <span class="se">\</span>
-    --data_part_num<span class="o">=</span><span class="m">1</span> <span class="se">\</span>
-    --log_dir<span class="o">=</span>./bert_regresssioin_test/of <span class="se">\</span>
-    --loss_print_every_n_iter<span class="o">=</span><span class="m">5</span> <span class="se">\</span>
-    --model_save_dir<span class="o">=</span>./bert_regresssioin_test/of <span class="se">\</span>
-    --warmup_batches <span class="m">831</span> <span class="se">\</span>
-    --save_last_snapshot True
-</code></pre></div>
+<code>bash
+python ./run_pretraining.py\
+    --gpu_num_per_node=1 \
+    --learning_rate=3e-5 \
+    --batch_size_per_device=1 \
+    --iter_num=3 \
+    --loss_print_every_n_iter=50 \
+    --seq_length=128 \
+    --max_predictions_per_seq=20 \
+    --num_hidden_layers=12 \
+    --num_attention_heads=12 \
+    --max_position_embeddings=512 \
+    --type_vocab_size=2 \
+    --vocab_size=30522 \
+    --attention_probs_dropout_prob=0.0 \
+    --hidden_dropout_prob=0.0 \
+    --hidden_size_per_head=64 \
+    --use_boxing_v2=True \
+    --data_dir=./dataset/ \
+    --data_part_num=1 \
+    --log_dir=./bert_regresssioin_test/of \
+    --loss_print_every_n_iter=5 \
+    --model_save_dir=./bert_regresssioin_test/of \
+    --warmup_batches 831 \
+    --save_last_snapshot True</code>
 我们将获得类似以下输出：
-<div class="highlight"><pre><span></span><code>==================================================================
+```text
+==================================================================
 Running bert: num_gpu_per_node = 1, num_nodes = 1.
 ==================================================================
 gpu_num_per_node = 1
@@ -1377,20 +1392,19 @@ type_vocab_size = 2
 vocab_size = 30522
 attention_probs_dropout_prob = 0.0
 hidden_dropout_prob = 0.0
-hidden_size_per_head = 64
-------------------------------------------------------------------
-Time stamp: 2020-07-06-19:09:29
+hidden_size_per_head = 64</p>
+<hr />
+<p>Time stamp: 2020-07-06-19:09:29
 I0706 19:09:29.605840639   34801 ev_epoll_linux.c:82]        Use of signals is disabled. Epoll engine will not be used
 Init model on demand
 iter 4, total_loss: 11.032, mlm_loss: 10.281, nsp_loss: 0.751, speed: 33.086(sec/batch), 0.151(sentences/sec)
 iter 9, total_loss: 11.548, mlm_loss: 10.584, nsp_loss: 0.965, speed: 0.861(sec/batch), 5.806(sentences/sec)
 iter 14, total_loss: 10.697, mlm_loss: 10.249, nsp_loss: 0.448, speed: 0.915(sec/batch), 5.463(sentences/sec)
 iter 19, total_loss: 10.685, mlm_loss: 10.266, nsp_loss: 0.419, speed: 1.087(sec/batch), 4.602(sentences/sec)
-Saving model to ./bert_regresssioin_test/of/last_snapshot.
-------------------------------------------------------------------
-average speed: 0.556(sentences/sec)
-------------------------------------------------------------------
-</code></pre></div></p>
+Saving model to ./bert_regresssioin_test/of/last_snapshot.</p>
+<hr />
+<h2 id="average-speed-0556sentencessec">average speed: 0.556(sentences/sec)<a class="headerlink" href="#average-speed-0556sentencessec" title="Permanent link">&para;</a></h2>
+<p>```</p>
 <h2 id="_5">详细说明<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
 <h3 id="_6">脚本说明<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
 <table>
@@ -1517,66 +1531,64 @@ average speed: 0.556(sentences/sec)
 <p>如果想直接使用已经训练好的 pretrained 模型做 fine-tune 任务（如以下将展示的SQuAD），可以考虑直接从 <a href="https://github.com/google-research/bert">google-research BERT</a> 页面下载已经训练好的 BERT 模型。</p>
 <p>再利用我们提供的 <code>convert_tf_ckpt_to_of.py</code> 脚本，将其转为 OneFlow 模型格式。转换过程如下：</p>
 <p>首先，下载并解压某个版本的 BERT 模型，如 <code>uncased_L-12_H-768_A-12</code>。
-<div class="highlight"><pre><span></span><code>wget https://storage.googleapis.com/bert_models/2020_02_20/uncased_L-12_H-768_A-12.zip
-unzip uncased_L-12_H-768_A-12.zip -d uncased_L-12_H-768_A-12
-</code></pre></div></p>
+<code>wget https://storage.googleapis.com/bert_models/2020_02_20/uncased_L-12_H-768_A-12.zip
+unzip uncased_L-12_H-768_A-12.zip -d uncased_L-12_H-768_A-12</code></p>
 <p>然后，运行以下命令：
-<div class="highlight"><pre><span></span><code>cd uncased_L-12_H-768_A-12/
+<code>cd uncased_L-12_H-768_A-12/
 cat &gt; checkpoint &lt;&lt;ONEFLOW
-model_checkpoint_path: &quot;bert_model.ckpt&quot;
-all_model_checkpoint_paths: &quot;bert_model.ckpt&quot;
-ONEFLOW
-</code></pre></div></p>
+model_checkpoint_path: "bert_model.ckpt"
+all_model_checkpoint_paths: "bert_model.ckpt"
+ONEFLOW</code></p>
 <p>该命令将在解压目录下创建一个 <code>checkpoint</code> 文件，并写入以下内容：
-<div class="highlight"><pre><span></span><code>model_checkpoint_path: &quot;bert_model.ckpt&quot;
-all_model_checkpoint_paths: &quot;bert_model.ckpt&quot;
-</code></pre></div></p>
+<code>model_checkpoint_path: "bert_model.ckpt"
+all_model_checkpoint_paths: "bert_model.ckpt"</code></p>
 <p>此时，已经准备好待转化的 TensorFlow 模型目录，整个模型目录的结构如下：
-<div class="highlight"><pre><span></span><code>uncased_L-12_H-768_A-12
+<code>uncased_L-12_H-768_A-12
 ├── bert_config.json
 ├── bert_model.ckpt.data-00000-of-00001
 ├── bert_model.ckpt.index
 ├── checkpoint
-└── vocab.txt
-</code></pre></div></p>
+└── vocab.txt</code></p>
 <p>我们接着使用 <code>convert_tf_ckpt_to_of.py</code> 将 TensorFlow 模型转为 OneFlow 模型：
-<div class="highlight"><pre><span></span><code>python convert_tf_ckpt_to_of.py <span class="se">\</span>
-  --tf_checkpoint_path ./uncased_L-12_H-768_A-12 <span class="se">\</span>
-  --of_dump_path ./uncased_L-12_H-768_A-12-oneflow
-</code></pre></div>
+<code>bash
+python convert_tf_ckpt_to_of.py \
+  --tf_checkpoint_path ./uncased_L-12_H-768_A-12 \
+  --of_dump_path ./uncased_L-12_H-768_A-12-oneflow</code>
 以上命令，将转化好的 OneFlow 格式的模型保存在 <code>./uncased_L-12_H-768_A-12-oneflow</code> 目录下，供后续微调训练(如：SQuAD)使用。</p>
 <h2 id="squad">微调：SQuAD 问答任务<a class="headerlink" href="#squad" title="Permanent link">&para;</a></h2>
 <h3 id="pretrained-squad">将 pretrained 模型修改为 SQuAD 模型<a class="headerlink" href="#pretrained-squad" title="Permanent link">&para;</a></h3>
 <p>我们只需要在 BERT 的 backbone 基础上，加上一层 <code>output</code> 层，并修改 loss 的表达式即可，完整的代码可以查看 <code>squad.py</code> 脚本，以下是几处关键修改：
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">SQuADTrain</span><span class="p">():</span>
-    <span class="c1">#...</span>
-    <span class="n">backbone</span> <span class="o">=</span> <span class="n">bert_util</span><span class="o">.</span><span class="n">BertBackbone</span><span class="p">()</span>
+```python
+def SQuADTrain():
+    #...
+    backbone = bert_util.BertBackbone()</p>
+<div class="codehilite"><pre><span></span><code>#在BERT的基础上加上一个全连接层
+with flow.name_scope(&quot;cls-squad&quot;):
+    final_hidden = backbone.sequence_output()
+    final_hidden_matrix = flow.reshape(final_hidden, [-1, hidden_size])
+    logits = bert_util._FullyConnected(
+                final_hidden_matrix,
+                hidden_size,
+                units=2,
+                weight_initializer=bert_util.CreateInitializer(initializer_range),
+                name=&#39;output&#39;)
+    logits = flow.reshape(logits, [-1, seq_length, 2])
 
-    <span class="c1">#在BERT的基础上加上一个全连接层</span>
-    <span class="k">with</span> <span class="n">flow</span><span class="o">.</span><span class="n">name_scope</span><span class="p">(</span><span class="s2">&quot;cls-squad&quot;</span><span class="p">):</span>
-        <span class="n">final_hidden</span> <span class="o">=</span> <span class="n">backbone</span><span class="o">.</span><span class="n">sequence_output</span><span class="p">()</span>
-        <span class="n">final_hidden_matrix</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">final_hidden</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">])</span>
-        <span class="n">logits</span> <span class="o">=</span> <span class="n">bert_util</span><span class="o">.</span><span class="n">_FullyConnected</span><span class="p">(</span>
-                    <span class="n">final_hidden_matrix</span><span class="p">,</span>
-                    <span class="n">hidden_size</span><span class="p">,</span>
-                    <span class="n">units</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-                    <span class="n">weight_initializer</span><span class="o">=</span><span class="n">bert_util</span><span class="o">.</span><span class="n">CreateInitializer</span><span class="p">(</span><span class="n">initializer_range</span><span class="p">),</span>
-                    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
-        <span class="n">logits</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">seq_length</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+    start_logits = flow.slice(logits, [None, None, 0], [None, None, 1])
+    end_logits = flow.slice(logits, [None, None, 1], [None, None, 1])
 
-        <span class="n">start_logits</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-        <span class="n">end_logits</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+#重新定义SQuAD任务的loss
+    start_loss = _ComputeLoss(start_logits, start_positions_blob, seq_length)
+    end_loss = _ComputeLoss(end_logits, end_positions_blob, seq_length)
 
-    <span class="c1">#重新定义SQuAD任务的loss</span>
-        <span class="n">start_loss</span> <span class="o">=</span> <span class="n">_ComputeLoss</span><span class="p">(</span><span class="n">start_logits</span><span class="p">,</span> <span class="n">start_positions_blob</span><span class="p">,</span> <span class="n">seq_length</span><span class="p">)</span>
-        <span class="n">end_loss</span> <span class="o">=</span> <span class="n">_ComputeLoss</span><span class="p">(</span><span class="n">end_logits</span><span class="p">,</span> <span class="n">end_positions_blob</span><span class="p">,</span> <span class="n">seq_length</span><span class="p">)</span>
+    total_loss = 0.5*(start_loss + end_loss)
 
-        <span class="n">total_loss</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">start_loss</span> <span class="o">+</span> <span class="n">end_loss</span><span class="p">)</span>
+return total_loss
+</code></pre></div>
 
-    <span class="k">return</span> <span class="n">total_loss</span>
-</code></pre></div></p>
+<p>```</p>
 <p>为了得到一个初始化的 squad 模型，我们通过以下脚本启动 squad 训练，并保存模型。</p>
-<p><div class="highlight"><pre><span></span><code>python ./run_squad.py\
+<p><code>python ./run_squad.py\
     --gpu_num_per_node=1\
     --learning_rate=3e-5\
     --batch_size_per_device=2\
@@ -1598,22 +1610,19 @@ all_model_checkpoint_paths: &quot;bert_model.ckpt&quot;
     --log_dir=./bert_regresssioin_test/of\
     --model_save_dir=./bert_regresssioin_test/of\
     --warmup_batches 831\
-    --save_last_snapshot True
-</code></pre></div>
+    --save_last_snapshot True</code>
 完成训练后，在 <code>./bert_regresssioin_test/of/last_snapshot</code> 中保存有初始化的 SQuAD 模型，我们将其与训练好的 BERT 合并后，进行微调（fine-tune）训练。</p>
 <h3 id="pretrained-squad_1">合并 pretrained 模型为 SQuAD 模型<a class="headerlink" href="#pretrained-squad_1" title="Permanent link">&para;</a></h3>
 <p>SQuAD 模型是在 pretrained 模型基础上的扩充，我们需要参照<a href="../basics_topics/model_load_save.html">模型的加载与保存</a>中的“模型部分初始化和部分导入”方法，将训练好的 BERT pretrained 模型与初始化的 SQuAD 模型合并。</p>
-<div class="highlight"><pre><span></span><code>cp -R ./bert_regresssioin_test/of/last_snapshot ./squadModel
-cp -R --remove-destination ./dataset/uncased_L-12_H-768_A-12_oneflow/* ./squadModel/
-</code></pre></div>
+<p><code>cp -R ./bert_regresssioin_test/of/last_snapshot ./squadModel
+cp -R --remove-destination ./dataset/uncased_L-12_H-768_A-12_oneflow/* ./squadModel/</code></p>
 <h3 id="oneflow">OneFlow 预训练模型的训练次数问题<a class="headerlink" href="#oneflow" title="Permanent link">&para;</a></h3>
 <p>OneFlow 生成的模型目录中，会有一个名为 <code>System-Train-TrainStep-xxx</code> 的子目录(xxx为作业函数的函数名)，该子目录下的 out 文件中，保存有训练总迭代数，并且这个迭代数会用于动态调节训练过程的<code>learning rate</code>。</p>
 <p>为了防止保存的迭代数影响到微调的训练，应该将out文件中的二进制数据清零：
-<div class="highlight"><pre><span></span><code>cd System-Train-TrainStep-xxx
+<code>cd System-Train-TrainStep-xxx
 xxd -r &gt; out &lt;&lt;ONEFLOW
 00000000: 0000 0000 0000 0000
-ONEFLOW
-</code></pre></div></p>
+ONEFLOW</code></p>
 <p>如果你使用的是由 TensorFlow 转过来的预训练模型，则可以省去这个步骤。</p>
 <h3 id="squad_1">开始 SQuAD 训练<a class="headerlink" href="#squad_1" title="Permanent link">&para;</a></h3>
 <p>通过 <code>run_suqad.py</code> 脚本，开始训练 SQuAD 模型，主要配置如下：</p>
@@ -1631,7 +1640,7 @@ ONEFLOW
 <p>learning rate = 3e-5</p>
 </li>
 </ul>
-<div class="highlight"><pre><span></span><code>python ./run_squad.py\
+<p><code>python ./run_squad.py\
     --gpu_num_per_node=4\
     --learning_rate=3e-5\
     --batch_size_per_device=8\
@@ -1654,35 +1663,34 @@ ONEFLOW
     --model_save_dir=./bert_regresssioin_test/of\
     --warmup_batches 831\
     --save_last_snapshot True\
-    --model_load_dir=./squadModel
-</code></pre></div>
+    --model_load_dir=./squadModel</code></p>
 <h3 id="_8">预测及打分<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
 <p>生成为了生成 <a href="https://rajpurkar.github.io/SQuAD-explorer/">Preidiction File</a> 格式的 json 文件，我们先将预测结果保存为 npy 文件，再使用 <a href="https://github.com/google-research/bert/blob/master/run_squad.py">google BERT的run_squad.py</a> 中的 <code>write_predictions</code> 函数，转化为 json 格式。</p>
 <p>利用 <code>run_squad_predict.py</code> 生成 <code>all_results.npy</code> 文件：
-<div class="highlight"><pre><span></span><code>python run_squad_predict.py <span class="se">\</span>
-  --gpu_num_per_node<span class="o">=</span><span class="m">1</span> <span class="se">\</span>
-  --batch_size_per_device<span class="o">=</span><span class="m">4</span> <span class="se">\</span>
-  --iter_num<span class="o">=</span><span class="m">2709</span> <span class="se">\</span>
-  --seq_length<span class="o">=</span><span class="m">384</span> <span class="se">\</span>
-  --max_predictions_per_seq<span class="o">=</span><span class="m">20</span> <span class="se">\</span>
-  --num_hidden_layers<span class="o">=</span><span class="m">12</span> <span class="se">\</span>
-  --num_attention_heads<span class="o">=</span><span class="m">12</span> <span class="se">\</span>
-  --max_position_embeddings<span class="o">=</span><span class="m">512</span> <span class="se">\</span>
-  --type_vocab_size<span class="o">=</span><span class="m">2</span> <span class="se">\</span>
-  --vocab_size<span class="o">=</span><span class="m">30522</span> <span class="se">\</span>
-  --attention_probs_dropout_prob<span class="o">=</span><span class="m">0</span>.0 <span class="se">\</span>
-  --hidden_dropout_prob<span class="o">=</span><span class="m">0</span>.0 <span class="se">\</span>
-  --hidden_size_per_head<span class="o">=</span><span class="m">64</span> <span class="se">\</span>
-  --use_boxing_v2<span class="o">=</span>True <span class="se">\</span>
-  --data_part_num<span class="o">=</span><span class="m">1</span> <span class="se">\</span>
-  --data_dir<span class="o">=</span>./dataset/dev-v1.1 <span class="se">\</span>
-  --log_dir<span class="o">=</span>./bert_regresssioin_test/of <span class="se">\</span>
-  --model_load_dir<span class="o">=</span>path/to/squadModel <span class="se">\</span>
-  --warmup_batches <span class="m">831</span>
-</code></pre></div>
+<code>bash
+python run_squad_predict.py \
+  --gpu_num_per_node=1 \
+  --batch_size_per_device=4 \
+  --iter_num=2709 \
+  --seq_length=384 \
+  --max_predictions_per_seq=20 \
+  --num_hidden_layers=12 \
+  --num_attention_heads=12 \
+  --max_position_embeddings=512 \
+  --type_vocab_size=2 \
+  --vocab_size=30522 \
+  --attention_probs_dropout_prob=0.0 \
+  --hidden_dropout_prob=0.0 \
+  --hidden_size_per_head=64 \
+  --use_boxing_v2=True \
+  --data_part_num=1 \
+  --data_dir=./dataset/dev-v1.1 \
+  --log_dir=./bert_regresssioin_test/of \
+  --model_load_dir=path/to/squadModel \
+  --warmup_batches 831</code>
 注意将以上 <code>model_load_dir</code> 修改为 <strong>训练好的</strong> squadModel。</p>
 <p>得到 <code>all_results.npy</code> 文件后，在<a href="https://github.com/google-research/bert/">google bert</a>仓库目录下（注意该仓库的 tensorflow 版本为 <strong>tensorflow v1</strong> ），运行我们提供的 <code>npy2json.py</code> (由 google bert 中的 run_squand.py 修改得来)：
-<div class="highlight"><pre><span></span><code>python npy2json.py\
+<code>python npy2json.py\
   --vocab_file=./dataset/vocab.txt \
   --bert_config_file=./dataset/bert_config.json \
   --do_train=False \
@@ -1691,39 +1699,38 @@ ONEFLOW
   --predict_file=./dataset/dev-v1.1.json \
   --max_seq_length=384 \
   --doc_stride=128 \
-  --output_dir=./squad_base/
-</code></pre></div></p>
+  --output_dir=./squad_base/</code></p>
 <p>注意将 <code>all_results_file</code> 修改为上一步得到的 <code>all_results.npy</code> 的路径。</p>
 <p>最终，得到 <code>predictions.json</code> 文件，可以使用 <a href="https://rajpurkar.github.io/SQuAD-explorer/">evaluate-v1.1.py</a> 进行打分。</p>
-<div class="highlight"><pre><span></span><code>python evaluate-v1.1.py <span class="se">\</span>
-./dataset/dev-v1.1.json <span class="se">\</span>
-path/to/squad_base/predictions.json
-</code></pre></div>
+<p><code>bash
+python evaluate-v1.1.py \
+./dataset/dev-v1.1.json \
+path/to/squad_base/predictions.json</code></p>
 <h2 id="_9">分布式训练<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h2>
 <p>如之前介绍脚本参数时描述：进行分布式训练，只需要在启动训练脚本式加入 <code>node_num</code> 选项指定主机数目及 <code>node_list</code> 选项即可：</p>
-<div class="highlight"><pre><span></span><code>python run_squad_predict.py <span class="se">\</span>
-  --gpu_num_per_node<span class="o">=</span><span class="m">1</span> <span class="se">\</span>
-  --batch_size_per_device<span class="o">=</span><span class="m">4</span> <span class="se">\</span>
-  --iter_num<span class="o">=</span><span class="m">2709</span> <span class="se">\</span>
-  --seq_length<span class="o">=</span><span class="m">384</span> <span class="se">\</span>
-  --max_predictions_per_seq<span class="o">=</span><span class="m">20</span> <span class="se">\</span>
-  --num_hidden_layers<span class="o">=</span><span class="m">12</span> <span class="se">\</span>
-  --num_attention_heads<span class="o">=</span><span class="m">12</span> <span class="se">\</span>
-  --max_position_embeddings<span class="o">=</span><span class="m">512</span> <span class="se">\</span>
-  --type_vocab_size<span class="o">=</span><span class="m">2</span> <span class="se">\</span>
-  --vocab_size<span class="o">=</span><span class="m">30522</span> <span class="se">\</span>
-  --attention_probs_dropout_prob<span class="o">=</span><span class="m">0</span>.0 <span class="se">\</span>
-  --hidden_dropout_prob<span class="o">=</span><span class="m">0</span>.0 <span class="se">\</span>
-  --hidden_size_per_head<span class="o">=</span><span class="m">64</span> <span class="se">\</span>
-  --use_boxing_v2<span class="o">=</span>True <span class="se">\</span>
-  --data_part_num<span class="o">=</span><span class="m">1</span> <span class="se">\</span>
-  --data_dir<span class="o">=</span>./dataset/dev-v1.1 <span class="se">\</span>
-  --log_dir<span class="o">=</span>./bert_regresssioin_test/of <span class="se">\</span>
-  --model_load_dir<span class="o">=</span>path/to/squadModel <span class="se">\</span>
-  --warmup_batches <span class="m">831</span> <span class="se">\</span>
-  --node_num<span class="o">=</span><span class="m">2</span> <span class="se">\</span>
-  --node_list<span class="o">=</span><span class="s2">&quot;192.168.1.12,192.168.1.14&quot;</span>
-</code></pre></div>
+<p><code>bash
+python run_squad_predict.py \
+  --gpu_num_per_node=1 \
+  --batch_size_per_device=4 \
+  --iter_num=2709 \
+  --seq_length=384 \
+  --max_predictions_per_seq=20 \
+  --num_hidden_layers=12 \
+  --num_attention_heads=12 \
+  --max_position_embeddings=512 \
+  --type_vocab_size=2 \
+  --vocab_size=30522 \
+  --attention_probs_dropout_prob=0.0 \
+  --hidden_dropout_prob=0.0 \
+  --hidden_size_per_head=64 \
+  --use_boxing_v2=True \
+  --data_part_num=1 \
+  --data_dir=./dataset/dev-v1.1 \
+  --log_dir=./bert_regresssioin_test/of \
+  --model_load_dir=path/to/squadModel \
+  --warmup_batches 831 \
+  --node_num=2 \
+  --node_list="192.168.1.12,192.168.1.14"</code></p>
                 
               
               

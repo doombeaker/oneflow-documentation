@@ -571,29 +571,8 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#node-configuration" class="md-nav__link">
-    Node Configuration
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#complete-code-of-distributed-training" class="md-nav__link">
-    Complete Code of Distributed Training
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#faq" class="md-nav__link">
-    FAQ
-  </a>
   
 </li>
       
@@ -923,29 +902,8 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#node-configuration" class="md-nav__link">
-    Node Configuration
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#complete-code-of-distributed-training" class="md-nav__link">
-    Complete Code of Distributed Training
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#faq" class="md-nav__link">
-    FAQ
-  </a>
   
 </li>
       
@@ -999,30 +957,25 @@
 <p>Here is an example to change a program run on a single machine to be run on a distributed system with few configurations.</p>
 <h3 id="single-machine-program">Single Machine Program<a class="headerlink" href="#single-machine-program" title="Permanent link">&para;</a></h3>
 <p>Here is the framework of single machine training program. Because the code of each function will be presented in the distributed program below, it is not listed in detail here.
-<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">oneflow</span> <span class="k">as</span> <span class="nn">flow</span>
-<span class="kn">import</span> <span class="nn">oneflow.typing</span> <span class="k">as</span> <span class="nn">tp</span>
-
-<span class="n">BATCH_SIZE</span> <span class="o">=</span> <span class="mi">100</span>
-
-<span class="k">def</span> <span class="nf">mlp</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-  <span class="c1">#build network...</span>
-
-
-<span class="nd">@flow</span><span class="o">.</span><span class="n">global_function</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">train_job</span><span class="p">(</span>
-    <span class="n">images</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">float</span><span class="p">),</span>
-    <span class="n">labels</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">:</span>
-  <span class="c1">#achieve job function ...</span>
-  <span class="c1">#Optimization method and parameters configuration training</span>
-
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-  <span class="c1">#call job function and start training...</span>
-      <span class="n">loss</span> <span class="o">=</span> <span class="n">train_job</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
-  <span class="c1">#...</span>
-</code></pre></div></p>
+```python
+import numpy as np
+import oneflow as flow
+import oneflow.typing as tp</p>
+<p>BATCH_SIZE = 100</p>
+<p>def mlp(data):
+  #build network...</p>
+<p><a class="magiclink magiclink-github magiclink-mention" href="https://github.com/flow" title="GitHub User: flow">@flow</a>.global_function(type="train")
+def train_job(
+    images: tp.Numpy.Placeholder((BATCH_SIZE, 1, 28, 28), dtype=flow.float),
+    labels: tp.Numpy.Placeholder((BATCH_SIZE,), dtype=flow.int32),
+) -&gt; tp.Numpy:
+  #achieve job function ...
+  #Optimization method and parameters configuration training</p>
+<p>if <strong>name</strong> == '<strong>main</strong>':
+  #call job function and start training...
+      loss = train_job(images, labels)
+  #...
+```</p>
 <h3 id="configuration-of-ports-and-device">Configuration of Ports and Device<a class="headerlink" href="#configuration-of-ports-and-device" title="Permanent link">&para;</a></h3>
 <p>In <code>oneflow.config</code>, we provide interfaces related to distributed program. We mainly use two of them:</p>
 <ul>
@@ -1034,43 +987,45 @@
 </li>
 </ul>
 <p>In the following demo, we set all machines to use one device and use the port 9988 for communication. User can change the configuration according to their actual situation.
-<div class="highlight"><pre><span></span><code><span class="c1">#device number</span>
-<span class="n">flow</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">gpu_device_num</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="c1">#Port number</span>
-<span class="n">flow</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">ctrl_port</span><span class="p">(</span><span class="mi">9988</span><span class="p">)</span>
-</code></pre></div></p>
+```python</p>
+<h1 id="device-number">device number<a class="headerlink" href="#device-number" title="Permanent link">&para;</a></h1>
+<p>flow.config.gpu_device_num(1)</p>
+<h1 id="port-number">Port number<a class="headerlink" href="#port-number" title="Permanent link">&para;</a></h1>
+<p>flow.env.ctrl_port(9988)
+```</p>
 <p>To be mentioned that, if we only have one single machine with multiple GPU devices in it, we can still use  <code>flow.config.gpu_device_num</code>  to change a program from running on a single machine to run on a distributed system. In the code below, we will use two GPU devices in one machine to do the distributed training:
-<div class="highlight"><pre><span></span><code><span class="n">flow</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">gpu_device_num</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</code></pre></div></p>
+<code>python
+flow.config.gpu_device_num(2)</code></p>
 <h3 id="node-configuration">Node Configuration<a class="headerlink" href="#node-configuration" title="Permanent link">&para;</a></h3>
 <p>Then we need to config the connection between the machines in network. In OneFlow, the distributed machine called <code>node</code>.</p>
 <p>The network information of each node is stored as a <code>dict</code>. The key "addr" is corresponding with IP of this node. All nodes are stored in a <code>list</code>, which will be informed to Oneflow by <code>flow.env.machine</code>. OneFlow will automatically generate the connection between nodes.</p>
-<div class="highlight"><pre><span></span><code><span class="n">nodes</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;addr&quot;</span><span class="p">:</span><span class="s2">&quot;192.168.1.12&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;addr&quot;</span><span class="p">:</span><span class="s2">&quot;192.168.1.11&quot;</span><span class="p">}]</span>
-<span class="n">flow</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">machine</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
-</code></pre></div>
+<p><code>python
+nodes = [{"addr":"192.168.1.12"}, {"addr":"192.168.1.11"}]
+flow.env.machine(nodes)</code></p>
 <p>In the code above, we have two nodes in our distributed system. Their IP is "192.168.1.12" and "192.168.1.11".</p>
 <p>It should be noted that the node 0 in list (in the above code is 192.168.1.12) is called <code>master node</code>. After the whole distributed training system starts, it will create the graph while the other nodes are waiting. When construction of graph is finished, all nodes will receive a notice specifying which nodes that they need to contact. Then they will work together in a decentralized way.</p>
 <p>During the training process, <code>master node</code>  will deal with the standard output and store the model. The other nodes are only responsible for calculation.</p>
 <p>We can wrap the configuration code for distributed training as a function, which is easy to be called:</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">config_distributed</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;distributed config&quot;</span><span class="p">)</span>
-    <span class="c1">#number of device used in each node</span>
-    <span class="n">flow</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">gpu_device_num</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="c1">#communication channel</span>
-    <span class="n">flow</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">ctrl_port</span><span class="p">(</span><span class="mi">9988</span><span class="p">)</span>
-
-    <span class="c1">#node configuration</span>
-    <span class="n">nodes</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;addr&quot;</span><span class="p">:</span><span class="s2">&quot;192.168.1.12&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;addr&quot;</span><span class="p">:</span><span class="s2">&quot;192.168.1.11&quot;</span><span class="p">}]</span>
-    <span class="n">flow</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">machine</span><span class="p">(</span><span class="n">n</span>
+<p>```python
+def config_distributed():
+    print("distributed config")
+    #number of device used in each node
+    flow.config.gpu_device_num(1)
+    #communication channel
+    flow.env.ctrl_port(9988)</p>
+<div class="codehilite"><pre><span></span><code>#node configuration
+nodes = [{&quot;addr&quot;:&quot;192.168.1.12&quot;}, {&quot;addr&quot;:&quot;192.168.1.11&quot;}]
+flow.env.machine(n
 </code></pre></div>
+
+<p>```</p>
 <h3 id="complete-code-of-distributed-training">Complete Code of Distributed Training<a class="headerlink" href="#complete-code-of-distributed-training" title="Permanent link">&para;</a></h3>
 <p>After adding the configurations code, the program becomes a distributed training one. Just follow the same step as we do in a single machine program.</p>
 <p>Compared with <strong>single machine training program</strong>, the distributed training program only needs to call one more function named <code>config_distributed</code>.</p>
 <p>Distribution script: <a href="../code/basics_topics/distributed_train.py">distributed_train.py</a></p>
 <p>Running on both <code>192.168.1.12</code> and <code>192.168.1.11</code>:</p>
-<p><div class="highlight"><pre><span></span><code>wget https://docs.oneflow.org/code/basics_topics/distributed_train.py
-python3 distributed_train.py
-</code></pre></div>
+<p><code>wget https://docs.oneflow.org/code/basics_topics/distributed_train.py
+python3 distributed_train.py</code>
 The result of the program will be displayed on <code>192.168.1.12</code>.</p>
 <h2 id="faq">FAQ<a class="headerlink" href="#faq" title="Permanent link">&para;</a></h2>
 <ul>

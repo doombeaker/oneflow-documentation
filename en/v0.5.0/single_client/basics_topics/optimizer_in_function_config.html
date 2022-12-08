@@ -1049,34 +1049,36 @@
 <h3 id="configuration-for-predictioninference">Configuration for prediction/inference<a class="headerlink" href="#configuration-for-predictioninference" title="Permanent link">&para;</a></h3>
 <p>Here we define a job function to evaluate the model: <code>eval_job</code></p>
 <p>We set up the configurations of <code>eval_job()</code> in <code>get_eval_config</code> fucntion and pass it to <code>@flow.global_function</code>. At the same time, we set the <code>type</code> parameter of the <code>@flow.global_function</code> to "predict" for evaluation task. This way, OneFlow does not propagate backwards in this job function.</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_eval_config</span><span class="p">():</span>
-  <span class="n">config</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">function_config</span><span class="p">()</span>
-  <span class="n">config</span><span class="o">.</span><span class="n">default_data_type</span><span class="p">(</span><span class="n">flow</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
-  <span class="k">return</span> <span class="n">config</span>
-
-<span class="nd">@flow</span><span class="o">.</span><span class="n">global_function</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;predict&quot;</span><span class="p">,</span> <span class="n">get_eval_config</span><span class="p">())</span>
-<span class="k">def</span> <span class="nf">eval_job</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">:</span>
-  <span class="c1"># build neural network here</span>
-</code></pre></div>
+<p>```python
+def get_eval_config():
+  config = flow.function_config()
+  config.default_data_type(flow.float)
+  return config</p>
+<p><a class="magiclink magiclink-github magiclink-mention" href="https://github.com/flow" title="GitHub User: flow">@flow</a>.global_function(type="predict", get_eval_config())
+def eval_job() -&gt; tp.Numpy:
+  # build neural network here
+```</p>
 <h3 id="configuration-for-training">Configuration for training<a class="headerlink" href="#configuration-for-training" title="Permanent link">&para;</a></h3>
 <p>If you specify the <code>type</code> parameter of <code>@flow.global_function</code> to be <code>train</code>, you can get a job function for training.</p>
 <p>In the following code, <code>train_job</code> is the job function used for training and it is configured with the default <code>function_config</code> (so there is no parameter passed to <code>function_config</code>).</p>
 <p>The reason you need to specify the following settings like optimizer, learning rate and other hyperparameters in the job function is because OneFlow will back propagate for <code>train</code> functions.</p>
-<p><div class="highlight"><pre><span></span><code><span class="nd">@flow</span><span class="o">.</span><span class="n">global_function</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">train_job</span><span class="p">(</span>
-    <span class="n">images</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">float</span><span class="p">),</span>
-    <span class="n">labels</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">:</span>
-    <span class="k">with</span> <span class="n">flow</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">placement</span><span class="p">(</span><span class="s2">&quot;gpu&quot;</span><span class="p">,</span> <span class="s2">&quot;0:0&quot;</span><span class="p">):</span>
-        <span class="n">logits</span> <span class="o">=</span> <span class="n">lenet</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">sparse_softmax_cross_entropy_with_logits</span><span class="p">(</span>
-            <span class="n">labels</span><span class="p">,</span> <span class="n">logits</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;softmax_loss&quot;</span>
-        <span class="p">)</span>
-
-    <span class="n">lr_scheduler</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">PiecewiseConstantScheduler</span><span class="p">([],</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">])</span>
-    <span class="n">flow</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">lr_scheduler</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">loss</span>
+<p>```python
+<a class="magiclink magiclink-github magiclink-mention" href="https://github.com/flow" title="GitHub User: flow">@flow</a>.global_function(type="train")
+def train_job(
+    images: tp.Numpy.Placeholder((BATCH_SIZE, 1, 28, 28), dtype=flow.float),
+    labels: tp.Numpy.Placeholder((BATCH_SIZE,), dtype=flow.int32),
+) -&gt; tp.Numpy:
+    with flow.scope.placement("gpu", "0:0"):
+        logits = lenet(images, train=True)
+        loss = flow.nn.sparse_softmax_cross_entropy_with_logits(
+            labels, logits, name="softmax_loss"
+        )</p>
+<div class="codehilite"><pre><span></span><code>lr_scheduler = flow.optimizer.PiecewiseConstantScheduler([], [0.1])
+flow.optimizer.SGD(lr_scheduler, momentum=0).minimize(loss)
+return loss
 </code></pre></div>
+
+<p>```
 In above code:</p>
 <ol>
 <li>

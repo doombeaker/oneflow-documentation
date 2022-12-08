@@ -1215,30 +1215,30 @@
 <ul>
 <li>Use  <code>oneflow.config.gpu_device_num</code>  to set the device number in training:</li>
 </ul>
-<div class="highlight"><pre><span></span><code>  <span class="n">flow</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">gpu_device_num</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</code></pre></div>
+<p><code>python
+  flow.config.gpu_device_num(2)</code></p>
 <ul>
 <li><code>reshape</code> and <code>hidden</code> using data parallelism as default. The output layer can set <code>model_distribute</code> as <code>flow.distribute.split(axis=0)</code> to change to model parallelism:</li>
 </ul>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">mlp</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-    <span class="n">initializer</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">truncated_normal</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
-    <span class="n">reshape</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">hidden</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span>
-        <span class="n">reshape</span><span class="p">,</span>
-        <span class="mi">512</span><span class="p">,</span>
-        <span class="n">activation</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span>
-        <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;dense1&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span>
-        <span class="n">hidden</span><span class="p">,</span>
-        <span class="mi">10</span><span class="p">,</span>
-        <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer</span><span class="p">,</span>
-        <span class="c1"># dense for column storage with split(0) slicing.</span>
-        <span class="n">model_distribute</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">distribute</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;dense2&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-</code></pre></div>
+<p><code>python
+def mlp(data):
+    initializer = flow.truncated_normal(0.1)
+    reshape = flow.reshape(data, [data.shape[0], -1])
+    hidden = flow.layers.dense(
+        reshape,
+        512,
+        activation=flow.nn.relu,
+        kernel_initializer=initializer,
+        name="dense1",
+    )
+    return flow.layers.dense(
+        hidden,
+        10,
+        kernel_initializer=initializer,
+        # dense for column storage with split(0) slicing.
+        model_distribute=flow.distribute.split(axis=0),
+        name="dense2",
+    )</code></p>
 <p>You may be curious about why <code>split(axis=0)</code> is column cutting. To be explained, <code>dense</code> is column-oriented storage in OneFlow. Thus the <code>flow.distribute.split(axis=0)</code> in above code is split by column.</p>
 <p>In addition, <code>flow.layers.dense</code>  use <code>model_distribute</code>  to set parallelism mode, it use the common <code>get_variable</code> to create <code>blob</code> in basic level from inner, and internally calls the more general interface <code>get_variable</code> to create <code>blob</code>. The <code>get_variable</code> interface uses a parameter named <code>distribute</code> to set the parallelism mode.</p>
 <p>As you can see, we can change the single machine training program to a distributed, hybrid parallel program with few modifications, which is one of the features that distinguishes OneFlow from other frameworks.</p>
@@ -1254,22 +1254,23 @@
 <ul>
 <li>Use <code>oneflow.scope.placement</code> to specify the operator run on device 0 in  <code>hidden</code> layer.</li>
 </ul>
-<div class="highlight"><pre><span></span><code>  <span class="k">with</span> <span class="n">flow</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">placement</span><span class="p">(</span><span class="s2">&quot;gpu&quot;</span><span class="p">,</span> <span class="s2">&quot;0:0&quot;</span><span class="p">):</span>
-        <span class="n">hidden</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span>
-            <span class="n">reshape</span><span class="p">,</span>
-            <span class="mi">512</span><span class="p">,</span>
-            <span class="n">activation</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span>
-            <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;hidden&quot;</span><span class="p">,</span>
-</code></pre></div>
+<p>```python
+  with flow.scope.placement("gpu", "0:0"):
+        hidden = flow.layers.dense(
+            reshape,
+            512,
+            activation=flow.nn.relu,
+            kernel_initializer=initializer,
+            name="hidden",</p>
+<p>```</p>
 <ul>
 <li>Use  <code>oneflow.scope.placement</code> to specify the operator in <code>output</code> layer run on device 1. </li>
 </ul>
-<p><div class="highlight"><pre><span></span><code>  <span class="k">with</span> <span class="n">flow</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">placement</span><span class="p">(</span><span class="s2">&quot;gpu&quot;</span><span class="p">,</span> <span class="s2">&quot;0:1&quot;</span><span class="p">):</span>
-        <span class="n">output</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span>
-            <span class="n">hidden</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;outlayer&quot;</span>
-        <span class="p">)</span>
-</code></pre></div>
+<p><code>python
+  with flow.scope.placement("gpu", "0:1"):
+        output = flow.layers.dense(
+            hidden, 10, kernel_initializer=initializer, name="outlayer"
+        )</code>
 More details of <code>scope.placement</code> can be found in the <a href="https://oneflow.readthedocs.io/en/master/scope.html#oneflow.scope.placement">API documentation</a>.</p>
 <p>Pipelining can allow user to specify which device to be used for each op. It is very useful for user who master the distributed training to <strong>optimize deeply</strong>.</p>
 <p>In addition, OneFlow also provides API <code>oneflow.unpack</code>, <code>oneflow.pack</code>. Combined with the own features of task scheduling in OneFlow, they make the pipelining easier to be used and more efficient. We will introduce them in other article.</p>

@@ -799,21 +799,42 @@
 <p>Since you have known about 1D SBP, this document introduces 2D SBP, which can more flexibly deal with more complex distributed training scenarios.</p>
 <h2 id="2d-devices-array">2D Devices Array<a class="headerlink" href="#2d-devices-array" title="Permanent link">&para;</a></h2>
 <p>We are already familiar with the placement configuration of 1D SBP. In the scenario of 1D SBP, configure the cluster through the <a href="https://oneflow.readthedocs.io/en/master/placement.html#oneflow.placement">oneflow.placement</a> interface. For example, use the 0~3 GPU graphics in the cluster:</p>
-<div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">placement1</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">placement</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">ranks</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
-</code></pre></div>
+<p>```python</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>placement1 = flow.placement("cuda", ranks=[0, 1, 2, 3])
+```</p>
+</blockquote>
+</blockquote>
+</blockquote>
 <p>The above <code>"cuda"</code> specifies the device type, and <code>ranks=[0, 1, 2, 3]</code> specifies the computing devices in the cluster. In fact, <code>ranks</code> can be not only a one-dimensional int list, but also a multi-dimensional int array:</p>
-<div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">placement2</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">placement</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">ranks</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]])</span>
-</code></pre></div>
+<p>```python</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>placement2 = flow.placement("cuda", ranks=[[0, 1], [2, 3]])
+```</p>
+</blockquote>
+</blockquote>
+</blockquote>
 <p>When <code>ranks</code> is in the form of a one-dimensional list like <code>ranks=[0, 1, 2, 3]</code>, all devices in the cluster form a 1D device vector, which is where the 1D SBP name comes from.</p>
 <p>When <code>ranks</code> is in the form of a multi-dimensional array, the devices in the cluster are grouped into a multi-dimensional array of devices. <code>ranks=[[0, 1], [2, 3]]</code> means that the four computing devices in the cluster are divided into a <span class="arithmatex">\(2 \times 2\)</span> device array.</p>
 <h2 id="2d-sbp_1">2D SBP<a class="headerlink" href="#2d-sbp_1" title="Permanent link">&para;</a></h2>
 <p>When constructing a Global Tensor, we need to specify both <code>placement</code> and <code>SBP</code>. When the cluster in <code>placement</code> is a 2-dimensional device array, SBP must also correspond to it, being a <code>tuple</code> with a length of 2. The 0<sup>th</sup> and 1<sup>st</sup> elements in this <code>tuple</code> respectively describes the distribution of Global Tensor in the 0<sup>th</sup> and 1<sup>st</sup> dimensions of the device array.</p>
 <p>For example, The following code configures a <span class="arithmatex">\(2 \times 2\)</span> device array, and sets the 2D SBP to <code>(broadcast, split(0))</code>.</p>
-<div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">a</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">Tensor</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]])</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">placement</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">placement</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">ranks</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]])</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">sbp</span> <span class="o">=</span> <span class="p">(</span><span class="n">flow</span><span class="o">.</span><span class="n">sbp</span><span class="o">.</span><span class="n">broadcast</span><span class="p">,</span> <span class="n">flow</span><span class="o">.</span><span class="n">sbp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">a_to_global</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">to_global</span><span class="p">(</span><span class="n">placement</span><span class="o">=</span><span class="n">placement</span><span class="p">,</span> <span class="n">sbp</span><span class="o">=</span><span class="n">sbp</span><span class="p">)</span>
-</code></pre></div>
+<p>```python</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>a = flow.Tensor([[1,2],[3,4]])
+placement = flow.placement("cuda", ranks=[[0, 1], [2, 3]])
+sbp = (flow.sbp.broadcast, flow.sbp.split(0))
+a_to_global = a.to_global(placement=placement, sbp=sbp)
+```</p>
+</blockquote>
+</blockquote>
+</blockquote>
 <p>It means that logically the data, over the entire device array, is <code>broadcast</code> in the 0<sup>th</sup> dimension ("viewed vertically"); <code>split(0)</code> in the 1<sup>st</sup> dimension ("viewed across").</p>
 <p>See the following figure:</p>
 <p><img alt="" src="imgs/2d-sbp.png" /></p>

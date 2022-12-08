@@ -1054,27 +1054,25 @@
 </li>
 </ul>
 <p>Take <code>oneflow.watch</code> as example:</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">my_watch</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">T</span><span class="p">):</span>
-    <span class="c1">#process x</span>
-
-<span class="nd">@global_function</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">foo</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
-    <span class="c1">#define network ...</span>
-    <span class="n">oneflow</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">my_watch</span><span class="p">)</span>
-    <span class="c1">#...</span>
-</code></pre></div>
+<p>```python
+def my_watch(x: T):
+    #process x</p>
+<p><a class="magiclink magiclink-github magiclink-mention" href="https://github.com/global_function" title="GitHub User: global_function">@global_function</a>()
+def foo() -&gt; T:
+    #define network ...
+    oneflow.watch(x, my_watch)
+    #...
+```</p>
 <p>The T in the code above is the data type in <code>oneflow.typing</code>. Like  <code>oneflow.typing.Numpy</code>. Please refer to <a href="../basics_topics/async_get.html#oneflowtyping">this article</a>.</p>
 <p>We will use the following examples to demonstrate how to use  <code>watch</code> and <code>watch_diff</code>.</p>
 <h2 id="use-watch-to-obtain-the-data-when-running">Use watch to Obtain the Data when Running<a class="headerlink" href="#use-watch-to-obtain-the-data-when-running" title="Permanent link">&para;</a></h2>
 <p>The following is an example to demonstrate how to use <code>oneflow.watch</code> to obtain the data from middle layer in OneFlow.
 Code:<a href="../code/extended_topics/test_watch.py">test_watch.py</a></p>
 <p>Run above code:
-<div class="highlight"><pre><span></span><code>python3 test_watch.py
-</code></pre></div></p>
+<code>python3 test_watch.py</code></p>
 <p>We can get results like the followings:
-<div class="highlight"><pre><span></span><code>in: [ 0.15727027  0.45887455  0.10939325  0.66666406 -0.62354755]
-out: [0.15727027 0.45887455 0.10939325 0.66666406 0.        ]
-</code></pre></div></p>
+<code>in: [ 0.15727027  0.45887455  0.10939325  0.66666406 -0.62354755]
+out: [0.15727027 0.45887455 0.10939325 0.66666406 0.        ]</code></p>
 <h3 id="code-explanation">Code Explanation<a class="headerlink" href="#code-explanation" title="Permanent link">&para;</a></h3>
 <p>In the example, we focus on <code>y</code> in <code>ReluJob</code>. Thus, we call <code>flow.watch(y, watch_handler)</code> to monitor <code>y</code>. The function <code>oneflow.watch</code> needs two parameters:</p>
 <ul>
@@ -1090,23 +1088,22 @@ out: [0.15727027 0.45887455 0.10939325 0.66666406 0.        ]
 <p>The following is an example to demonstrate how to use <code>oneflow.watch_diff</code> to obtain the gradient at runtime.</p>
 <p>Code: <a href="../code/extended_topics/test_watch_diff.py">test_watch_diff.py</a></p>
 <p>Run above code:
-<div class="highlight"><pre><span></span><code>python3 test_watch.py
-</code></pre></div>
+<code>python3 test_watch.py</code>
 We should have the following results:
-<div class="highlight"><pre><span></span><code>[ ...
+<code>text
+[ ...
  [ 1.39966095e-03  3.49164731e-03  3.31605263e-02  4.50417027e-03
    7.73609674e-04  4.89911772e-02  2.47627571e-02  7.65468649e-05
-  -1.18361652e-01  1.20161276e-03]] (100, 10) float32
-</code></pre></div></p>
+  -1.18361652e-01  1.20161276e-03]] (100, 10) float32</code></p>
 <h3 id="code-explanation_1">Code Explanation<a class="headerlink" href="#code-explanation_1" title="Permanent link">&para;</a></h3>
 <p>In the example above, we use <code>oneflow.watch_diff</code> to obtain the gradient. The processe is the same as the example which using <code>oneflow.watch</code>  to obtain data tensor.</p>
 <p>First, we define the callback function:
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">watch_diff_handler</span><span class="p">(</span><span class="n">blob</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;watch_diff_handler:&quot;</span><span class="p">,</span> <span class="n">blob</span><span class="p">,</span> <span class="n">blob</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">blob</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
-</code></pre></div></p>
+<code>python
+def watch_diff_handler(blob: tp.Numpy):
+    print("watch_diff_handler:", blob, blob.shape, blob.dtype)</code></p>
 <p>Then we use <code>oneflow.watch_diff</code> to register the callback function in job function:
-<div class="highlight"><pre><span></span><code><span class="n">flow</span><span class="o">.</span><span class="n">watch_diff</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">watch_diff_handler</span><span class="p">)</span>
-</code></pre></div></p>
+<code>python
+flow.watch_diff(logits, watch_diff_handler)</code></p>
 <p>When running, OneFlow framework will call <code>watch_diff_handler</code> and send the gradient corresponding with <code>logits</code> to <code>watch_diff_handler</code>.</p>
                 
               

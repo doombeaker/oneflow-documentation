@@ -1215,29 +1215,28 @@
 </blockquote>
 <h4 id="_2">环境依赖<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h4>
 <h5 id="_3">用户环境配置<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h5>
-<div class="highlight"><pre><span></span><code>python&gt;<span class="o">=</span><span class="m">3</span>.5
-onnx&gt;<span class="o">=</span><span class="m">1</span>.8.0
-onnx-simplifier&gt;<span class="o">=</span><span class="m">0</span>.3.3
-onnxoptimizer&gt;<span class="o">=</span><span class="m">0</span>.2.5
-onnxruntime&gt;<span class="o">=</span><span class="m">1</span>.6.0
-oneflow <span class="o">(</span>https://github.com/Oneflow-Inc/oneflow#install-with-pip-package<span class="o">)</span>
-</code></pre></div>
+<p><code>sh
+python&gt;=3.5
+onnx&gt;=1.8.0
+onnx-simplifier&gt;=0.3.3
+onnxoptimizer&gt;=0.2.5
+onnxruntime&gt;=1.6.0
+oneflow (https://github.com/Oneflow-Inc/oneflow#install-with-pip-package)</code></p>
 <p>如果你想使用 X2OneFlow（X 代表 TensorFlow/Pytorch/PaddlePaddle）则需要安装对应的深度学习框架。依赖如下：</p>
-<div class="highlight"><pre><span></span><code>pytorch&gt;<span class="o">=</span><span class="m">1</span>.7.0
-paddlepaddle&gt;<span class="o">=</span><span class="m">2</span>.0.0
-paddle2onnx&gt;<span class="o">=</span><span class="m">0</span>.6
-tensorflow&gt;<span class="o">=</span><span class="m">2</span>.0.0
-tf2onnx&gt;<span class="o">=</span><span class="m">1</span>.8.4
-</code></pre></div>
+<p><code>sh
+pytorch&gt;=1.7.0
+paddlepaddle&gt;=2.0.0
+paddle2onnx&gt;=0.6
+tensorflow&gt;=2.0.0
+tf2onnx&gt;=1.8.4</code></p>
 <h4 id="_4">安装<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h4>
 <h5 id="1">安装方式1<a class="headerlink" href="#1" title="Permanent link">&para;</a></h5>
-<div class="highlight"><pre><span></span><code>pip install oneflow_onnx
-</code></pre></div>
+<p><code>sh
+pip install oneflow_onnx</code></p>
 <p><strong>安装方式2</strong></p>
-<div class="highlight"><pre><span></span><code>git clone https://github.com/Oneflow-Inc/oneflow_convert_tools
+<p><code>git clone https://github.com/Oneflow-Inc/oneflow_convert_tools
 cd oneflow_onnx
-python3 setup.py install
-</code></pre></div>
+python3 setup.py install</code></p>
 <h4 id="_5">使用方法<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h4>
 <p>请参考<a href="https://github.com/Oneflow-Inc/oneflow_convert_tools/tree/main/examples/README.md">使用示例</a></p>
 <h4 id="_6">相关文档<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h4>

@@ -918,13 +918,13 @@
 <p>在 OneFlow v0.4.0 版本及以前，OneFlow 的接口是非面向对象的。现有版本的动态图、静态图模式均提供了面向对象接口。</p>
 <p>为了照顾老接口的用户，OneFlow 将老接口移动至 <code>oneflow.compatible.single_client</code>。
 有历史遗留代码的用户，只需要将原代码的包导入：</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">oneflow</span> <span class="k">as</span> <span class="nn">flow</span>
-<span class="kn">import</span> <span class="nn">oneflow.typing</span> <span class="k">as</span> <span class="nn">tp</span>
-</code></pre></div>
+<p><code>python
+import oneflow as flow
+import oneflow.typing as tp</code></p>
 <p>改为新的导入方式即可：</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">oneflow.compatible</span> <span class="kn">import</span> <span class="n">single_client</span> <span class="k">as</span> <span class="n">flow</span>
-<span class="kn">from</span> <span class="nn">oneflow.compatible.single_client</span> <span class="kn">import</span> <span class="n">typing</span> <span class="k">as</span> <span class="n">tp</span>
-</code></pre></div>
+<p><code>python
+from oneflow.compatible import single_client as flow
+from oneflow.compatible.single_client import typing as tp</code></p>
                 
               
               

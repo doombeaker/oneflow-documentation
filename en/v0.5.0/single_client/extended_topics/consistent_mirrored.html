@@ -1190,9 +1190,9 @@
 <p>Other frameworks like TensorFlow or Pytorch support <code>mirrored view</code>. The <code>mirrored view</code> of OneFlow is similar to them.</p>
 <p>In mirrored view, the model are copied in each GPU, the graph building on each node is the same, thus we can only use <strong>data parallelism</strong>.</p>
 <p>In OneFlow, the default strategy is consistent view, so you should use <code>default_logical_view</code> of  <code>flow.function_config()</code> to define:</p>
-<div class="highlight"><pre><span></span><code>    <span class="n">func_config</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">function_config</span><span class="p">()</span>
-    <span class="n">func_config</span><span class="o">.</span><span class="n">default_logical_view</span><span class="p">(</span><span class="n">flow</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">mirrored_view</span><span class="p">())</span>
-</code></pre></div>
+<p><code>python
+    func_config = flow.function_config()
+    func_config.default_logical_view(flow.scope.mirrored_view())</code></p>
 <p>In <code>mirrored_view</code>, we can only use <strong>data parallelism</strong>. When we call the job function, we need to divide the data evenly according to the amount of the devices and put the data after dividing it into a <code>list</code>. Every element in the <code>list</code> is the data to send to <strong>each device</strong>.</p>
 <p>The return value type of job function is <code>oneflow.typing.ListNumpy</code>. Every element in the <code>list</code> is corresponding to the results of each device.</p>
 <p><strong>Concat</strong> all elements in the <code>list</code> can make a complete batch.</p>
@@ -1205,45 +1205,44 @@
 <ul>
 <li>
 <p>Use  <code>flow.config.gpu_device_num</code> to set device amount as 2.
-<div class="highlight"><pre><span></span><code><span class="n">flow</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">gpu_device_num</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</code></pre></div></p>
+<code>python
+flow.config.gpu_device_num(2)</code></p>
 </li>
 <li>
 <p><code>oneflow.typing.ListNumpy.Placeholder</code> defined the sample amount which is divided. And the relationship between <code>BATCH_SIZE_PER_GPU</code>  and <code>BATCH_SIZE</code> is <code>BATCH_SIZE=BATCH_SIZE_PER_GPU×GPU_NUM</code>.
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">train_job</span><span class="p">(</span>
-    <span class="n">images</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ListNumpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE_PER_GPU</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">float</span><span class="p">),</span>
-    <span class="n">labels</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ListNumpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE_PER_GPU</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tp</span><span class="o">.</span><span class="n">ListNumpy</span><span class="p">:</span>
-</code></pre></div></p>
+<code>python
+def train_job(
+    images: tp.ListNumpy.Placeholder((BATCH_SIZE_PER_GPU, 1, 28, 28), dtype=flow.float),
+    labels: tp.ListNumpy.Placeholder((BATCH_SIZE_PER_GPU,), dtype=flow.int32),
+) -&gt; tp.ListNumpy:</code></p>
 </li>
 <li>
 <p>The data after dividing need to be stored in the <code>list</code> and passed to training functions. The number of elements in <code>list</code> need to be same as the <strong>amount of devices in the training process</strong>. The i-th element in <code>list</code> will be sent to the i-th device:
-<div class="highlight"><pre><span></span><code>  <span class="n">images1</span> <span class="o">=</span> <span class="n">images</span><span class="p">[:</span><span class="n">BATCH_SIZE_PER_GPU</span><span class="p">]</span>
-  <span class="n">images2</span> <span class="o">=</span> <span class="n">images</span><span class="p">[</span><span class="n">BATCH_SIZE_PER_GPU</span><span class="p">:]</span>
-  <span class="n">labels1</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[:</span><span class="n">BATCH_SIZE_PER_GPU</span><span class="p">]</span>
-  <span class="n">labels2</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="n">BATCH_SIZE_PER_GPU</span><span class="p">:]</span>
-
-  <span class="n">imgs_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">images1</span><span class="p">,</span> <span class="n">images2</span><span class="p">]</span>
-  <span class="n">labels_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">labels1</span><span class="p">,</span> <span class="n">labels2</span><span class="p">]</span>
-
-  <span class="n">loss</span> <span class="o">=</span> <span class="n">train_job</span><span class="p">(</span><span class="n">imgs_list</span><span class="p">,</span> <span class="n">labels_list</span><span class="p">)</span>
-</code></pre></div></p>
+```python
+  images1 = images[:BATCH_SIZE_PER_GPU]
+  images2 = images[BATCH_SIZE_PER_GPU:]
+  labels1 = labels[:BATCH_SIZE_PER_GPU]
+  labels2 = labels[BATCH_SIZE_PER_GPU:]</p>
 </li>
-<li>
-<p>The return result <code>loss</code> is a <code>list</code>, the number of elements in this <code>list</code> need to be same as <strong>the amount of devices in the training process</strong>. Then we concat them and print the <code>total_loss</code>.
-<div class="highlight"><pre><span></span><code> <span class="n">total_loss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">*</span><span class="n">loss</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">*</span><span class="n">loss</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
-  <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">20</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-      <span class="nb">print</span><span class="p">(</span><span class="n">total_loss</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
-</code></pre></div></p>
-</li>
+</ul>
+<p>imgs_list = [images1, images2]
+  labels_list = [labels1, labels2]</p>
+<p>loss = train_job(imgs_list, labels_list)
+```</p>
+<ul>
+<li>The return result <code>loss</code> is a <code>list</code>, the number of elements in this <code>list</code> need to be same as <strong>the amount of devices in the training process</strong>. Then we concat them and print the <code>total_loss</code>.
+<code>python
+ total_loss = np.array([*loss[0], *loss[1]])
+  if i % 20 == 0:
+      print(total_loss.mean())</code></li>
 </ul>
 <h2 id="use-consistent-view-in-oneflow">Use consistent view in OneFlow<a class="headerlink" href="#use-consistent-view-in-oneflow" title="Permanent link">&para;</a></h2>
 <p>We have already learned about the mirrored view, where samples will be distributed evenly while the models are the same in every device, and the results of each node need to be assembled to get the complete batch.</p>
 <p>In addition to mirrored view, OneFlow also provides consistent view. Consistent view is one of the features of OneFlow. Compared with mirrored view, it has a great advantage.</p>
 <p>OneFlow will use consistent view as default. We can declare it explicitly as the following code.
-<div class="highlight"><pre><span></span><code>  <span class="n">config</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">function_config</span><span class="p">()</span>
-  <span class="n">config</span><span class="o">.</span><span class="n">default_distribute_strategy</span><span class="p">(</span><span class="n">flow</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">consistent_view</span><span class="p">())</span>
-</code></pre></div>
+<code>python
+  config = flow.function_config()
+  config.default_distribute_strategy(flow.scope.consistent_view())</code>
 The reason why consistent view is the main feature of OneFlow is that in OneFlow design, if we use <code>consistent_view</code>, multiple devices in a distributed system can <strong>get consistently in logic level</strong> from user's point of view. We use matrix multiplication as an example in the beginning of article, we only need focus on <a href="#mat_mul_op">matrix multiplication</a> itself on mathematics level. But in project, the issue of how to config and use model parallelism or data parallelism can be easily done in OneFlow. OneFlow will handle <strong>The data division in data parallelism</strong>, <strong>model division in model parallelism</strong> and <strong>serial logic</strong> issue quickly and efficiently.</p>
 <p>In consistent view of OneFlow, we can choose model parallelism, data parallelism, or hybrid parallelism freely.</p>
 <h3 id="code-example">Code Example<a class="headerlink" href="#code-example" title="Permanent link">&para;</a></h3>
@@ -1254,25 +1253,25 @@ The reason why consistent view is the main feature of OneFlow is that in OneFlow
 <ul>
 <li>
 <p>Use  <code>flow.config.gpu_device_num</code> to set the amount of devices:
-<div class="highlight"><pre><span></span><code><span class="n">flow</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">gpu_device_num</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</code></pre></div></p>
+<code>python
+flow.config.gpu_device_num(2)</code></p>
 </li>
 <li>
 <p>Use  <code>tp.Numpy.Placeholder</code> to define the placeholder in consistent view. Because the blob of <code>Numpy.Placeholder</code> represent the op and placeholder in logic. Thus. the BATCH_SIZE is the sum of samples, without artificial split or combination
-<div class="highlight"><pre><span></span><code><span class="nd">@flow</span><span class="o">.</span><span class="n">global_function</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">train_job</span><span class="p">(</span>
-    <span class="n">images</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">float</span><span class="p">),</span>
-    <span class="n">labels</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">:</span>
-</code></pre></div></p>
+<code>python
+@flow.global_function(type="train")
+def train_job(
+    images: tp.Numpy.Placeholder((BATCH_SIZE, 1, 28, 28), dtype=flow.float),
+    labels: tp.Numpy.Placeholder((BATCH_SIZE,), dtype=flow.int32),
+) -&gt; tp.Numpy:</code></p>
 </li>
 <li>
 <p>The job function is called directly to obtain the training results. The splitting and concatenating in the distributed training are completed automatically by OneFlow. In the consistent view, there are few differences between the single-machine training program and the distributed training program.
-<div class="highlight"><pre><span></span><code><span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">train_images</span><span class="p">,</span> <span class="n">train_labels</span><span class="p">)):</span>
-  <span class="n">loss</span> <span class="o">=</span> <span class="n">train_job</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
-  <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">20</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-      <span class="nb">print</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
-</code></pre></div></p>
+<code>python
+for i, (images, labels) in enumerate(zip(train_images, train_labels)):
+  loss = train_job(images, labels)
+  if i % 20 == 0:
+      print(loss.mean())</code></p>
 </li>
 </ul>
 <h2 id="more-extension">More extension<a class="headerlink" href="#more-extension" title="Permanent link">&para;</a></h2>

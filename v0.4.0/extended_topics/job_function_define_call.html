@@ -1101,32 +1101,34 @@
 </li>
 </ul>
 <p>以下代码示例中，我们构建了一个 mlp 模型。并且将由 <code>flow.nn.sparse_softmax_cross_entropy_with_logits</code> 计算得到交叉熵损失结果作为优化目标。</p>
-<div class="highlight"><pre><span></span><code><span class="nd">@flow</span><span class="o">.</span><span class="n">global_function</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">train_job</span><span class="p">(</span>
-    <span class="n">images</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">float</span><span class="p">),</span>
-    <span class="n">labels</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tp</span><span class="o">.</span><span class="n">Callback</span><span class="p">[</span><span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">]:</span>
-    <span class="c1"># mlp</span>
-    <span class="n">initializer</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">truncated_normal</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
-    <span class="n">reshape</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="p">[</span><span class="n">images</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">hidden</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span>
-        <span class="n">reshape</span><span class="p">,</span>
-        <span class="mi">512</span><span class="p">,</span>
-        <span class="n">activation</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span>
-        <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;hidden&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">logits</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span>
-        <span class="n">hidden</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;output&quot;</span>
-    <span class="p">)</span>
-
-    <span class="n">loss</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">sparse_softmax_cross_entropy_with_logits</span><span class="p">(</span>
-        <span class="n">labels</span><span class="p">,</span> <span class="n">logits</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;softmax_loss&quot;</span>
-    <span class="p">)</span>
-    <span class="n">lr_scheduler</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">PiecewiseConstantScheduler</span><span class="p">([],</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">])</span>
-    <span class="n">flow</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">lr_scheduler</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">loss</span>
+<p>```python
+<a class="magiclink magiclink-github magiclink-mention" href="https://github.com/flow" title="GitHub User: flow">@flow</a>.global_function(type="train")
+def train_job(
+    images: tp.Numpy.Placeholder((BATCH_SIZE, 1, 28, 28), dtype=flow.float),
+    labels: tp.Numpy.Placeholder((BATCH_SIZE,), dtype=flow.int32),
+) -&gt; tp.Callback[tp.Numpy]:
+    # mlp
+    initializer = flow.truncated_normal(0.1)
+    reshape = flow.reshape(images, [images.shape[0], -1])
+    hidden = flow.layers.dense(
+        reshape,
+        512,
+        activation=flow.nn.relu,
+        kernel_initializer=initializer,
+        name="hidden",
+    )
+    logits = flow.layers.dense(
+        hidden, 10, kernel_initializer=initializer, name="output"
+    )</p>
+<div class="codehilite"><pre><span></span><code>loss = flow.nn.sparse_softmax_cross_entropy_with_logits(
+    labels, logits, name=&quot;softmax_loss&quot;
+)
+lr_scheduler = flow.optimizer.PiecewiseConstantScheduler([], [0.1])
+flow.optimizer.SGD(lr_scheduler, momentum=0).minimize(loss)
+return loss
 </code></pre></div>
+
+<p>```</p>
 <h3 id="oneflowglobal_function"><code>oneflow.global_function</code> 的参数<a class="headerlink" href="#oneflowglobal_function" title="Permanent link">&para;</a></h3>
 <p><code>oneflow.global_function</code> 修饰符接收两个参数，分别是 <code>type</code> 与 <code>function_config</code>。</p>
 <ul>
@@ -1137,18 +1139,18 @@
 <p><code>function_config</code> 参数接收一个 <code>oneflow.function_config()</code> 所构造的对象，在 <code>function_config</code> 对象中，可以通过成员方法或属性，进行相关配置。如以下代码：</p>
 </li>
 </ul>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_train_config</span><span class="p">():</span>
-    <span class="n">config</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">function_config</span><span class="p">()</span>
-    <span class="n">config</span><span class="o">.</span><span class="n">default_data_type</span><span class="p">(</span><span class="n">flow</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">config</span>
-</code></pre></div>
+<p><code>python
+def get_train_config():
+    config = flow.function_config()
+    config.default_data_type(flow.float)
+    return config</code></p>
 <p>我们设置了默认数据类型，然后，我们可以再向 <code>global_function</code> 装饰器传递这个<code>function_config</code> 对象：
-<div class="highlight"><pre><span></span><code><span class="nd">@flow</span><span class="o">.</span><span class="n">global_function</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">,</span> <span class="n">function_config</span><span class="o">=</span><span class="n">get_train_config</span><span class="p">())</span>
-<span class="k">def</span> <span class="nf">train_job</span><span class="p">(</span>
-    <span class="n">images</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">float</span><span class="p">),</span>
-    <span class="n">labels</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">:</span>
-</code></pre></div>
+<code>python
+@flow.global_function(type="train", function_config=get_train_config())
+def train_job(
+    images: tp.Numpy.Placeholder((BATCH_SIZE, 1, 28, 28), dtype=flow.float),
+    labels: tp.Numpy.Placeholder((BATCH_SIZE,), dtype=flow.int32),
+) -&gt; tp.Numpy:</code>
 包含以上代码的完整示例可见文章<a href="consistent_mirrored.html">Consistent 与 Mirrored 视角</a>中的 <a href="../code/extended_topics/mixed_parallel_mlp.py">mixed_parallel_mlp.py</a></p>
 <h3 id="_3">数据占位符<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
 <p>注意，以上的 <code>images</code>、<code>logits</code>、<code>labels</code>、<code>loss</code>等对象，在我们定义作业函数时，并没有实际的数据。它们的作用只是 <strong>描述数据的形状和属性</strong> ，起到 <strong>占位符</strong> 的作用。</p>
@@ -1167,16 +1169,18 @@
 <p>OneFlow 利用函数修饰符将普通 Python 函数转变为 OneFlow 特有的作业函数的过程，对于用户而言是无感、透明的。</p>
 <p>我们可以像调用普通的 Python 函数一样调用作业函数。每一次调用，OneFlow 都会在框架内部完成正向传播、反向传播、参数更新等一系列事情。</p>
 <p>以下代码，获取数据之后，会向 <code>train_job</code> 作业函数传递参数并调用，打印 <code>loss</code>。</p>
-<div class="highlight"><pre><span></span><code>    <span class="p">(</span><span class="n">train_images</span><span class="p">,</span> <span class="n">train_labels</span><span class="p">),</span> <span class="p">(</span><span class="n">test_images</span><span class="p">,</span> <span class="n">test_labels</span><span class="p">)</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">load_mnist</span><span class="p">(</span>
-        <span class="n">BATCH_SIZE</span>
-    <span class="p">)</span>
-
-    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">train_images</span><span class="p">,</span> <span class="n">train_labels</span><span class="p">)):</span>
-            <span class="n">loss</span> <span class="o">=</span> <span class="n">train_job</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">20</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+<p>```python
+    (train_images, train_labels), (test_images, test_labels) = flow.data.load_mnist(
+        BATCH_SIZE
+    )</p>
+<div class="codehilite"><pre><span></span><code>for epoch in range(3):
+    for i, (images, labels) in enumerate(zip(train_images, train_labels)):
+        loss = train_job(images, labels)
+        if i % 20 == 0:
+            print(loss.mean())
 </code></pre></div>
+
+<p>```</p>
 <p>可以看到，通过调用作业函数 <code>train_job</code> 直接返回了 <code>numpy</code> 数据。</p>
 <p>以上展示的调用方式是同步方式， OneFlow 还支持异步调用，具体可以参阅专题<a href="../basics_topics/async_get.html">获取作业函数的结果</a>。</p>
                 

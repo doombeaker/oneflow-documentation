@@ -987,23 +987,23 @@
 <h2 id="_2">对齐测试<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <p>本例程的核心代码在<code>dcgan.py</code>文件中，其中的模型结构和参数参考了tensorflow的<a href="https://www.tensorflow.org/tutorials/generative/dcgan">官方示例</a></p>
 <p>通过以下代码，可以运行一个简单的对齐测试，保证oneflow的模型结果与tensorflow的结果是一致的</p>
-<div class="highlight"><pre><span></span><code><span class="n">dcgan</span> <span class="o">=</span> <span class="n">DCGAN</span><span class="p">()</span>
-<span class="n">dcgan</span><span class="o">.</span><span class="n">compare_with_tensorflow</span><span class="p">()</span>
-</code></pre></div>
+<p><code>python
+dcgan = DCGAN()
+dcgan.compare_with_tensorflow()</code></p>
 <h2 id="_3">数据集准备<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <p>例程提供了数据集下载脚本，运行<code>download.py</code>下载mnist数据集， 数据集默认保存在<code>./data/minst</code>目录中</p>
-<div class="highlight"><pre><span></span><code>python download.py mnist
-</code></pre></div>
+<p><code>bash
+python download.py mnist</code></p>
 <h2 id="_4">训练<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <p>在准备好数据集后，可通过DCGAN实例的<code>train</code>方法进行DCGAN的训练</p>
-<div class="highlight"><pre><span></span><code><span class="n">dcgan</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">epochs</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-</code></pre></div>
+<p><code>python
+dcgan.train(epochs=2)</code></p>
 <p>训练将每隔<code>self.eval_interval</code>个batch输出生成的图像</p>
 <p><img alt="1" src="imgs/1.png" /></p>
 <h2 id="_5">导出动图<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
 <p>再完成训练后，可以通过DCGAN实例的<code>save_to_gif</code>方法将图像导出为动图</p>
-<div class="highlight"><pre><span></span><code><span class="n">dcgan</span><span class="o">.</span><span class="n">save_to_gif</span><span class="p">()</span>
-</code></pre></div>
+<p><code>python
+dcgan.save_to_gif()</code></p>
                 
               
               

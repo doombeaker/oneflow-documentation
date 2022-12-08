@@ -723,49 +723,8 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
-    代码解读
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#dataloader" class="md-nav__link">
-    使用 DataLoader 及相关算子
-  </a>
-  
-    <nav class="md-nav" aria-label="使用 DataLoader 及相关算子">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
-    运行例子
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
-    代码解读
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#dataloader_1" class="md-nav__link">
-    支持更多格式的 DataLoader
-  </a>
   
 </li>
       
@@ -1003,49 +962,8 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
-    代码解读
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#dataloader" class="md-nav__link">
-    使用 DataLoader 及相关算子
-  </a>
-  
-    <nav class="md-nav" aria-label="使用 DataLoader 及相关算子">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
-    运行例子
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
-    代码解读
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#dataloader_1" class="md-nav__link">
-    支持更多格式的 DataLoader
-  </a>
   
 </li>
       
@@ -1077,43 +995,40 @@
 <h2 id="numpy">使用 Numpy 数据作为输入<a class="headerlink" href="#numpy" title="Permanent link">&para;</a></h2>
 <h3 id="_2">运行例子<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
 <p>在 Oneflow 中，可以直接使用 NumPy 类型的数据作为作业函数的输入，下面是一个完整的例子：</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># feed_numpy.py</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">oneflow.compatible</span> <span class="kn">import</span> <span class="n">single_client</span> <span class="k">as</span> <span class="n">flow</span>
-<span class="kn">from</span> <span class="nn">oneflow.compatible.single_client</span> <span class="kn">import</span> <span class="n">typing</span> <span class="k">as</span> <span class="n">tp</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
-
-
-<span class="nd">@flow</span><span class="o">.</span><span class="n">global_function</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;predict&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">test_job</span><span class="p">(</span>
-    <span class="n">images</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="mi">32</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">float</span><span class="p">),</span>
-    <span class="n">labels</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="mi">32</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">,</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">]:</span>
-    <span class="c1"># do something with images or labels</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
-
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">images_in</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-    <span class="n">labels_in</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="p">(</span><span class="mi">32</span><span class="p">,))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
-    <span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">test_job</span><span class="p">(</span><span class="n">images_in</span><span class="p">,</span> <span class="n">labels_in</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">labels</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-</code></pre></div>
+<p>```python</p>
+<h1 id="feed_numpypy">feed_numpy.py<a class="headerlink" href="#feed_numpypy" title="Permanent link">&para;</a></h1>
+<p>import numpy as np
+from oneflow.compatible import single_client as flow
+from oneflow.compatible.single_client import typing as tp
+from typing import Tuple</p>
+<p><a class="magiclink magiclink-github magiclink-mention" href="https://github.com/flow" title="GitHub User: flow">@flow</a>.global_function(type="predict")
+def test_job(
+    images: tp.Numpy.Placeholder((32, 1, 28, 28), dtype=flow.float),
+    labels: tp.Numpy.Placeholder((32,), dtype=flow.int32),
+) -&gt; Tuple[tp.Numpy, tp.Numpy]:
+    # do something with images or labels
+    return (images, labels)</p>
+<p>if <strong>name</strong> == "<strong>main</strong>":
+    images_in = np.random.uniform(-10, 10, (32, 1, 28, 28)).astype(np.float32)
+    labels_in = np.random.randint(-10, 10, (32,)).astype(np.int32)
+    images, labels = test_job(images_in, labels_in)
+    print(images.shape, labels.shape)
+```</p>
 <p>下载完整代码：<a href="../code/basics_topics/feed_numpy.py">feed_numpy.py</a> ，然后用 python 执行即可：</p>
-<p><div class="highlight"><pre><span></span><code>python feed_numpy.py
-</code></pre></div>
+<p><code>bash
+python feed_numpy.py</code>
 将得到如下结果
-<div class="highlight"><pre><span></span><code><span class="o">(</span><span class="m">32</span>, <span class="m">1</span>, <span class="m">28</span>, <span class="m">28</span><span class="o">)</span> <span class="o">(</span><span class="m">32</span>,<span class="o">)</span>
-</code></pre></div></p>
+<code>bash
+(32, 1, 28, 28) (32,)</code></p>
 <h3 id="_3">代码解读<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
 <p>在上面的代码中，我们定义了一个作业函数 <code>test_job()</code>，其输入为 <code>images</code> 和 <code>labels</code> ，并且通过注解(注意形参后面是“:”，而不是“=”。)指定了数据的形状与数据类型。</p>
 <p>因此，例子中按照作业函数对形状和数据类型的要求随机生成了 NumPy数据：<code>images_in</code> 和 <code>labels_in</code> ：
-<div class="highlight"><pre><span></span><code>  <span class="n">images_in</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-  <span class="n">labels_in</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
-</code></pre></div></p>
+<code>python
+  images_in = np.random.uniform(-10, 10, (32, 1, 28, 28)).astype(np.float32)
+  labels_in = np.random.randint(-10, 10, (32, )).astype(np.int32)</code></p>
 <p>并在调用作业函数时，直接将 NumPy 数据 <code>images_in</code> 和 <code>labels_in</code> 作为参数传递：
-<div class="highlight"><pre><span></span><code><span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">test_job</span><span class="p">(</span><span class="n">images_in</span><span class="p">,</span> <span class="n">labels_in</span><span class="p">)</span>
-</code></pre></div></p>
+<code>python
+images, labels = test_job(images_in, labels_in)</code></p>
 <p>代码中的 <code>flow.typing.Numpy.Placeholder</code> 是 NumPy <code>ndarray</code> 对象的占位符，OneFlow 中还有多种占位符，可以表示更复杂的 NumPy 数据形式。具体可以参考<a href="../extended_topics/job_function_define_call.html">作业函数的定义与调用</a>。</p>
 <h2 id="dataloader">使用 DataLoader 及相关算子<a class="headerlink" href="#dataloader" title="Permanent link">&para;</a></h2>
 <p>在 <a href="https://oneflow.readthedocs.io/en/master/data.html">oneflow.data</a> 模块下，有用于加载数据集的 DataLoader 算子以及相关的数据预处理算子。DataLoader 一般以 <code>data.xxx_reader</code> 的形式命名，如目前已有的 <code>data.ofrecord_reader</code> 和 <code>data.coco_reader</code>，分别支持 OneFlow 原生的 <code>OFRecord</code> 格式的文件和 COCO 数据集。</p>
@@ -1123,47 +1038,45 @@
 <p>这个脚本，需要一个 OFRecord 数据集，你可以根据<a href="../extended_topics/how_to_make_ofdataset.html">这篇文章</a>自己制作一个。</p>
 <p>或者下载我们已经准备好的 <a href="https://oneflow-public.oss-cn-beijing.aliyuncs.com/online_document/docs/basics_topics/part-00000">part-00000</a> 数据文件，它包含了64张图片。并且，将脚本中的 <code>path/to/ImageNet/ofrecord</code> 替换为 <code>part-00000</code> 文件 <strong>所在的目录</strong>，然后运行脚本。</p>
 <p>以下是使用我们预先准备的数据集运行脚本的例子:</p>
-<div class="highlight"><pre><span></span><code>wget https://oneflow-public.oss-cn-beijing.aliyuncs.com/online_document/docs/basics_topics/part-00000
-sed -i &quot;s:path/to/ImageNet/ofrecord:./:&quot; of_data_pipeline.py
-python3 of_data_pipeline.py
-</code></pre></div>
+<p><code>wget https://oneflow-public.oss-cn-beijing.aliyuncs.com/online_document/docs/basics_topics/part-00000
+sed -i "s:path/to/ImageNet/ofrecord:./:" of_data_pipeline.py
+python3 of_data_pipeline.py</code></p>
 <p>将得到下面的输出：
-<div class="highlight"><pre><span></span><code>(64, 3, 224, 224) (64,)
-</code></pre></div></p>
+<code>(64, 3, 224, 224) (64,)</code></p>
 <h3 id="_5">代码解读<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
 <p>使用 OneFlow DataLoader 一般为两个阶段： <strong>数据加载</strong> 和 <strong>数据预处理</strong> 。</p>
 <p>脚本中 <code>flow.data.ofrecord_reader</code> 负责从文件系统中加载数据到内存。
-<div class="highlight"><pre><span></span><code>    <span class="n">ofrecord</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ofrecord_reader</span><span class="p">(</span>
-        <span class="s2">&quot;path/to/ImageNet/ofrecord&quot;</span><span class="p">,</span>
-        <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
-        <span class="n">data_part_num</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">part_name_suffix_length</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-        <span class="n">random_shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">shuffle_after_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="p">)</span>
-</code></pre></div></p>
+<code>python
+    ofrecord = flow.data.ofrecord_reader(
+        "path/to/ImageNet/ofrecord",
+        batch_size=batch_size,
+        data_part_num=1,
+        part_name_suffix_length=5,
+        random_shuffle=True,
+        shuffle_after_epoch=True,
+    )</code></p>
 <p>需要指定 OFRecord 格式文件所在的目录，和一些其他参数，请参考 <a href="https://oneflow.readthedocs.io/en/master/data.html#oneflow.data.ofrecord_reader">data.ofrecord_reader</a></p>
 <p>DataLoader 的返回值，如果是简单的基本数据类型，那么可以直接作为下游的算子的输入，否则，需要继续调用数据预处理算子，进行预处理。</p>
 <p>比如，在以上脚本中：
-<div class="highlight"><pre><span></span><code>    <span class="n">image</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">OFRecordImageDecoderRandomCrop</span><span class="p">(</span>
-        <span class="n">ofrecord</span><span class="p">,</span> <span class="s2">&quot;encoded&quot;</span><span class="p">,</span> <span class="n">color_space</span><span class="o">=</span><span class="n">color_space</span>
-    <span class="p">)</span>
-    <span class="n">label</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">OFRecordRawDecoder</span><span class="p">(</span>
-        <span class="n">ofrecord</span><span class="p">,</span> <span class="s2">&quot;class/label&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">int32</span>
-    <span class="p">)</span>
-    <span class="n">rsz</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span>
-        <span class="n">image</span><span class="p">,</span> <span class="n">resize_x</span><span class="o">=</span><span class="mi">224</span><span class="p">,</span> <span class="n">resize_y</span><span class="o">=</span><span class="mi">224</span><span class="p">,</span> <span class="n">color_space</span><span class="o">=</span><span class="n">color_space</span>
-    <span class="p">)</span>
-    <span class="n">rng</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">CoinFlip</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">)</span>
-    <span class="n">normal</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">CropMirrorNormalize</span><span class="p">(</span>
-        <span class="n">rsz</span><span class="p">,</span>
-        <span class="n">mirror_blob</span><span class="o">=</span><span class="n">rng</span><span class="p">,</span>
-        <span class="n">color_space</span><span class="o">=</span><span class="n">color_space</span><span class="p">,</span>
-        <span class="n">mean</span><span class="o">=</span><span class="p">[</span><span class="mf">123.68</span><span class="p">,</span> <span class="mf">116.779</span><span class="p">,</span> <span class="mf">103.939</span><span class="p">],</span>
-        <span class="n">std</span><span class="o">=</span><span class="p">[</span><span class="mf">58.393</span><span class="p">,</span> <span class="mf">57.12</span><span class="p">,</span> <span class="mf">57.375</span><span class="p">],</span>
-        <span class="n">output_dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">float</span><span class="p">,</span>
-    <span class="p">)</span>
-</code></pre></div></p>
+<code>python
+    image = flow.data.OFRecordImageDecoderRandomCrop(
+        ofrecord, "encoded", color_space=color_space
+    )
+    label = flow.data.OFRecordRawDecoder(
+        ofrecord, "class/label", shape=(), dtype=flow.int32
+    )
+    rsz = flow.image.Resize(
+        image, resize_x=224, resize_y=224, color_space=color_space
+    )
+    rng = flow.random.CoinFlip(batch_size=batch_size)
+    normal = flow.image.CropMirrorNormalize(
+        rsz,
+        mirror_blob=rng,
+        color_space=color_space,
+        mean=[123.68, 116.779, 103.939],
+        std=[58.393, 57.12, 57.375],
+        output_dtype=flow.float,
+    )</code></p>
 <p><code>OFRecordImageDecoderRandomCrop</code> 负责图片解码并随机做了裁剪，<code>OFRecordRawDecoder</code> 负责从 ofrecord 对象中直接解码出标签， <code>image.Resize</code> 把裁剪后的图片调整成224x224的大小， <code>CropMirrorNormalize</code> 把图片进行了正则化。</p>
 <h2 id="dataloader_1">支持更多格式的 DataLoader<a class="headerlink" href="#dataloader_1" title="Permanent link">&para;</a></h2>
 <p>OneFlow 提供了一些 DataLoader 和预处理的算子，详细请参考 <a href="https://oneflow.readthedocs.io/en/master/data.html">oneflow.data</a>。</p>

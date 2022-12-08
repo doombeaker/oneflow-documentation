@@ -1091,10 +1091,9 @@
 <p>如果使用 <code>Release</code> 版本的 OneFlow，可能会因为编译器优化，导致在调试过程中程序实际运行位置与源码行不对应。</p>
 <p>因此我们需要编译 <code>Debug</code> 版本的 OneFlow，并且需要生成 clangd 所需要的 json 文件。</p>
 <p>在运行 cmake 的时候需要加上 <code>Debug</code> 及 <code>CMAKE_EXPORT_COMPILE_COMMANDS</code> 的 flag。</p>
-<div class="highlight"><pre><span></span><code>cmake .. \
+<p><code>cmake .. \
 -DCMAKE_BUILD_TYPE=Debug \
--DCMAKE_EXPORT_COMPILE_COMMANDS=1
-</code></pre></div>
+-DCMAKE_EXPORT_COMPILE_COMMANDS=1</code></p>
 <ul>
 <li><code>-DCMAKE_BUILD_TYPE=Debug</code> 选项指定编译 Debug 版本</li>
 <li><code>-DCMAKE_EXPORT_COMPILE_COMMANDS</code> 选项会在 <code>build</code> 目录下生成后文 clangd 配置时所需要的 <code>compile_commands.json</code> 文件</li>
@@ -1119,16 +1118,15 @@
 </ul>
 <h4 id="vs-code-clangd">配置 VS Code 中的 clangd 插件<a class="headerlink" href="#vs-code-clangd" title="Permanent link">&para;</a></h4>
 <p>将 build 目录下的 <code>compile_commands.json</code> 文件软链接到 OneFlow 的源码根目录下，在 OneFlow 的源码根目录下：</p>
-<div class="highlight"><pre><span></span><code>ln -s ./build/compile_commands.json compile_commands.json
-</code></pre></div>
+<p><code>ln -s ./build/compile_commands.json compile_commands.json</code></p>
 <p>然后 <code>Ctrl+Shift+P</code> (macOS 下 <code>command+shift+p</code>)，找到 <code>Open Remote Settings</code> 选项，打开 <code>settings.json</code> 配置文件，在其中加入以下配置：</p>
-<p><div class="highlight"><pre><span></span><code><span class="w">    </span><span class="nt">&quot;clangd.path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/path/to/bin/clangd&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;clangd.arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
-<span class="w">        </span><span class="s2">&quot;-j&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">        </span><span class="s2">&quot;12&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">        </span><span class="s2">&quot;-clang-tidy&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="p">]</span><span class="w"></span>
-</code></pre></div>
+<p><code>json
+    "clangd.path": "/path/to/bin/clangd",
+    "clangd.arguments": [
+        "-j",
+        "12",
+        "-clang-tidy"
+    ]</code>
 <code>clangd.arguments</code>的意义及更多参数选项，可查阅<code>clangd --help</code>。</p>
 <h4 id="clangd_1">使用 clangd<a class="headerlink" href="#clangd_1" title="Permanent link">&para;</a></h4>
 <p>在 VS Code 的 View-&gt;Output 面板，下拉菜单中选择 "Clang Language Server"，可以看到 clangd 的解析输出，解析完成后。选择 C/C++ 源码中的符号，可以实现跳转。</p>
@@ -1139,21 +1137,21 @@
 <p>选择 <code>Create a launch.json file</code>，选择 gdb 模板。
 <img alt="gdb" src="imgs/gdb-select.png" /></p>
 <p>然后设置相关参数：
-<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.2.0&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;configurations&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
-<span class="w">        </span><span class="p">{</span><span class="w"></span>
-<span class="w">            </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;lenet&quot;</span><span class="p">,</span><span class="w"> </span><span class="c1">//自定义任务名</span><span class="w"></span>
-<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;gdb&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">            </span><span class="nt">&quot;request&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;launch&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">            </span><span class="nt">&quot;target&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/home/yaochi/.conda/envs/ycof/bin/python3&quot;</span><span class="p">,</span><span class="w"> </span><span class="c1">//python路径</span><span class="w"></span>
-<span class="w">            </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;lenet_train.py&quot;</span><span class="p">,</span><span class="w"> </span><span class="c1">//脚本</span><span class="w"></span>
-<span class="w">            </span><span class="nt">&quot;cwd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/home/yaochi/of_example&quot;</span><span class="p">,</span><span class="w"> </span><span class="c1">//脚本所在路径</span><span class="w"></span>
-<span class="w">            </span><span class="nt">&quot;valuesFormatting&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;parseText&quot;</span><span class="w"></span>
-<span class="w">        </span><span class="p">}</span><span class="w"></span>
-<span class="w">    </span><span class="p">]</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
-</code></pre></div></p>
+<code>json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "lenet", //自定义任务名
+            "type": "gdb",
+            "request": "launch",
+            "target": "/home/yaochi/.conda/envs/ycof/bin/python3", //python路径
+            "arguments": "lenet_train.py", //脚本
+            "cwd": "/home/yaochi/of_example", //脚本所在路径
+            "valuesFormatting": "parseText"
+        }
+    ]
+}</code></p>
 <p>设置断点后，F5 启动调试：
 <img alt="调试截图" src="imgs/debug_snapshot.png" /></p>
 <h3 id="_1">其它<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
@@ -1171,8 +1169,7 @@
 <p>clangd 的最新版本可能对 glibc 版本要求过高，导致报缺少库的错误。</p>
 </li>
 </ul>
-<div class="highlight"><pre><span></span><code>./bin/clangd: /lib64/libc.so.6: version `GLIBC_2.18&#39; not found (required by ./bin/clangd)
-</code></pre></div>
+<p><code>./bin/clangd: /lib64/libc.so.6: version `GLIBC_2.18' not found (required by ./bin/clangd)</code></p>
 <p>此时可以下载其它更低 clangd 的版本（本文推荐版本为 9.0.0），早期版本的 clangd 需要到 <a href="https://releases.llvm.org/download.html">LLVM官网</a> 下载整个LLVM工具链，其中包含有 clangd。</p>
                 
               

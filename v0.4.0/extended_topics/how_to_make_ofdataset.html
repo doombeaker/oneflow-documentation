@@ -1099,7 +1099,7 @@
 <p>OFRecord 数据集是 <strong>OFRecord 文件的集合</strong> 。将多个 <code>OFRecord文件</code>，按照 OneFlow 约定的文件名格式，存放在同一个目录中，就得到了 OFRecord 数据集。</p>
 <p>默认情况下，OFRecord 数据集目录中的文件，统一以 <code>part-xxx</code> 的方式命名，其中的 "xxx" 是从0开始的文件编号，有补齐和不补齐两种选择。</p>
 <p>以下是没有采用补齐的命名风格示例：
-<div class="highlight"><pre><span></span><code>mnist_kaggle/train/
+<code>mnist_kaggle/train/
 ├── part-0
 ├── part-1
 ├── part-10
@@ -1115,10 +1115,9 @@
 ├── part-6
 ├── part-7
 ├── part-8
-└── part-9
-</code></pre></div></p>
+└── part-9</code></p>
 <p>以下是有补齐的命名风格：
-<div class="highlight"><pre><span></span><code>mnist_kaggle/train/
+<code>mnist_kaggle/train/
 ├── part-00000
 ├── part-00001
 ├── part-00002
@@ -1134,8 +1133,7 @@
 ├── part-00012
 ├── part-00013
 ├── part-00014
-├── part-00015
-</code></pre></div>
+├── part-00015</code>
 OneFlow 采用此约定，与 <code>spark</code> 的默认存储的文件名一致，方便使用 spark 制作与转化 OFRecord 数据。</p>
 <p>实际上，文件名前缀(<code>part-</code>)、文件名编号是否补齐、按多少位补齐，均可以自行指定，只需要在加载数据集(下文会介绍)时，保持相关参数一致即可。</p>
 <p>OneFlow 提供了加载 OFRecord 数据集的接口，使得我们只要指定数据集目录的路径，就可以享受 OneFlow 框架所带来的多线程、数据流水线等优势。</p>
@@ -1144,18 +1142,18 @@ OneFlow 采用此约定，与 <code>spark</code> 的默认存储的文件名一�
 <p>在<a href="../basics_topics/data_input.html">数据输入</a>一文中，我们已经展示了如何使用 <code>ofrecord_reader</code> 接口加载 OFRecord 数据，并进行数据预处理。</p>
 <p>代码见：<a href="../code/basics_topics/of_data_pipeline.py">of_data_pipeline.py</a></p>
 <p><code>ofrecord_reader</code> 的接口如下：
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">ofrecord_reader</span><span class="p">(</span>
-    <span class="n">ofrecord_dir</span><span class="p">,</span>
-    <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">data_part_num</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">part_name_prefix</span><span class="o">=</span><span class="s2">&quot;part-&quot;</span><span class="p">,</span>
-    <span class="n">part_name_suffix_length</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">random_shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">shuffle_buffer_size</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
-    <span class="n">shuffle_after_epoch</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span>
-</code></pre></div></p>
+<code>python
+def ofrecord_reader(
+    ofrecord_dir,
+    batch_size=1,
+    data_part_num=1,
+    part_name_prefix="part-",
+    part_name_suffix_length=-1,
+    random_shuffle=False,
+    shuffle_buffer_size=1024,
+    shuffle_after_epoch=False,
+    name=None,
+)</code></p>
 <ul>
 <li>
 <p><code>ofrecord_dir</code> 指定存放数据集的目录路径</p>
@@ -1206,33 +1204,35 @@ OneFlow 采用此约定，与 <code>spark</code> 的默认存储的文件名一�
 </li>
 </ul>
 <p>接着，解压 <code>spark-2.4.7-bin-hadoop2.7.tgz</code>，并配置环境变量 <code>SPARK_HOME</code>:
-<div class="highlight"><pre><span></span><code>export SPARK_HOME=path/to/spark-2.4.7-bin-hadoop2.7
-export PATH=$SPARK_HOME/bin:$PATH
-</code></pre></div></p>
+<code>export SPARK_HOME=path/to/spark-2.4.7-bin-hadoop2.7
+export PATH=$SPARK_HOME/bin:$PATH</code></p>
 <p>然后，通过以下命令启动 pyspark shell：
-<div class="highlight"><pre><span></span><code>pyspark --master &quot;local[*]&quot;\
+<code>pyspark --master "local[*]"\
  --jars spark-oneflow-connector-assembly-0.1.0_int64.jar\
- --packages org.tensorflow:spark-tensorflow-connector_2.11:1.13.1
-</code></pre></div></p>
-<div class="highlight"><pre><span></span><code>...
+ --packages org.tensorflow:spark-tensorflow-connector_2.11:1.13.1</code></p>
+<p><code>``text
+...
 Welcome to
       ____              __
      / __/__  ___ _____/ /__
-    _\ \/ _ \/ _ `/ __/  &#39;_/
-   /__ / .__/\_,_/_/ /_/\_\   version 2.4.7
-      /_/
-
-Using Python version 3.6.10 (default, Mar 25 2020 18:53:43)
-SparkSession available as &#39;spark&#39;.
-&gt;&gt;&gt;
-</code></pre></div>
+    _\ \/ _ \/ _</code>/ <strong>/  '_/
+   /</strong> / .__/_,<em>/</em>/ /<em>/_   version 2.4.7
+      /</em>/</p>
+<p>Using Python version 3.6.10 (default, Mar 25 2020 18:53:43)
+SparkSession available as 'spark'.</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>```</p>
+</blockquote>
+</blockquote>
+</blockquote>
 <p>在启动的 pyspark shell 中，我们可以完成 OFRecord 数据集与其它数据格式的相互转化。</p>
 <h3 id="spark-ofrecord">使用 spark 查看 OFRecord 数据集<a class="headerlink" href="#spark-ofrecord" title="Permanent link">&para;</a></h3>
 <p>使用以下命令可以查看 OFRecord 数据：
-<div class="highlight"><pre><span></span><code>spark.read.format(&quot;ofrecord&quot;).load(&quot;file:///path/to/ofrecord_file&quot;).show()
-</code></pre></div>
+<code>spark.read.format("ofrecord").load("file:///path/to/ofrecord_file").show()</code>
 默认显示前20条数据:
-<div class="highlight"><pre><span></span><code>+--------------------+------+
+<code>+--------------------+------+
 |              images|labels|
 +--------------------+------+
 |[0.33967614, 0.87...|     2|
@@ -1256,40 +1256,39 @@ SparkSession available as &#39;spark&#39;.
 |[0.7508129, 0.464...|     4|
 |[0.035597708, 0.3...|     9|
 +--------------------+------+
-only showing top 20 rows
-</code></pre></div></p>
+only showing top 20 rows</code></p>
 <h3 id="tfrecord">与 TFRecord 数据集的相互转化<a class="headerlink" href="#tfrecord" title="Permanent link">&para;</a></h3>
 <p>以下命令可以将 TFRecord 转化为 OFRecrod：</p>
-<p><div class="highlight"><pre><span></span><code><span class="n">reader</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;tfrecords&quot;</span><span class="p">)</span>
-<span class="n">dataframe</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;file:///path/to/tfrecord_file&quot;</span><span class="p">)</span>
-<span class="n">writer</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;ofrecord&quot;</span><span class="p">)</span>
-<span class="n">writer</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;file:///path/to/outputdir&quot;</span><span class="p">)</span>
-</code></pre></div>
+<p><code>python
+reader = spark.read.format("tfrecords")
+dataframe = reader.load("file:///path/to/tfrecord_file")
+writer = dataframe.write.format("ofrecord")
+writer.save("file:///path/to/outputdir")</code>
 以上代码中的 <code>outputdir</code> 目录会被自动创建，并在其中保存 ofrecord 文件。在执行命令前应保证 outputdir 目录不存在。</p>
 <p>此外，还可以使用以下命令，在转化的同时，将数据切分为多个 ofrecord 文件：
-<div class="highlight"><pre><span></span><code><span class="n">reader</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;tfrecords&quot;</span><span class="p">)</span>
-<span class="n">dataframe</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;file:///path/to/tfrecord_file&quot;</span><span class="p">)</span>
-<span class="n">writer</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">repartition</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;ofrecord&quot;</span><span class="p">)</span>
-<span class="n">writer</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;file://path/to/outputdir&quot;</span><span class="p">)</span>
-</code></pre></div>
+<code>python
+reader = spark.read.format("tfrecords")
+dataframe = reader.load("file:///path/to/tfrecord_file")
+writer = dataframe.repartition(10).write.format("ofrecord")
+writer.save("file://path/to/outputdir")</code>
 以上命令执行后，在 outputdir 目录下会产生10个 <code>part-xxx</code> 格式的ofrecord文件。</p>
 <p>将 OFRecord 文件转为 TFRecord 文件的过程类似，交换读/写方的 <code>format</code> 即可：
-<div class="highlight"><pre><span></span><code><span class="n">reader</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;ofrecord&quot;</span><span class="p">)</span>
-<span class="n">dataframe</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;file:///path/to/ofrecord_file&quot;</span><span class="p">)</span>
-<span class="n">writer</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;tfrecords&quot;</span><span class="p">)</span>
-<span class="n">writer</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;file:///path/to/outputdir&quot;</span><span class="p">)</span>
-</code></pre></div></p>
+<code>python
+reader = spark.read.format("ofrecord")
+dataframe = reader.load("file:///path/to/ofrecord_file")
+writer = dataframe.write.format("tfrecords")
+writer.save("file:///path/to/outputdir")</code></p>
 <h3 id="json">与 JSON 格式的相互转化<a class="headerlink" href="#json" title="Permanent link">&para;</a></h3>
 <p>以下命令可以将 JSON 格式数据转为 OFRecord 数据集:
-<div class="highlight"><pre><span></span><code><span class="n">dataframe</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">json</span><span class="p">(</span><span class="s2">&quot;file:///path/to/json_file&quot;</span><span class="p">)</span>
-<span class="n">writer</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;ofrecord&quot;</span><span class="p">)</span>
-<span class="n">writer</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;file:///path/to/outputdir&quot;</span><span class="p">)</span>
-</code></pre></div></p>
+<code>python
+dataframe = spark.read.json("file:///path/to/json_file")
+writer = dataframe.write.format("ofrecord")
+writer.save("file:///path/to/outputdir")</code></p>
 <p>以下命令将 OFRecord 数据转为 JSON 文件：
-<div class="highlight"><pre><span></span><code><span class="n">reader</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;ofrecord&quot;</span><span class="p">)</span>
-<span class="n">dataframe</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;file:///path/to/ofrecord_file&quot;</span><span class="p">)</span>
-<span class="n">dataframe</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">json</span><span class="p">(</span><span class="s2">&quot;file://path/to/outputdir&quot;</span><span class="p">)</span>
-</code></pre></div></p>
+<code>python
+reader = spark.read.format("ofrecord")
+dataframe = reader.load("file:///path/to/ofrecord_file")
+dataframe.write.json("file://path/to/outputdir")</code></p>
                 
               
               

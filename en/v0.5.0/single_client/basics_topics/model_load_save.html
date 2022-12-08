@@ -1143,37 +1143,39 @@
 <p>If the <code>name</code> value doesn't exist in the program, <code>get_variable</code> will create a blob object internally and return.</p>
 <h3 id="use-get_variable-create-object">Use get_variable Create Object<a class="headerlink" href="#use-get_variable-create-object" title="Permanent link">&para;</a></h3>
 <p>The signature of <code>oneflow.get_variable</code> is:</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_variable</span><span class="p">(</span>
-    <span class="n">name</span><span class="p">,</span>
-    <span class="n">shape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">initializer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">regularizer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">trainable</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">model_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">random_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">distribute</span><span class="o">=</span><span class="n">distribute_util</span><span class="o">.</span><span class="n">broadcast</span><span class="p">(),</span>
-<span class="p">)</span>
-</code></pre></div>
+<p><code>python
+def get_variable(
+    name,
+    shape=None,
+    dtype=None,
+    initializer=None,
+    regularizer=None,
+    trainable=None,
+    model_name=None,
+    random_seed=None,
+    distribute=distribute_util.broadcast(),
+)</code></p>
 <p>The following example use <code>get_variable</code> to create parameters and build the network with <code>oneflow.layers.conv2d</code>:</p>
-<div class="highlight"><pre><span></span><code>    <span class="c1">#...</span>
-    <span class="n">weight</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span>
-        <span class="n">weight_name</span> <span class="k">if</span> <span class="n">weight_name</span> <span class="k">else</span> <span class="n">name_prefix</span> <span class="o">+</span> <span class="s2">&quot;-weight&quot;</span><span class="p">,</span>
-        <span class="n">shape</span><span class="o">=</span><span class="n">weight_shape</span><span class="p">,</span>
-        <span class="n">dtype</span><span class="o">=</span><span class="n">inputs</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
-        <span class="n">initializer</span><span class="o">=</span><span class="n">kernel_initializer</span>
-        <span class="k">if</span> <span class="n">kernel_initializer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="k">else</span> <span class="n">flow</span><span class="o">.</span><span class="n">constant_initializer</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
-        <span class="n">regularizer</span><span class="o">=</span><span class="n">kernel_regularizer</span><span class="p">,</span>
-        <span class="n">trainable</span><span class="o">=</span><span class="n">trainable</span><span class="p">,</span>
-        <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;weight&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-
-    <span class="n">output</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">conv2d</span><span class="p">(</span>
-        <span class="n">inputs</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">strides</span><span class="p">,</span> <span class="n">padding</span><span class="p">,</span> <span class="n">data_format</span><span class="p">,</span> <span class="n">dilation_rate</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="n">groups</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span>
-    <span class="p">)</span>
-    <span class="c1">#...</span>
+<p>```python
+    #...
+    weight = flow.get_variable(
+        weight_name if weight_name else name_prefix + "-weight",
+        shape=weight_shape,
+        dtype=inputs.dtype,
+        initializer=kernel_initializer
+        if kernel_initializer is not None
+        else flow.constant_initializer(0),
+        regularizer=kernel_regularizer,
+        trainable=trainable,
+        model_name="weight",
+    )</p>
+<div class="codehilite"><pre><span></span><code>output = flow.nn.conv2d(
+    inputs, weight, strides, padding, data_format, dilation_rate, groups=groups, name=name
+)
+#...
 </code></pre></div>
+
+<p>```</p>
 <h3 id="initializer-setting">Initializer Setting<a class="headerlink" href="#initializer-setting" title="Permanent link">&para;</a></h3>
 <p>In the previous sections, when we call <code>get_variable</code>, we specify the method of initializing the parameters by <code>initializer</code>. In OneFlow, we provide many initializers which can be found in <a href="https://oneflow.readthedocs.io/en/master/oneflow.html">oneflow</a>.</p>
 <p>Under the static graph mechanism, we set the <code>initializer</code> first, and parameter initialization will be done by the OneFlow framework automatically.</p>
@@ -1224,48 +1226,48 @@
 </ul>
 <p><code>oneflow.get_all_variables</code> returns a dictionary whose key is the <code>name</code> specified when creating the <code>variable</code> and the value corresponding to the key is a tensor which has <code>numpy()</code> method to convert itself to a numpy array.</p>
 <p>For example, creating an object named <code>myblob</code>  in job function:</p>
-<div class="highlight"><pre><span></span><code><span class="nd">@flow</span><span class="o">.</span><span class="n">global_function</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">job</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">:</span>
-    <span class="o">...</span>
-    <span class="n">myblob</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s2">&quot;myblob&quot;</span><span class="p">,</span>
-        <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span>
-        <span class="n">initializer</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">random_normal_initializer</span><span class="p">()</span>
-        <span class="p">)</span>
-    <span class="o">...</span>
-</code></pre></div>
+<p><code>python
+@flow.global_function()
+def job() -&gt; tp.Numpy:
+    ...
+    myblob = flow.get_variable("myblob",
+        shape=(3,3),
+        initializer=flow.random_normal_initializer()
+        )
+    ...</code></p>
 <p>If we want to print the value of <code>myblob</code>, we can call:</p>
-<div class="highlight"><pre><span></span><code><span class="o">...</span>
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
-    <span class="o">...</span>
-    <span class="n">job</span><span class="p">()</span>
-    <span class="n">all_variables</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">get_all_variables</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">all_variables</span><span class="p">[</span><span class="s2">&quot;myblob&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
-    <span class="o">...</span>
-</code></pre></div>
+<p><code>python
+...
+for epoch in range(20):
+    ...
+    job()
+    all_variables = flow.get_all_variables()
+    print(all_variables["myblob"].numpy())
+    ...</code></p>
 <p>The <code>flow.get_all_variables</code> gets the dictionary and <code>all_variables["myblob"].numpy()</code> gets the <code>myblob</code> object then converts it to a numpy array.</p>
 <p>By contrary, we can use <code>oneflow.load_variables</code> to update the values of variable.</p>
 <p>The signature of <code>oneflow.load_variables</code> is as follows:</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">load_variables</span><span class="p">(</span><span class="n">value_dict</span><span class="p">,</span> <span class="n">ignore_mismatch</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
-</code></pre></div>
+<p><code>python
+def load_variables(value_dict, ignore_mismatch = True)</code></p>
 <p>Before call <code>load_variables</code>, we have to prepare a dictionary whose key is the <code>name</code> specified when creating <code>variable</code> and value is a numpy array. After passing the dictionary to <code>load_variables</code>, <code>load_variables</code> will find the variable object in the job function based on the key and update the value.</p>
 <p>For example:</p>
-<div class="highlight"><pre><span></span><code><span class="nd">@flow</span><span class="o">.</span><span class="n">global_function</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;predict&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">job</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">:</span>
-    <span class="n">myblob</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s2">&quot;myblob&quot;</span><span class="p">,</span>
-        <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span>
-        <span class="n">initializer</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">random_normal_initializer</span><span class="p">()</span>
-        <span class="p">)</span>
-    <span class="k">return</span> <span class="n">myblob</span>
-
-<span class="n">myvardict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;myblob&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)}</span>
-<span class="n">flow</span><span class="o">.</span><span class="n">load_variables</span><span class="p">(</span><span class="n">myvardict</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">flow</span><span class="o">.</span><span class="n">get_all_variables</span><span class="p">()[</span><span class="s2">&quot;myblob&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
-</code></pre></div>
+<p>```python
+<a class="magiclink magiclink-github magiclink-mention" href="https://github.com/flow" title="GitHub User: flow">@flow</a>.global_function(type="predict")
+def job() -&gt; tp.Numpy:
+    myblob = flow.get_variable("myblob",
+        shape=(3,3),
+        initializer=flow.random_normal_initializer()
+        )
+    return myblob</p>
+<p>myvardict = {"myblob": np.ones((3,3)).astype(np.float32)}
+flow.load_variables(myvardict)
+print(flow.get_all_variables()["myblob"].numpy())
+```</p>
 <p>Although we have chosen the <code>random_normal_initializer</code>  initializer,  <code>flow.load_variables(myvardict)</code> updates the value of <code>myblob</code>. The final output will be:</p>
-<div class="highlight"><pre><span></span><code>[[1. 1. 1.]
+<p><code>text
+[[1. 1. 1.]
  [1. 1. 1.]
- [1. 1. 1.]]
-</code></pre></div>
+ [1. 1. 1.]]</code></p>
 <h3 id="model-saving-and-loading">Model Saving and Loading<a class="headerlink" href="#model-saving-and-loading" title="Permanent link">&para;</a></h3>
 <p>We can save or load the model by methods:</p>
 <ul>
@@ -1273,15 +1275,15 @@
 <li><code>oneflow.checkpoint.get</code> :  Load a model from the specified path.</li>
 </ul>
 <p>The signature of <code>save</code> is as follows which saves the model to the path specified by <code>path</code>.</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">var_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-</code></pre></div>
+<p><code>python
+def save(path, var_dict=None)</code></p>
 <p>If the optional parameter <code>var_dict</code> is not <code>None</code>, <code>save</code> will save the object specified in <code>var_dict</code> to the specified <code>path</code>.</p>
 <p>The signature of <code>get</code> is as follows which loads the previously saved model specified by the <code>path</code>.</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-</code></pre></div>
+<p><code>python
+def get(path)</code></p>
 <p>It will return a dictionary that can be updated into the model using the <code>load_variables</code>.</p>
-<div class="highlight"><pre><span></span><code><span class="n">flow</span><span class="o">.</span><span class="n">load_variables</span><span class="p">(</span><span class="n">flow</span><span class="o">.</span><span class="n">checkpoint</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">save_dir</span><span class="p">))</span>
-</code></pre></div>
+<p><code>python
+flow.load_variables(flow.checkpoint.get(save_dir))</code></p>
 <p>Attention：</p>
 <ul>
 <li>The path specified by the <code>save</code> should either be empty or not existed. Otherwise <code>save</code> will report an error (to prevent overwriting the existed saved model)</li>
@@ -1290,49 +1292,50 @@
 </ul>
 <h2 id="the-structure-of-oneflow-saved-model">The Structure of OneFlow Saved Model<a class="headerlink" href="#the-structure-of-oneflow-saved-model" title="Permanent link">&para;</a></h2>
 <p>OneFlow model are the <strong>parameters</strong> of network. For now there are no meta graph information in OneFlow model. The path to save model have many sub-directories. Each of them is corresponding to the <code>name</code> of <code>job function</code> in model. For example, we define the model in the first place:</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">lenet</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="n">initializer</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">truncated_normal</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
-    <span class="n">conv1</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">conv2d</span><span class="p">(</span>
-        <span class="n">data</span><span class="p">,</span>
-        <span class="mi">32</span><span class="p">,</span>
-        <span class="mi">5</span><span class="p">,</span>
-        <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;SAME&quot;</span><span class="p">,</span>
-        <span class="n">activation</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;conv1&quot;</span><span class="p">,</span>
-        <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">pool1</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">max_pool2d</span><span class="p">(</span>
-        <span class="n">conv1</span><span class="p">,</span> <span class="n">ksize</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">strides</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;SAME&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;pool1&quot;</span><span class="p">,</span> <span class="n">data_format</span><span class="o">=</span><span class="s2">&quot;NCHW&quot;</span>
-    <span class="p">)</span>
-    <span class="n">conv2</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">conv2d</span><span class="p">(</span>
-        <span class="n">pool1</span><span class="p">,</span>
-        <span class="mi">64</span><span class="p">,</span>
-        <span class="mi">5</span><span class="p">,</span>
-        <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;SAME&quot;</span><span class="p">,</span>
-        <span class="n">activation</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;conv2&quot;</span><span class="p">,</span>
-        <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">pool2</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">max_pool2d</span><span class="p">(</span>
-        <span class="n">conv2</span><span class="p">,</span> <span class="n">ksize</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">strides</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;SAME&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;pool2&quot;</span><span class="p">,</span> <span class="n">data_format</span><span class="o">=</span><span class="s2">&quot;NCHW&quot;</span>
-    <span class="p">)</span>
-    <span class="n">reshape</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">pool2</span><span class="p">,</span> <span class="p">[</span><span class="n">pool2</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">hidden</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span>
-        <span class="n">reshape</span><span class="p">,</span>
-        <span class="mi">512</span><span class="p">,</span>
-        <span class="n">activation</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span>
-        <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;dense1&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="k">if</span> <span class="n">train</span><span class="p">:</span>
-        <span class="n">hidden</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">hidden</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;dropout&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span><span class="n">hidden</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;dense2&quot;</span><span class="p">)</span>
-</code></pre></div>
+<p>```python
+def lenet(data, train=False):
+    initializer = flow.truncated_normal(0.1)
+    conv1 = flow.layers.conv2d(
+        data,
+        32,
+        5,
+        padding="SAME",
+        activation=flow.nn.relu,
+        name="conv1",
+        kernel_initializer=initializer,
+    )
+    pool1 = flow.nn.max_pool2d(
+        conv1, ksize=2, strides=2, padding="SAME", name="pool1", data_format="NCHW"
+    )
+    conv2 = flow.layers.conv2d(
+        pool1,
+        64,
+        5,
+        padding="SAME",
+        activation=flow.nn.relu,
+        name="conv2",
+        kernel_initializer=initializer,
+    )
+    pool2 = flow.nn.max_pool2d(
+        conv2, ksize=2, strides=2, padding="SAME", name="pool2", data_format="NCHW"
+    )
+    reshape = flow.reshape(pool2, [pool2.shape[0], -1])
+    hidden = flow.layers.dense(
+        reshape,
+        512,
+        activation=flow.nn.relu,
+        kernel_initializer=initializer,
+        name="dense1",
+    )
+    if train:
+        hidden = flow.nn.dropout(hidden, rate=0.5, name="dropout")
+    return flow.layers.dense(hidden, 10, kernel_initializer=initializer, name="dense2")</p>
+<p>```</p>
 <p>Assume that in the process of training, we call the following code to save model:</p>
-<div class="highlight"><pre><span></span><code><span class="n">flow</span><span class="o">.</span><span class="n">checkpoint</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;./lenet_models_name&#39;</span><span class="p">)</span>
-</code></pre></div>
+<p><code>python
+flow.checkpoint.save('./lenet_models_name')</code></p>
 <p>Then <code>lenet_models_name</code> and the subdirectories are as follows:</p>
-<div class="highlight"><pre><span></span><code>lenet_models_name/
+<p><code>lenet_models_name/
 ├── conv1-bias
 │   ├── meta
 │   └── out
@@ -1360,8 +1363,7 @@
 ├── snapshot_done
 └── System-Train-TrainStep-train_job
     ├── meta
-    └── out
-</code></pre></div>
+    └── out</code></p>
 <p>We can see:</p>
 <ul>
 <li>
@@ -1385,75 +1387,79 @@
 </ul>
 <p>We can use oneflow.load_variables to complete the process above. Here is a simple example to illustrate the concept.</p>
 <p>First we need define a model and save it to <code>./mlp_models_1</code> after training:</p>
-<div class="highlight"><pre><span></span><code><span class="nd">@flow</span><span class="o">.</span><span class="n">global_function</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">train_job</span><span class="p">(</span>
-    <span class="n">images</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">float</span><span class="p">),</span>
-    <span class="n">labels</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">:</span>
-    <span class="k">with</span> <span class="n">flow</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">placement</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;0:0&quot;</span><span class="p">):</span>
-        <span class="n">initializer</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">truncated_normal</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
-        <span class="n">reshape</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="p">[</span><span class="n">images</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-        <span class="n">hidden</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span>
-            <span class="n">reshape</span><span class="p">,</span>
-            <span class="mi">512</span><span class="p">,</span>
-            <span class="n">activation</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span>
-            <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;dense1&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">dense2</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span>
-            <span class="n">hidden</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;dense2&quot;</span>
-        <span class="p">)</span>
+<p>```python
+<a class="magiclink magiclink-github magiclink-mention" href="https://github.com/flow" title="GitHub User: flow">@flow</a>.global_function(type="train")
+def train_job(
+    images: tp.Numpy.Placeholder((BATCH_SIZE, 1, 28, 28), dtype=flow.float),
+    labels: tp.Numpy.Placeholder((BATCH_SIZE,), dtype=flow.int32),
+) -&gt; tp.Numpy:
+    with flow.scope.placement("cpu", "0:0"):
+        initializer = flow.truncated_normal(0.1)
+        reshape = flow.reshape(images, [images.shape[0], -1])
+        hidden = flow.layers.dense(
+            reshape,
+            512,
+            activation=flow.nn.relu,
+            kernel_initializer=initializer,
+            name="dense1",
+        )
+        dense2 = flow.layers.dense(
+            hidden, 10, kernel_initializer=initializer, name="dense2"
+        )</p>
+<div class="codehilite"><pre><span></span><code>    loss = flow.nn.sparse_softmax_cross_entropy_with_logits(labels, dense2)
 
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">sparse_softmax_cross_entropy_with_logits</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">dense2</span><span class="p">)</span>
+lr_scheduler = flow.optimizer.PiecewiseConstantScheduler([], [0.1])
+flow.optimizer.SGD(lr_scheduler, momentum=0).minimize(loss)
 
-    <span class="n">lr_scheduler</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">PiecewiseConstantScheduler</span><span class="p">([],</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">])</span>
-    <span class="n">flow</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">lr_scheduler</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">loss</span>
+return loss
 </code></pre></div>
+
+<p>```</p>
 <p>Then we expand the network and add one more layer (<code>dense3</code>) in above model:</p>
-<div class="highlight"><pre><span></span><code><span class="nd">@flow</span><span class="o">.</span><span class="n">global_function</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">train_job</span><span class="p">(</span>
-    <span class="n">images</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">float</span><span class="p">),</span>
-    <span class="n">labels</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">:</span>
-    <span class="k">with</span> <span class="n">flow</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">placement</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;0:0&quot;</span><span class="p">):</span>
-        <span class="c1">#... original structure</span>
+<p>```python
+<a class="magiclink magiclink-github magiclink-mention" href="https://github.com/flow" title="GitHub User: flow">@flow</a>.global_function(type="train")
+def train_job(
+    images: tp.Numpy.Placeholder((BATCH_SIZE, 1, 28, 28), dtype=flow.float),
+    labels: tp.Numpy.Placeholder((BATCH_SIZE,), dtype=flow.int32),
+) -&gt; tp.Numpy:
+    with flow.scope.placement("cpu", "0:0"):
+        #... original structure</p>
+<div class="codehilite"><pre><span></span><code>    dense3 = flow.layers.dense(
+        dense2, 10, kernel_initializer=initializer, name=&quot;dense3&quot;
+    )
+    loss = flow.nn.sparse_softmax_cross_entropy_with_logits(labels, dense3)
 
-        <span class="n">dense3</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span>
-            <span class="n">dense2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;dense3&quot;</span>
-        <span class="p">)</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">sparse_softmax_cross_entropy_with_logits</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">dense3</span><span class="p">)</span>
-
-    <span class="c1">#...</span>
+#...
 </code></pre></div>
+
+<p>```</p>
 <p>Finally, load parameters from original model and start training:</p>
-<div class="highlight"><pre><span></span><code><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">check_point</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">CheckPoint</span><span class="p">()</span>
-    <span class="n">check_point</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;./mlp_models_1&quot;</span><span class="p">)</span>
-
-    <span class="p">(</span><span class="n">train_images</span><span class="p">,</span> <span class="n">train_labels</span><span class="p">),</span> <span class="p">(</span><span class="n">test_images</span><span class="p">,</span> <span class="n">test_labels</span><span class="p">)</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">load_mnist</span><span class="p">(</span>
-        <span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="n">BATCH_SIZE</span>
-    <span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">train_images</span><span class="p">,</span> <span class="n">train_labels</span><span class="p">)):</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">train_job</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">20</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
-    <span class="n">check_point</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;./mlp_ext_models_1&quot;</span><span class="p">)</span>
+<p>```python
+if <strong>name</strong> == "<strong>main</strong>":
+    check_point = flow.train.CheckPoint()
+    check_point.load("./mlp_models_1")</p>
+<div class="codehilite"><pre><span></span><code>(train_images, train_labels), (test_images, test_labels) = flow.data.load_mnist(
+    BATCH_SIZE, BATCH_SIZE
+)
+for i, (images, labels) in enumerate(zip(train_images, train_labels)):
+    loss = train_job(images, labels)
+    if i % 20 == 0:
+        print(loss.mean())
+check_point.save(&quot;./mlp_ext_models_1&quot;)
 </code></pre></div>
+
+<p>```</p>
 <p>The parameters of new <code>dense3</code> layer do not exist in the original model. They are automatically initialized to their values by OneFlow.</p>
 <h3 id="codes">Codes<a class="headerlink" href="#codes" title="Permanent link">&para;</a></h3>
 <p>The following code is from <a href="../code/basics_topics/mlp_mnist_origin.py">mlp_mnist_origin.py</a>. As the backbone network. Trained model is stored in <code>./mlp_models_1</code>.</p>
 <p>Run:</p>
-<div class="highlight"><pre><span></span><code>wget https://docs.oneflow.org/master/code/basics_topics/mlp_mnist_origin.py
-python3 mlp_mnist_origin.py
-</code></pre></div>
+<p><code>wget https://docs.oneflow.org/master/code/basics_topics/mlp_mnist_origin.py
+python3 mlp_mnist_origin.py</code></p>
 <p>When the training is complete, you will get the <code>mlp_models_1</code> in the current working directory.</p>
 <p>The following code is from <a href="../code/basics_topics/mlp_mnist_finetune.py">mlp_mnist_finetune.py</a>. After finetuning (add one more layer <code>dense3</code> in backbone network), we load <code>./mlp_models_1</code> and train it.</p>
 <p>Run:</p>
-<div class="highlight"><pre><span></span><code>wget https://docs.oneflow.org/master/code/basics_topics/mlp_mnist_finetune.py
-python3 mlp_mnist_finetune.py
-</code></pre></div>
+<p><code>wget https://docs.oneflow.org/master/code/basics_topics/mlp_mnist_finetune.py
+python3 mlp_mnist_finetune.py</code></p>
 <p>The finetuned models are saved in <code>. /mlp_ext_models_1</code>.</p>
                 
               

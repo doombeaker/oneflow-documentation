@@ -977,10 +977,9 @@
 <p>If we use the <code>Release</code> version of OneFlow, we may have problems with debugging because of the compiling optimization, and actual running position may not correspond to the source line.</p>
 <p>Thus, we need to compile <code>Debug</code> version of OneFlow and generate the json file needed by clangd.</p>
 <p>When we run cmake, we need add flag of <code>Debug</code> and <code>CMAKE_EXPORT_COMPILE_COMMANDS</code>.</p>
-<div class="highlight"><pre><span></span><code>cmake .. \
+<p><code>cmake .. \
 -DCMAKE_BUILD_TYPE=Debug \
--DCMAKE_EXPORT_COMPILE_COMMANDS=1
-</code></pre></div>
+-DCMAKE_EXPORT_COMPILE_COMMANDS=1</code></p>
 <ul>
 <li>
 <p><code>-DCMAKE_BUILD_TYPE=Debug</code> choose the version of Debug.</p>
@@ -1010,16 +1009,15 @@ By the extension "Remote SSH" of VS Code, we can connect to a remote server thro
 </ul>
 <h4 id="configure-clangd-in-vs-code">Configure clangd in VS code<a class="headerlink" href="#configure-clangd-in-vs-code" title="Permanent link">&para;</a></h4>
 <p>Create a soft link to the <code>compile_commands.json</code> in "build" dictionary in the source root of OneFlow. We need to change to the directory of OneFlow's source root and run the command below:</p>
-<div class="highlight"><pre><span></span><code>ln -s ./build/compile_commands.json compile_commands.json
-</code></pre></div>
+<p><code>ln -s ./build/compile_commands.json compile_commands.json</code></p>
 <p>Then press <code>Ctrl+Shift+P</code> (<code>command+shift+p</code> on MacOS) to find the <code>Open Remote Settings</code> option and open the <code>settings.json</code> file and add the following configuration:</p>
-<p><div class="highlight"><pre><span></span><code><span class="w">    </span><span class="nt">&quot;clangd.path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/path/to/bin/clangd&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;clangd.arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
-<span class="w">        </span><span class="s2">&quot;-j&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">        </span><span class="s2">&quot;12&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">        </span><span class="s2">&quot;-clang-tidy&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="p">]</span><span class="w"></span>
-</code></pre></div>
+<p><code>json
+    "clangd.path": "/path/to/bin/clangd",
+    "clangd.arguments": [
+        "-j",
+        "12",
+        "-clang-tidy"
+    ]</code>
 The meaning of <code>clangd.arguments</code> and more options can be found by <code>clangd --help</code>.</p>
 <h4 id="using-clangd">Using clangd<a class="headerlink" href="#using-clangd" title="Permanent link">&para;</a></h4>
 <p>In View-&gt;Output panel of VS code, we can choose "Clang Language Server" in dropdown list and then we will see parsing output of clangd. After that, VS Code can jumps between symbols of C/C++.</p>
@@ -1030,21 +1028,21 @@ The meaning of <code>clangd.arguments</code> and more options can be found by <c
 <p>And then we choose <code>Create a launch.json file</code> first and next choose gdb template.</p>
 <p><img alt="gdb" src="imgs/gdb-select.png" /></p>
 <p>And then we can set the options:
-<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.2.0&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;configurations&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
-<span class="w">        </span><span class="p">{</span><span class="w"></span>
-<span class="w">            </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;lenet&quot;</span><span class="p">,</span><span class="w"> </span><span class="c1">//defined job name</span><span class="w"></span>
-<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;gdb&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">            </span><span class="nt">&quot;request&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;launch&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">            </span><span class="nt">&quot;target&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/home/yaochi/.conda/envs/ycof/bin/python3&quot;</span><span class="p">,</span><span class="w"> </span><span class="c1">//python path</span><span class="w"></span>
-<span class="w">            </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;lenet_train.py&quot;</span><span class="p">,</span><span class="w"> </span><span class="c1">//script</span><span class="w"></span>
-<span class="w">            </span><span class="nt">&quot;cwd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/home/yaochi/of_example&quot;</span><span class="p">,</span><span class="w"> </span><span class="c1">//script path</span><span class="w"></span>
-<span class="w">            </span><span class="nt">&quot;valuesFormatting&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;parseText&quot;</span><span class="w"></span>
-<span class="w">        </span><span class="p">}</span><span class="w"></span>
-<span class="w">    </span><span class="p">]</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
-</code></pre></div></p>
+<code>json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "lenet", //defined job name
+            "type": "gdb",
+            "request": "launch",
+            "target": "/home/yaochi/.conda/envs/ycof/bin/python3", //python path
+            "arguments": "lenet_train.py", //script
+            "cwd": "/home/yaochi/of_example", //script path
+            "valuesFormatting": "parseText"
+        }
+    ]
+}</code></p>
 <p>After we set the breakpoint, we can press F5 to start debugging.</p>
 <p><img alt="snapshot of debugging" src="imgs/debug_snapshot.png" /></p>
 <h3 id="others">Others:<a class="headerlink" href="#others" title="Permanent link">&para;</a></h3>
@@ -1062,8 +1060,7 @@ The meaning of <code>clangd.arguments</code> and more options can be found by <c
 <p>The latest version of clangd may have special requirements of glibc. That may lead to raise some errors on missing libraries.</p>
 </li>
 </ul>
-<div class="highlight"><pre><span></span><code>./bin/clangd: /lib64/libc.so.6: version `GLIBC_2.18&#39; not found (required by ./bin/clangd)
-</code></pre></div>
+<p><code>./bin/clangd: /lib64/libc.so.6: version `GLIBC_2.18' not found (required by ./bin/clangd)</code></p>
 <p>We can download the older version of clangd (The recommended version of this article is 9.0.0). Older version of clangd is available on <a href="https://releases.llvm.org/download.html">LLVM official site</a>. Download the LLVM tools package with clangd inside.</p>
                 
               

@@ -981,7 +981,7 @@
 <p>OFRecord dataset is <strong>the collection of OFRecord files</strong>. The collection of mutiple files that named by OneFlow convention, and that stored in the same directory, is an OFRecord dataset.</p>
 <p>By default, The files in OFRecord dataset directory are uniformly named in the way of <code>part-xxx</code>, where "xxx" is the file id starting from zero, and there can be choices about padding or non-padding.</p>
 <p>These are the examples of using non-padding name style:</p>
-<div class="highlight"><pre><span></span><code>mnist_kaggle/train/
+<p><code>mnist_kaggle/train/
 ├── part-0
 ├── part-1
 ├── part-10
@@ -997,10 +997,9 @@
 ├── part-6
 ├── part-7
 ├── part-8
-└── part-9
-</code></pre></div>
+└── part-9</code></p>
 <p>These are the examples of using padding name style:</p>
-<div class="highlight"><pre><span></span><code>mnist_kaggle/train/
+<p><code>mnist_kaggle/train/
 ├── part-00000
 ├── part-00001
 ├── part-00002
@@ -1016,8 +1015,7 @@
 ├── part-00012
 ├── part-00013
 ├── part-00014
-├── part-00015
-</code></pre></div>
+├── part-00015</code></p>
 <p>OneFlow adopts this convention, which is consistent with the default storage filename in <code>spark</code>, so it is convenient to prepare OFRecord data by spark.</p>
 <p>Actually, we can specify the filename prefix <code>part-</code>, whether we pad the filename id and how many bits to pad. We just need to keep the same parameters when loading dataset, which will be described below.</p>
 <p>OneFlow provides the API interface to load OFRecord dataset by specifying the path of dataset directory, so that we can have the multi-threading, pipelining and some other advantages brought by OneFlow framework.</p>
@@ -1026,18 +1024,18 @@
 <p>In article <a href="../basics_topics/data_input.html">Data Input</a>, we have shown how to use <code>ofrecord_reader</code> API to load OFRecord data and preprocess it.</p>
 <p>Code: <a href="../code/basics_topics/of_data_pipeline.py">of_data_pipeline.py</a></p>
 <p>The prototype of <code>ofrecord_reader</code> is as follows：</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">ofrecord_reader</span><span class="p">(</span>
-    <span class="n">ofrecord_dir</span><span class="p">,</span>
-    <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">data_part_num</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">part_name_prefix</span><span class="o">=</span><span class="s2">&quot;part-&quot;</span><span class="p">,</span>
-    <span class="n">part_name_suffix_length</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">random_shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">shuffle_buffer_size</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
-    <span class="n">shuffle_after_epoch</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span>
-</code></pre></div>
+<p><code>python
+def ofrecord_reader(
+    ofrecord_dir,
+    batch_size=1,
+    data_part_num=1,
+    part_name_prefix="part-",
+    part_name_suffix_length=-1,
+    random_shuffle=False,
+    shuffle_buffer_size=1024,
+    shuffle_after_epoch=False,
+    name=None,
+)</code></p>
 <ul>
 <li><code>ofrecord_dir</code> is the directory which stored the dataset</li>
 <li><code>batchsize</code> assign the batch size in each epoch</li>
@@ -1066,31 +1064,28 @@ For flexibility and extensibility of the code, we can define a preprocessing OP 
 </li>
 </ul>
 <p>Then unzip the <code>spark-2.4.7-bin-hadoop2.7.tgz</code> and configure the environment variable <code>SPARK_HOME</code>:</p>
-<div class="highlight"><pre><span></span><code>export SPARK_HOME=path/to/spark-2.4.7-bin-hadoop2.7
-export PATH=$SPARK_HOME/bin:$PATH
-</code></pre></div>
+<p><code>export SPARK_HOME=path/to/spark-2.4.7-bin-hadoop2.7
+export PATH=$SPARK_HOME/bin:$PATH</code></p>
 <p>We can launch the pyspark shell with the following command：</p>
-<div class="highlight"><pre><span></span><code>pyspark --master &quot;local[*]&quot;\
+<p><code>pyspark --master "local[*]"\
  --jars spark-oneflow-connector-assembly-0.1.0_int64.jar\
- --packages org.tensorflow:spark-tensorflow-connector_2.11:1.13.1
-</code></pre></div>
-<div class="highlight"><pre><span></span><code>Welcome to
+ --packages org.tensorflow:spark-tensorflow-connector_2.11:1.13.1</code></p>
+<p><code>``text
+Welcome to
       ____              __
      / __/__  ___ _____/ /__
-    _\ \/ _ \/ _ `/ __/  &#39;_/
-   /__ / .__/\_,_/_/ /_/\_\   version 2.4.7
-      /_/
-
-Using Python version 3.6.10 (default, Mar 25 2020 18:53:43)
-SparkSession available as &#39;spark&#39;.
-</code></pre></div>
+    _\ \/ _ \/ _</code>/ <strong>/  '_/
+   /</strong> / .__/_,<em>/</em>/ /<em>/_   version 2.4.7
+      /</em>/</p>
+<p>Using Python version 3.6.10 (default, Mar 25 2020 18:53:43)
+SparkSession available as 'spark'.
+```</p>
 <p>We can complete the data conversion between OFRecord dataset and other formats in pyspark shell.</p>
 <h3 id="use-spark-to-view-ofrecord-dataset">Use Spark to view OFRecord dataset<a class="headerlink" href="#use-spark-to-view-ofrecord-dataset" title="Permanent link">&para;</a></h3>
 <p>We can view OFRecord data with following code：</p>
-<div class="highlight"><pre><span></span><code>spark.read.format(&quot;ofrecord&quot;).load(&quot;file:///path/to/ofrecord_file&quot;).show()
-</code></pre></div>
+<p><code>spark.read.format("ofrecord").load("file:///path/to/ofrecord_file").show()</code></p>
 <p>The first 20 rows are displayed by default:</p>
-<div class="highlight"><pre><span></span><code>+--------------------+------+
+<p><code>+--------------------+------+
 |              images|labels|
 +--------------------+------+
 |[0.33967614, 0.87...|     2|
@@ -1114,40 +1109,39 @@ SparkSession available as &#39;spark&#39;.
 |[0.7508129, 0.464...|     4|
 |[0.035597708, 0.3...|     9|
 +--------------------+------+
-only showing top 20 rows
-</code></pre></div>
+only showing top 20 rows</code></p>
 <h3 id="the-interconversion-with-tfrecord-dataset">The interconversion with TFRecord dataset<a class="headerlink" href="#the-interconversion-with-tfrecord-dataset" title="Permanent link">&para;</a></h3>
 <p>we can convert TFRecord to OFRecord with the following command：</p>
-<div class="highlight"><pre><span></span><code><span class="n">reader</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;tfrecords&quot;</span><span class="p">)</span>
-<span class="n">dataframe</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;file:///path/to/tfrecord_file&quot;</span><span class="p">)</span>
-<span class="n">writer</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;ofrecord&quot;</span><span class="p">)</span>
-<span class="n">writer</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;file:///path/to/outputdir&quot;</span><span class="p">)</span>
-</code></pre></div>
+<p><code>python
+reader = spark.read.format("tfrecords")
+dataframe = reader.load("file:///path/to/tfrecord_file")
+writer = dataframe.write.format("ofrecord")
+writer.save("file:///path/to/outputdir")</code></p>
 <p>In the above code, the <code>outputdir</code> directory will be created automatically, and ofrecord files will be saved into this directory. Make sure that the "outputdir" directory does not exist before executing the command.</p>
 <p>In addition, we can use the following command to split data into multiple ofrecord files.</p>
-<div class="highlight"><pre><span></span><code><span class="n">reader</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;tfrecords&quot;</span><span class="p">)</span>
-<span class="n">dataframe</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;file:///path/to/tfrecord_file&quot;</span><span class="p">)</span>
-<span class="n">writer</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">repartition</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;ofrecord&quot;</span><span class="p">)</span>
-<span class="n">writer</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;file://path/to/outputdir&quot;</span><span class="p">)</span>
-</code></pre></div>
+<p><code>python
+reader = spark.read.format("tfrecords")
+dataframe = reader.load("file:///path/to/tfrecord_file")
+writer = dataframe.repartition(10).write.format("ofrecord")
+writer.save("file://path/to/outputdir")</code></p>
 <p>After executing the above commands, 10 ofrecord files of <code>part-xxx</code> format will be generated in "outputdir" directory.</p>
 <p>The process of converting OFRecord file to TFRecord file is similar. we just need to change the <code>format</code> of read/write side:</p>
-<div class="highlight"><pre><span></span><code><span class="n">reader</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;ofrecord&quot;</span><span class="p">)</span>
-<span class="n">dataframe</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;file:///path/to/ofrecord_file&quot;</span><span class="p">)</span>
-<span class="n">writer</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;tfrecords&quot;</span><span class="p">)</span>
-<span class="n">writer</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;file:///path/to/outputdir&quot;</span><span class="p">)</span>
-</code></pre></div>
+<p><code>python
+reader = spark.read.format("ofrecord")
+dataframe = reader.load("file:///path/to/ofrecord_file")
+writer = dataframe.write.format("tfrecords")
+writer.save("file:///path/to/outputdir")</code></p>
 <h3 id="the-interconversion-with-json-format">The interconversion with JSON format<a class="headerlink" href="#the-interconversion-with-json-format" title="Permanent link">&para;</a></h3>
 <p>We can convert JSON to OFRecord with the following command：</p>
-<div class="highlight"><pre><span></span><code><span class="n">dataframe</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">json</span><span class="p">(</span><span class="s2">&quot;file:///path/to/json_file&quot;</span><span class="p">)</span>
-<span class="n">writer</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;ofrecord&quot;</span><span class="p">)</span>
-<span class="n">writer</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;file:///path/to/outputdir&quot;</span><span class="p">)</span>
-</code></pre></div>
+<p><code>python
+dataframe = spark.read.json("file:///path/to/json_file")
+writer = dataframe.write.format("ofrecord")
+writer.save("file:///path/to/outputdir")</code></p>
 <p>The following command will convert OFRecord data to JSON files：</p>
-<div class="highlight"><pre><span></span><code><span class="n">reader</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;ofrecord&quot;</span><span class="p">)</span>
-<span class="n">dataframe</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;file:///path/to/ofrecord_file&quot;</span><span class="p">)</span>
-<span class="n">dataframe</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">json</span><span class="p">(</span><span class="s2">&quot;file://path/to/outputdir&quot;</span><span class="p">)</span>
-</code></pre></div>
+<p><code>python
+reader = spark.read.format("ofrecord")
+dataframe = reader.load("file:///path/to/ofrecord_file")
+dataframe.write.json("file://path/to/outputdir")</code></p>
                 
               
               

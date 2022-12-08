@@ -932,44 +932,44 @@
 </div>
 
 <p>There are two types of elements in the above diagram, one is the computing units represented by boxes which including <code>Op</code> and <code>Layer</code> such as <code>conv2d</code>, <code>dense</code>, <code>max_pool2d</code> and etc. The other is the data represented by arrows. It corresponds to the following code:</p>
-<p><div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">lenet</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="n">initializer</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">truncated_normal</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
-    <span class="n">conv1</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">conv2d</span><span class="p">(</span>
-        <span class="n">data</span><span class="p">,</span>
-        <span class="mi">32</span><span class="p">,</span>
-        <span class="mi">5</span><span class="p">,</span>
-        <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;SAME&quot;</span><span class="p">,</span>
-        <span class="n">activation</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;conv1&quot;</span><span class="p">,</span>
-        <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">pool1</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">max_pool2d</span><span class="p">(</span>
-        <span class="n">conv1</span><span class="p">,</span> <span class="n">ksize</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">strides</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;SAME&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;pool1&quot;</span><span class="p">,</span> <span class="n">data_format</span><span class="o">=</span><span class="s2">&quot;NCHW&quot;</span>
-    <span class="p">)</span>
-    <span class="n">conv2</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">conv2d</span><span class="p">(</span>
-        <span class="n">pool1</span><span class="p">,</span>
-        <span class="mi">64</span><span class="p">,</span>
-        <span class="mi">5</span><span class="p">,</span>
-        <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;SAME&quot;</span><span class="p">,</span>
-        <span class="n">activation</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;conv2&quot;</span><span class="p">,</span>
-        <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">pool2</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">max_pool2d</span><span class="p">(</span>
-        <span class="n">conv2</span><span class="p">,</span> <span class="n">ksize</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">strides</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;SAME&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;pool2&quot;</span><span class="p">,</span> <span class="n">data_format</span><span class="o">=</span><span class="s2">&quot;NCHW&quot;</span>
-    <span class="p">)</span>
-    <span class="n">reshape</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">pool2</span><span class="p">,</span> <span class="p">[</span><span class="n">pool2</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">hidden</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span>
-        <span class="n">reshape</span><span class="p">,</span>
-        <span class="mi">512</span><span class="p">,</span>
-        <span class="n">activation</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span>
-        <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;dense1&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="k">if</span> <span class="n">train</span><span class="p">:</span>
-        <span class="n">hidden</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">hidden</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;dropout&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span><span class="n">hidden</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;dense2&quot;</span><span class="p">)</span>
-</code></pre></div>
+<p><code>python
+def lenet(data, train=False):
+    initializer = flow.truncated_normal(0.1)
+    conv1 = flow.layers.conv2d(
+        data,
+        32,
+        5,
+        padding="SAME",
+        activation=flow.nn.relu,
+        name="conv1",
+        kernel_initializer=initializer,
+    )
+    pool1 = flow.nn.max_pool2d(
+        conv1, ksize=2, strides=2, padding="SAME", name="pool1", data_format="NCHW"
+    )
+    conv2 = flow.layers.conv2d(
+        pool1,
+        64,
+        5,
+        padding="SAME",
+        activation=flow.nn.relu,
+        name="conv2",
+        kernel_initializer=initializer,
+    )
+    pool2 = flow.nn.max_pool2d(
+        conv2, ksize=2, strides=2, padding="SAME", name="pool2", data_format="NCHW"
+    )
+    reshape = flow.reshape(pool2, [pool2.shape[0], -1])
+    hidden = flow.layers.dense(
+        reshape,
+        512,
+        activation=flow.nn.relu,
+        kernel_initializer=initializer,
+        name="dense1",
+    )
+    if train:
+        hidden = flow.nn.dropout(hidden, rate=0.5, name="dropout")
+    return flow.layers.dense(hidden, 10, kernel_initializer=initializer, name="dense2")</code>
 When the job function is running, <code>data's</code> shape is <code>100x1×28×28</code>. <code>Data</code> is firstly used as input in <code>conv2d</code> to participate in the convolution calculation and  the result from <code>conv1</code> is passed to <code>max_pool2d</code> as input.</p>
 <h2 id="operator-and-layer">Operator and Layer<a class="headerlink" href="#operator-and-layer" title="Permanent link">&para;</a></h2>
 <p>Operator is a common concept. It is the basic calculation unit in OneFlow. <code>reshape</code> and <code>nn.max_pool2d</code> used in LeNet code are two kinds of operators.</p>
@@ -980,16 +980,14 @@ When the job function is running, <code>data's</code> shape is <code>100x1×28×
 <p>When building the network by defining job function, we only describe the attributes and shapes(such as <code>shape</code>, <code>dtype</code>) of the nodes in network. There is no data in the node, we call the node as <strong>PlaceHolder</strong>, OneFlow can compile and infer according to these placeholders to get the computation graph. </p>
 <p>The placeholders are usually called <code>Blob</code> in OneFlow. There is a corresponding base class <code>BlobDef</code> in OneFlow.</p>
 <p>When we build network, we can print the information of <code>Blob</code>. For example, we can print data <code>shape</code> and <code>dtype</code> as follow.
-<div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="n">conv1</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">conv1</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
-</code></pre></div></p>
+<code>python
+print(conv1.shape, conv1.dtype)</code></p>
 <h3 id="operator-overloading">Operator Overloading<a class="headerlink" href="#operator-overloading" title="Permanent link">&para;</a></h3>
 <p>The <code>BlobDef</code> class implements operator overloading which means <code>BlobDef</code> supports math operators such as addition, subtraction, multiplication and division and so on.</p>
 <p>Like '+' in the following code:</p>
-<p><div class="highlight"><pre><span></span><code>output = output + fc2_biases
-</code></pre></div>
+<p><code>output = output + fc2_biases</code>
 which is same as:
-<div class="highlight"><pre><span></span><code>output = flow.broadcast_add(output, fc2_biases)
-</code></pre></div></p>
+<code>output = flow.broadcast_add(output, fc2_biases)</code></p>
 <h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
 <p>Neural network builds by OneFlow require the operators or layers provided by OneFlow as computing units. The placeholder <code>Blob</code> serves as input and output for the operators and layers. Also operator reloading helps simplify some of the statements.</p>
 <p>The operators provided by OneFlow can be found in the API documentation: <a href="https://oneflow.readthedocs.io/en/master/nn.html">oneflow.nn</a>、<a href="https://oneflow.readthedocs.io/en/master/math.html">oneflow.math</a>、<a href="https://oneflow.readthedocs.io/en/master/layers.html">oneflow.layers</a> </p>

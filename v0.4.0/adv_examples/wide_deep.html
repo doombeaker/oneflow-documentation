@@ -1184,7 +1184,7 @@
 <h3 id="oneflow-wdl">OneFlow-WDL脚本<a class="headerlink" href="#oneflow-wdl" title="Permanent link">&para;</a></h3>
 <p>OneFlow-WDL脚本只有一个文件<code>wdl_train_eval.py</code>，请从<a href="https://github.com/Oneflow-Inc/OneFlow-Benchmark/blob/master/ClickThroughRate/WideDeepLearning/wdl_train_eval.py">这里</a>下载。</p>
 <h2 id="oneflow-wdl_1">运行OneFlow-WDL脚本<a class="headerlink" href="#oneflow-wdl_1" title="Permanent link">&para;</a></h2>
-<p><div class="highlight"><pre><span></span><code>EMBD_SIZE=1603616
+<p><code>EMBD_SIZE=1603616
 DATA_ROOT=/path/to/wdl/ofrecord
 python3 wdl_train_eval.py \
   --train_data_dir $DATA_ROOT/train \
@@ -1198,18 +1198,16 @@ python3 wdl_train_eval.py \
   --batch_size=16384 \
   --wide_vocab_size=$EMBD_SIZE \
   --deep_vocab_size=$EMBD_SIZE \
-  --gpu_num 1
-</code></pre></div>
+  --gpu_num 1</code>
 通常配置好数据集的位置<code>DATA_ROOT</code>后，上面的shell脚本就可以被执行了，如果屏幕上能够输出下面类似的结果，就表示已经正确运行。
-<div class="highlight"><pre><span></span><code>1000 time 2020-07-08 00:28:08.066281 loss 0.503295350909233
+<code>1000 time 2020-07-08 00:28:08.066281 loss 0.503295350909233
 1000 eval_loss 0.4846755236387253 eval_auc 0.7616240146992771
 2000 time 2020-07-08 00:28:11.613961 loss 0.48661992555856703
 2000 eval_loss 0.4816856697201729 eval_auc 0.765256583562705
 3000 time 2020-07-08 00:28:15.149135 loss 0.48245503094792364
 3000 eval_loss 0.47835959643125536 eval_auc 0.7715609382514008
 4000 time 2020-07-08 00:28:18.686327 loss 0.47975033831596375
-4000 eval_loss 0.47925308644771575 eval_auc 0.7781267916810946
-</code></pre></div></p>
+4000 eval_loss 0.47925308644771575 eval_auc 0.7781267916810946</code></p>
 <h2 id="_4">测试结果及说明<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <p>我们在一台有8块12G显存的TitanV的服务器上对OneFlow-WDL进行了一组测试，并使用HugeCTR提供的docker容器做了同样参数的测试。</p>
 <h3 id="gpu">多GPU性能测试<a class="headerlink" href="#gpu" title="Permanent link">&para;</a></h3>

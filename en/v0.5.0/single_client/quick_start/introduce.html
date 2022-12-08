@@ -918,13 +918,13 @@
 <p>By version 0.4.0 and earlier, the interface of OneFlow was non object-oriented. Now OneFlow provides object-oriented interfaces.</p>
 <p>In order to take care of the code using the old interface, OneFlow moves the old interface to <code>oneflow.compatible.single_client</code>.</p>
 <p>That code only need to replace the import statements:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">oneflow</span> <span class="k">as</span> <span class="nn">flow</span>
-<span class="kn">import</span> <span class="nn">oneflow.typing</span> <span class="k">as</span> <span class="nn">tp</span>
-</code></pre></div>
+<p><code>python
+import oneflow as flow
+import oneflow.typing as tp</code></p>
 <p>with:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">oneflow.compatible</span> <span class="kn">import</span> <span class="n">single_client</span> <span class="k">as</span> <span class="n">flow</span>
-<span class="kn">from</span> <span class="nn">oneflow.compatible.single_client</span> <span class="kn">import</span> <span class="n">typing</span> <span class="k">as</span> <span class="n">tp</span>
-</code></pre></div>
+<p><code>python
+from oneflow.compatible import single_client as flow
+from oneflow.compatible.single_client import typing as tp</code></p>
                 
               
               

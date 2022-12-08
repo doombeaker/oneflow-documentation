@@ -754,61 +754,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#op-python" class="md-nav__link">
-    封装 Op 的 Python 接口
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#python-kernel" class="md-nav__link">
-    使用 Python 实现 Kernel
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#op_1" class="md-nav__link">
-    使用自定义 Op
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#op_2" class="md-nav__link">
-    为自定义 Op 提供反向计算
-  </a>
-  
-    <nav class="md-nav" aria-label="为自定义 Op 提供反向计算">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#user_relu_backward-op" class="md-nav__link">
-    实现 user_relu_backward Op
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#op_3" class="md-nav__link">
-    为 Op 注册反向梯度
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
-    其它
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1080,61 +1025,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#op-python" class="md-nav__link">
-    封装 Op 的 Python 接口
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#python-kernel" class="md-nav__link">
-    使用 Python 实现 Kernel
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#op_1" class="md-nav__link">
-    使用自定义 Op
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#op_2" class="md-nav__link">
-    为自定义 Op 提供反向计算
-  </a>
-  
-    <nav class="md-nav" aria-label="为自定义 Op 提供反向计算">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#user_relu_backward-op" class="md-nav__link">
-    实现 user_relu_backward Op
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#op_3" class="md-nav__link">
-    为 Op 注册反向梯度
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
-    其它
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1169,11 +1059,11 @@
 </ul>
 <h3 id="_3">开发步骤<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
 <p>使用 Python 扩展 Op，应该准备一个以 <code>op_type_name</code> 命名的目录，在该目录下，按照约定放置必需的文件，以 <a href="https://github.com/Oneflow-Inc/oneflow/tree/master/oneflow/python/test/custom_ops/user_sigmoid">oneflow/python/test/custom_ops/user_sigmoid</a> 为例：</p>
-<div class="highlight"><pre><span></span><code>user_sigmoid
+<p><code>text
+user_sigmoid
 ├── user_sigmoid_cpp_def.cpp
 ├── user_sigmoid_py_api.py
-└── user_sigmoid_py_kernel.py
-</code></pre></div>
+└── user_sigmoid_py_kernel.py</code></p>
 <p>其中：</p>
 <ul>
 <li><code>op_type_name_cpp_def.cpp</code>(以上的 <code>user_sigmoid_cpp_def.cpp</code>) 文件中放置 Op 定义信息</li>
@@ -1189,26 +1079,25 @@
 </ul>
 <h2 id="op">Op 的实现与注册<a class="headerlink" href="#op" title="Permanent link">&para;</a></h2>
 <p>首先，我们在 <code>user_relu_cpp_def.cpp</code> 中定义 op 并完成注册：
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;oneflow/core/framework/framework.h&quot;</span><span class="cp"></span>
-
-<span class="k">namespace</span><span class="w"> </span><span class="nn">oneflow</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="k">namespace</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-
-<span class="n">REGISTER_USER_OP</span><span class="p">(</span><span class="s">&quot;user_relu_forward&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="p">.</span><span class="n">Attr</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;device_sub_tag&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;py&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="p">.</span><span class="n">Input</span><span class="p">(</span><span class="s">&quot;in&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="p">.</span><span class="n">Output</span><span class="p">(</span><span class="s">&quot;out&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="p">.</span><span class="n">SetTensorDescInferFn</span><span class="p">(</span><span class="w"></span>
-<span class="w">      </span><span class="p">[](</span><span class="n">user_op</span><span class="o">::</span><span class="n">InferContext</span><span class="w"> </span><span class="o">*</span><span class="n">ctx</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">Maybe</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="o">*</span><span class="n">ctx</span><span class="o">-&gt;</span><span class="n">Shape4ArgNameAndIndex</span><span class="p">(</span><span class="s">&quot;out&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
-<span class="w">            </span><span class="o">*</span><span class="n">ctx</span><span class="o">-&gt;</span><span class="n">Shape4ArgNameAndIndex</span><span class="p">(</span><span class="s">&quot;in&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
-<span class="w">        </span><span class="o">*</span><span class="n">ctx</span><span class="o">-&gt;</span><span class="n">Dtype4ArgNameAndIndex</span><span class="p">(</span><span class="s">&quot;out&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
-<span class="w">            </span><span class="o">*</span><span class="n">ctx</span><span class="o">-&gt;</span><span class="n">Dtype4ArgNameAndIndex</span><span class="p">(</span><span class="s">&quot;in&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">Maybe</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;::</span><span class="n">Ok</span><span class="p">();</span><span class="w"></span>
-<span class="w">      </span><span class="p">});</span><span class="w"></span>
-<span class="p">}</span><span class="w">  </span><span class="c1">// namespace</span>
-<span class="p">}</span><span class="w">  </span><span class="c1">// namespace oneflow</span>
-</code></pre></div></p>
+```cpp</p>
+<h1 id="include-oneflowcoreframeworkframeworkh">include "oneflow/core/framework/framework.h"<a class="headerlink" href="#include-oneflowcoreframeworkframeworkh" title="Permanent link">&para;</a></h1>
+<p>namespace oneflow {
+namespace {</p>
+<p>REGISTER_USER_OP("user_relu_forward")
+  .Attr<std::string>("device_sub_tag", "py")
+  .Input("in")
+  .Output("out")
+  .SetTensorDescInferFn(
+      <a href="user_op::InferContext *ctx"></a> -&gt; Maybe<void> {
+        *ctx-&gt;Shape4ArgNameAndIndex("out", 0) =
+            *ctx-&gt;Shape4ArgNameAndIndex("in", 0);
+        *ctx-&gt;Dtype4ArgNameAndIndex("out", 0) =
+            *ctx-&gt;Dtype4ArgNameAndIndex("in", 0);
+        return Maybe<void>::Ok();
+      });
+}  // namespace
+}  // namespace oneflow
+```</p>
 <p>分析以上代码：</p>
 <ul>
 <li><code>oneflow/core/framework/framework.h</code> 中包含了我们创建一个 op 所需要的所有接口</li>
@@ -1225,18 +1114,18 @@
 <p><code>op_type_name_cpp_def.cpp</code> 文件是实现 <code>Python Kernel</code> 过程中唯一会使用到的 C++ 文件，它用于设置 Op 的信息，在现阶段，还无法将使用 C++ 配置 Op 的步骤省略（因为设置分布式等高级信息时必需），不过可以看到，该文件并不涉及具体的运算，仅仅是用于描述 Op，即使不熟悉 C++，根据我们的示例，也可以很轻松地掌握。</p>
 <h2 id="op-python">封装 Op 的 Python 接口<a class="headerlink" href="#op-python" title="Permanent link">&para;</a></h2>
 <p>为了用户可以在 Python 层使用刚刚设置并注册的 <code>user_relu</code> Op，我们需要创建一个 <code>user_relu_py_api.py</code> 文件，其内容如下：</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">oneflow</span> <span class="k">as</span> <span class="nn">flow</span>
-
-<span class="k">def</span> <span class="nf">user_relu_forward</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="n">op</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">flow</span><span class="o">.</span><span class="n">user_op_builder</span><span class="p">(</span><span class="s2">&quot;myrelu&quot;</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">Op</span><span class="p">(</span><span class="s2">&quot;user_relu_forward&quot;</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">Input</span><span class="p">(</span><span class="s2">&quot;in&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">x</span><span class="p">])</span>
-        <span class="o">.</span><span class="n">Output</span><span class="p">(</span><span class="s2">&quot;out&quot;</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">Build</span><span class="p">()</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="n">op</span><span class="o">.</span><span class="n">InferAndTryRun</span><span class="p">()</span><span class="o">.</span><span class="n">SoleOutputBlob</span><span class="p">()</span>
-</code></pre></div>
+<p>```python
+import oneflow as flow</p>
+<p>def user_relu_forward(x):
+    op = (
+        flow.user_op_builder("myrelu")
+        .Op("user_relu_forward")
+        .Input("in", [x])
+        .Output("out")
+        .Build()
+    )
+    return op.InferAndTryRun().SoleOutputBlob()
+```</p>
 <p><code>flow.user_op_builder("op_myrelu")</code> 其实会返回一个名为 <code>op_myrelu</code> 的 <code>UserOpConfBuilder</code> 对象。</p>
 <p>该对象包含 <code>Op</code>、<code>Input</code> 等方法，用于封装自定义 op，具体解释如下：</p>
 <ul>
@@ -1246,19 +1135,19 @@
 <li><code>Build</code>：以上设置完成后，调用 <code>Build</code> 可以得到自定义 op 的 Python wrapper</li>
 </ul>
 <p>以下代码，将获取自定义 op 的输出：
-<div class="highlight"><pre><span></span><code><span class="k">return</span> <span class="n">op</span><span class="o">.</span><span class="n">InferAndTryRun</span><span class="p">()</span><span class="o">.</span><span class="n">SoleOutputBlob</span><span class="p">()</span>
-</code></pre></div></p>
+<code>python
+return op.InferAndTryRun().SoleOutputBlob()</code></p>
 <p>其中的 <code>InferAndTryRun</code> 完成推导，返回 <code>UserOp</code>，如果返回结果只有一个输出，则使用 <code>SoleOutputBlob</code> 即可获取该唯一输出，否则，可以使用 <code>RemoteBlobList</code> 获取包含多个输出的列表。</p>
 <h2 id="python-kernel">使用 Python 实现 Kernel<a class="headerlink" href="#python-kernel" title="Permanent link">&para;</a></h2>
 <p>如本文开始所描述，Op 只是逻辑上的概念，真正的计算需要 Kernel 完成，在 OneFlow 中可以既可以使用 C++ 也可以使用 Python 实现 Kernel，本文只介绍最易上手的 Python Kernel 的实现方法。使用 C++ 实现 Kernel 可以参考<a href="user_op.html">使用 C++ 开发 Kernel</a>。</p>
 <p>为了为我们上文设置的 <code>user_relu</code> Op 提供 Python Kernel，我们需要创建一个 <code>user_relu_py_kernel.py</code> 文件，其内容如下：</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-
-<span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
-    <span class="p">(</span><span class="n">x</span><span class="p">,)</span> <span class="o">=</span> <span class="n">args</span>
-    <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="n">x</span>
-    <span class="k">return</span> <span class="n">y</span>
-</code></pre></div>
+<p>```python
+import numpy as np</p>
+<p>def forward(args):
+    (x,) = args
+    y = (x&gt;0)*x
+    return y
+```</p>
 <p>以上的 <code>forward</code> 方法是必需实现的，它的实现对应了我们 Op 的 Python Kernel。关于它的约定有：</p>
 <ul>
 <li>方法名必需为 <code>forward</code></li>
@@ -1268,42 +1157,39 @@
 </ul>
 <h2 id="op_1">使用自定义 Op<a class="headerlink" href="#op_1" title="Permanent link">&para;</a></h2>
 <p>完成以上工作后，我们得到了一个名为 <code>user_relu</code> 的目录，包含三个文件，它们的结构如下：</p>
-<div class="highlight"><pre><span></span><code>user_relu/
+<p><code>text
+user_relu/
 ├── user_relu_cpp_def.cpp
 ├── user_relu_py_api.py
-└── user_relu_py_kernel.py
-</code></pre></div>
+└── user_relu_py_kernel.py</code></p>
 <p>我们可以在 <code>user_relu</code> 文件夹所在的路径，创建一个测试文件，调用刚刚实现的自定义 Op，内容如下：</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">oneflow</span> <span class="k">as</span> <span class="nn">flow</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">oneflow.typing</span> <span class="k">as</span> <span class="nn">tp</span>
-
-<span class="c1"># 根据指定的路径与 op_type_name 创建 module 对象</span>
-<span class="n">module_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
-<span class="n">user_relu_op</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">experimental</span><span class="o">.</span><span class="n">custom_op_module</span><span class="p">(</span><span class="s2">&quot;user_relu&quot;</span><span class="p">,</span> <span class="n">module_path</span><span class="p">)</span>
-
-<span class="c1"># 使 Op, Python API, Python Kernel 生效</span>
-<span class="n">user_relu_op</span><span class="o">.</span><span class="n">py_api</span><span class="p">()</span><span class="o">.</span><span class="n">cpp_def</span><span class="p">()</span><span class="o">.</span><span class="n">py_kernel</span><span class="p">()</span><span class="o">.</span><span class="n">build_load</span><span class="p">()</span>
-
-<span class="nd">@flow</span><span class="o">.</span><span class="n">global_function</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">MyJob</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="mi">5</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">:</span>
-    <span class="k">with</span> <span class="n">flow</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">placement</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;0:0&quot;</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">user_relu_op</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">user_relu_forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="nb">input</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-    <span class="n">output</span> <span class="o">=</span> <span class="n">MyJob</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
-</code></pre></div>
+<p>```python
+import oneflow as flow
+import numpy as np
+import os
+import oneflow.typing as tp</p>
+<h1 id="op_type_name-module">根据指定的路径与 op_type_name 创建 module 对象<a class="headerlink" href="#op_type_name-module" title="Permanent link">&para;</a></h1>
+<p>module_path = os.path.dirname(os.path.abspath(<strong>file</strong>))
+user_relu_op = flow.experimental.custom_op_module("user_relu", module_path)</p>
+<h1 id="op-python-api-python-kernel">使 Op, Python API, Python Kernel 生效<a class="headerlink" href="#op-python-api-python-kernel" title="Permanent link">&para;</a></h1>
+<p>user_relu_op.py_api().cpp_def().py_kernel().build_load()</p>
+<p><a class="magiclink magiclink-github magiclink-mention" href="https://github.com/flow" title="GitHub User: flow">@flow</a>.global_function()
+def MyJob(x: tp.Numpy.Placeholder((5,), dtype=flow.float32)) -&gt; tp.Numpy:
+    with flow.scope.placement("cpu", "0:0"):
+        return user_relu_op.api.user_relu_forward(x)</p>
+<p>if <strong>name</strong> == "<strong>main</strong>":
+    input = np.array([-2, -1, 0, 1, 2], dtype=np.float32)
+    output = MyJob(input)
+    print(input)
+    print(output)
+```</p>
 <p>以上代码中，先通过 <code>flow.experimental.custom_op_module</code> 创建 module 对象，它接收两个参数，第一个参数为 <code>op_type_name</code>， 第二个参数为 <code>user_relu</code> 文件夹所在的路径。返回的 <code>module</code> 对象，代表了我们自定义的 Op。</p>
 <p>接着，通过 <code>user_sigmoid_op.py_api().cpp_def().py_kernel().build_load()</code> 可以使自定义 Op 生效，生效后的 Op 的 Python 接口，就是定义在 <code>user_relu_py_api.py</code> 文件中的方法名(<code>user_relu_forward</code>)，它被放置在 <code>moudle</code> 对象的 <code>api</code> 名称空间中。因此，我们需要通过以下方式调用:</p>
-<div class="highlight"><pre><span></span><code><span class="n">user_sigmoid_op</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">user_relu_forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-</code></pre></div>
+<p><code>python
+user_sigmoid_op.api.user_relu_forward(x)</code></p>
 <p>且因为 Python Kernel 只能运行在 CPU 设备上，因此需要指定计算设备为 CPU：
-<div class="highlight"><pre><span></span><code><span class="k">with</span> <span class="n">flow</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">placement</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;0:0&quot;</span><span class="p">):</span>
-</code></pre></div></p>
+<code>python
+with flow.scope.placement("cpu", "0:0"):</code></p>
 <h2 id="op_2">为自定义 Op 提供反向计算<a class="headerlink" href="#op_2" title="Permanent link">&para;</a></h2>
 <p>我们通过上述工作，已经完成了 <code>user_relu</code> 算子的正向计算过程，可以用于 <code>type="predict"</code> 的作业函数。但是，如果想支持 <code>type="train"</code> 类型的训练作业函数，我们就还需要为自定义 Op 提供反向计算。</p>
 <p>为自定义 Op 提供反向计算的代码，需要写在 <code>op_type_name_cpp_def.cpp</code> 文件中，通过宏 <code>REGISTER_USER_OP_GRAD</code> 进行注册。</p>
@@ -1311,48 +1197,50 @@
 <p>以下，我们将专门实现一个 Op，名为 <code>user_relu_backward</code>。我们将在为 <code>user_relu</code> 注册后向梯度时，用到这个“专门定制”的 Op。</p>
 <h3 id="user_relu_backward-op">实现 <code>user_relu_backward</code> Op<a class="headerlink" href="#user_relu_backward-op" title="Permanent link">&para;</a></h3>
 <p>实现 <code>user_relu_backward</code> Op 的过程与实现 <code>user_relu</code> 的前向几乎是一样的。首先，在 <code>user_relu_cpp_def.cpp</code> 中设置并注册该 Op：</p>
-<div class="highlight"><pre><span></span><code><span class="n">REGISTER_USER_OP</span><span class="p">(</span><span class="s">&quot;user_relu_backward&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="p">.</span><span class="n">Input</span><span class="p">(</span><span class="s">&quot;y&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="p">.</span><span class="n">Input</span><span class="p">(</span><span class="s">&quot;dy&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="p">.</span><span class="n">Output</span><span class="p">(</span><span class="s">&quot;dx&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="p">.</span><span class="n">Attr</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;device_sub_tag&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;py&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="p">.</span><span class="n">SetTensorDescInferFn</span><span class="p">([](</span><span class="n">user_op</span><span class="o">::</span><span class="n">InferContext</span><span class="o">*</span><span class="w"> </span><span class="n">ctx</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">Maybe</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">      </span><span class="k">const</span><span class="w"> </span><span class="n">Shape</span><span class="o">*</span><span class="w"> </span><span class="n">dy_shape</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ctx</span><span class="o">-&gt;</span><span class="n">Shape4ArgNameAndIndex</span><span class="p">(</span><span class="s">&quot;dy&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
-<span class="w">      </span><span class="n">Shape</span><span class="o">*</span><span class="w"> </span><span class="n">dx_shape</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ctx</span><span class="o">-&gt;</span><span class="n">Shape4ArgNameAndIndex</span><span class="p">(</span><span class="s">&quot;dx&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
-<span class="w">      </span><span class="o">*</span><span class="n">dx_shape</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="n">dy_shape</span><span class="p">;</span><span class="w"></span>
-<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="n">Maybe</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;::</span><span class="n">Ok</span><span class="p">();</span><span class="w"></span>
-<span class="w">    </span><span class="p">});</span><span class="w"></span>
-</code></pre></div>
+<p><code>cpp
+REGISTER_USER_OP("user_relu_backward")
+    .Input("y")
+    .Input("dy")
+    .Output("dx")
+    .Attr&lt;std::string&gt;("device_sub_tag", "py")
+    .SetTensorDescInferFn([](user_op::InferContext* ctx) -&gt; Maybe&lt;void&gt; {
+      const Shape* dy_shape = ctx-&gt;Shape4ArgNameAndIndex("dy", 0);
+      Shape* dx_shape = ctx-&gt;Shape4ArgNameAndIndex("dx", 0);
+      *dx_shape = *dy_shape;
+      return Maybe&lt;void&gt;::Ok();
+    });</code></p>
 <p>值得注意的是，同前向类似，以上代码中 <code>.Attr&lt;std::string&gt;("device_sub_tag", "py")</code> 必不可少，它告知 OneFlow 在使用该 Op 时，默认调用 Python Kernel。</p>
 <p>同理，因为不需要用户直接调用这个 <code>user_relu_backward</code> Op，因此我们不需要在 <code>user_relu_py_api.py</code> 为 <code>user_relu_backward</code> 封装 Python 接口。可以直接实现它的 Python Kernel。</p>
 <p>在 <code>user_relu_py_kernel.py</code> 中，实现 <code>backward</code> 方法：</p>
-<p><div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
-    <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span> <span class="o">=</span> <span class="n">args</span>
-    <span class="n">dx</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="n">dy</span>
-    <span class="k">return</span> <span class="n">dx</span>
-</code></pre></div>
+<p><code>python
+def backward(args):
+    (y, dy) = args
+    dx = (y&gt;0)*dy
+    return dx</code>
 它的参数是一个 <code>tuple</code>，数目和顺序对应了 Op 注册时的 <code>Input</code>，输出对应了 Op 注册时的 Output。</p>
 <h3 id="op_3">为 Op 注册反向梯度<a class="headerlink" href="#op_3" title="Permanent link">&para;</a></h3>
 <p>我们需要在 <code>user_relu_cpp_def.cpp</code> 中，通过宏 <code>REGISTER_USER_OP_GRAD</code> 为我们的正向 Op (<code>user_relu_forward</code>) 注册反向。</p>
 <p>其代码如下：
-<div class="highlight"><pre><span></span><code><span class="n">REGISTER_USER_OP_GRAD</span><span class="p">(</span><span class="s">&quot;user_relu_forward&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="p">.</span><span class="n">SetBackwardOpConfGenFn</span><span class="p">([](</span><span class="n">user_op</span><span class="o">::</span><span class="n">BackwardOpConfContext</span><span class="o">*</span><span class="w"> </span><span class="n">ctx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">      </span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">grad_op_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ctx</span><span class="o">-&gt;</span><span class="n">FwOp</span><span class="p">().</span><span class="n">op_name</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;_grad&quot;</span><span class="p">;</span><span class="w"></span>
-<span class="w">      </span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">grad_op_func</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="o">&amp;</span><span class="n">ctx</span><span class="p">](</span><span class="n">user_op</span><span class="o">::</span><span class="n">BackwardOpBuilder</span><span class="o">&amp;</span><span class="w"> </span><span class="n">builder</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">builder</span><span class="p">.</span><span class="n">OpTypeName</span><span class="p">(</span><span class="s">&quot;user_relu_backward&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">            </span><span class="p">.</span><span class="n">InputBind</span><span class="p">(</span><span class="s">&quot;y&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ctx</span><span class="o">-&gt;</span><span class="n">FwOp</span><span class="p">().</span><span class="n">output</span><span class="p">(</span><span class="s">&quot;y&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span><span class="w"></span>
-<span class="w">            </span><span class="p">.</span><span class="n">InputBind</span><span class="p">(</span><span class="s">&quot;dy&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ctx</span><span class="o">-&gt;</span><span class="n">FwOp</span><span class="p">().</span><span class="n">output_grad</span><span class="p">(</span><span class="s">&quot;y&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span><span class="w"></span>
-<span class="w">            </span><span class="p">.</span><span class="n">Output</span><span class="p">(</span><span class="s">&quot;dx&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">            </span><span class="p">.</span><span class="n">Build</span><span class="p">();</span><span class="w"></span>
-<span class="w">      </span><span class="p">};</span><span class="w"></span>
-<span class="w">      </span><span class="n">ctx</span><span class="o">-&gt;</span><span class="n">DefineOp</span><span class="p">(</span><span class="n">grad_op_name</span><span class="p">,</span><span class="w"> </span><span class="n">grad_op_func</span><span class="p">);</span><span class="w"></span>
+```c++
+REGISTER_USER_OP_GRAD("user_relu_forward")
+    .SetBackwardOpConfGenFn(<a href="user_op::BackwardOpConfContext* ctx"></a> {
+      const auto grad_op_name = ctx-&gt;FwOp().op_name() + "_grad";
+      const auto&amp; grad_op_func = <a href="user_op::BackwardOpBuilder&amp; builder">&amp;ctx</a> {
+        return builder.OpTypeName("user_relu_backward")
+            .InputBind("y", ctx-&gt;FwOp().output("y", 0))
+            .InputBind("dy", ctx-&gt;FwOp().output_grad("y", 0))
+            .Output("dx")
+            .Build();
+      };
+      ctx-&gt;DefineOp(grad_op_name, grad_op_func);</p>
+<div class="codehilite"><pre><span></span><code>  const auto&amp; dx_get_func = [&amp;ctx, &amp;grad_op_name]() -&gt; const std::string&amp; {
+    return ctx-&gt;GetOp(grad_op_name).output(&quot;dx&quot;, 0);
+  };
+  ctx-&gt;FwOp().InputGradBind(user_op::OpArg(&quot;x&quot;, 0), dx_get_func);
+});
+</code></pre></div>
 
-<span class="w">      </span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">dx_get_func</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="o">&amp;</span><span class="n">ctx</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">grad_op_name</span><span class="p">]()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ctx</span><span class="o">-&gt;</span><span class="n">GetOp</span><span class="p">(</span><span class="n">grad_op_name</span><span class="p">).</span><span class="n">output</span><span class="p">(</span><span class="s">&quot;dx&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
-<span class="w">      </span><span class="p">};</span><span class="w"></span>
-<span class="w">      </span><span class="n">ctx</span><span class="o">-&gt;</span><span class="n">FwOp</span><span class="p">().</span><span class="n">InputGradBind</span><span class="p">(</span><span class="n">user_op</span><span class="o">::</span><span class="n">OpArg</span><span class="p">(</span><span class="s">&quot;x&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w"> </span><span class="n">dx_get_func</span><span class="p">);</span><span class="w"></span>
-<span class="w">    </span><span class="p">});</span><span class="w"></span>
-</code></pre></div></p>
+<p>```</p>
 <p>我们对以上代码进行解释，通过 <code>REGISTER_USER_OP_GRAD("user_relu_forward")</code> 注册为前向 Op 注册后向求梯度规则，该宏接收一个参数，就是 <strong>前向的</strong> <code>op_type_name</code>。</p>
 <p>然后通过 <code>SetBackwardOpConfGenFn</code> 设置后向求梯度规则，同 Op 类似，在 <code>op_type_name_cpp_def.cpp</code> 中注册后向，其实不涉及真正的运算，而是设置后向计算与前向的对应关系，告诉 OneFlow 框架：</p>
 <ul>
@@ -1360,25 +1248,25 @@
 <li>该 Op 的输入来自哪里，和前向 Op 什么关系</li>
 </ul>
 <p>因此，以上代码中的：</p>
-<div class="highlight"><pre><span></span><code><span class="w">      </span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">grad_op_func</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="o">&amp;</span><span class="n">ctx</span><span class="p">](</span><span class="n">user_op</span><span class="o">::</span><span class="n">BackwardOpBuilder</span><span class="o">&amp;</span><span class="w"> </span><span class="n">builder</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">builder</span><span class="p">.</span><span class="n">OpTypeName</span><span class="p">(</span><span class="s">&quot;user_relu_backward&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">            </span><span class="p">.</span><span class="n">InputBind</span><span class="p">(</span><span class="s">&quot;y&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ctx</span><span class="o">-&gt;</span><span class="n">FwOp</span><span class="p">().</span><span class="n">output</span><span class="p">(</span><span class="s">&quot;y&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span><span class="w"></span>
-<span class="w">            </span><span class="p">.</span><span class="n">InputBind</span><span class="p">(</span><span class="s">&quot;dy&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ctx</span><span class="o">-&gt;</span><span class="n">FwOp</span><span class="p">().</span><span class="n">output_grad</span><span class="p">(</span><span class="s">&quot;y&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span><span class="w"></span>
-<span class="w">            </span><span class="p">.</span><span class="n">Output</span><span class="p">(</span><span class="s">&quot;dx&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">            </span><span class="p">.</span><span class="n">Build</span><span class="p">();</span><span class="w"></span>
-<span class="w">      </span><span class="p">};</span><span class="w"></span>
-</code></pre></div>
+<p><code>c++
+      const auto&amp; grad_op_func = [&amp;ctx](user_op::BackwardOpBuilder&amp; builder) {
+        return builder.OpTypeName("user_relu_backward")
+            .InputBind("y", ctx-&gt;FwOp().output("y", 0))
+            .InputBind("dy", ctx-&gt;FwOp().output_grad("y", 0))
+            .Output("dx")
+            .Build();
+      };</code></p>
 <p>定义了 Op 求梯度的方法：使用 <code>user_relu_backward</code> 算子，并且将前向的输出 <code>y</code> 作为 <code>user_relu_backward</code> 的输入 <code>y</code>；将前向的输出 <code>y</code> 的梯度，作为 <code>user_relu_backward</code> 的输入 <code>dy</code>；最后输出 <code>dx</code>。</p>
 <p>定完求梯度的方法后，需要调用
-<div class="highlight"><pre><span></span><code><span class="n">ctx</span><span class="o">-&gt;</span><span class="n">DefineOp</span><span class="p">(</span><span class="n">grad_op_name</span><span class="p">,</span><span class="w"> </span><span class="n">grad_op_func</span><span class="p">);</span><span class="w"></span>
-</code></pre></div>
+<code>cpp
+ctx-&gt;DefineOp(grad_op_name, grad_op_func);</code>
 使之生效。</p>
 <p>之后的代码：
-<div class="highlight"><pre><span></span><code><span class="w">      </span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">dx_get_func</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="o">&amp;</span><span class="n">ctx</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">grad_op_name</span><span class="p">]()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ctx</span><span class="o">-&gt;</span><span class="n">GetOp</span><span class="p">(</span><span class="n">grad_op_name</span><span class="p">).</span><span class="n">output</span><span class="p">(</span><span class="s">&quot;dx&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
-<span class="w">      </span><span class="p">};</span><span class="w"></span>
-<span class="w">      </span><span class="n">ctx</span><span class="o">-&gt;</span><span class="n">FwOp</span><span class="p">().</span><span class="n">InputGradBind</span><span class="p">(</span><span class="n">user_op</span><span class="o">::</span><span class="n">OpArg</span><span class="p">(</span><span class="s">&quot;x&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w"> </span><span class="n">dx_get_func</span><span class="p">);</span><span class="w"></span>
-</code></pre></div></p>
+<code>cpp
+      const auto&amp; dx_get_func = [&amp;ctx, &amp;grad_op_name]() -&gt; const std::string&amp; {
+        return ctx-&gt;GetOp(grad_op_name).output("dx", 0);
+      };
+      ctx-&gt;FwOp().InputGradBind(user_op::OpArg("x", 0), dx_get_func);</code></p>
 <p>是将前向的输入 <code>x</code> 和刚刚设置的求梯度的方法的输出(<code>dx</code>) 绑定到一起，这样，使用 OneFlow 训练时，就可以自动求导。</p>
 <h2 id="_4">其它<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <ul>

@@ -695,9 +695,22 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#mlp_mnistpy" class="md-nav__link">
+    mlp_mnist.py
+  </a>
+  
+    <nav class="md-nav" aria-label="mlp_mnist.py">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#faq" class="md-nav__link">
     FAQ
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -957,9 +970,22 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#mlp_mnistpy" class="md-nav__link">
+    mlp_mnist.py
+  </a>
+  
+    <nav class="md-nav" aria-label="mlp_mnist.py">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#faq" class="md-nav__link">
     FAQ
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -980,80 +1006,74 @@
                   </a>
                 
                 
-                  <h1>3分钟快速上手</h1>
-                
                 <p>这篇文章将介绍如何快速上手 OneFlow ，我们可以在3分钟内完成一个完整的神经网络训练过程。</p>
 <h2 id="_1">运行例子<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>如果已经安装好了 OneFlow ，可以使用以下命令下载<a href="https://github.com/Oneflow-Inc/oneflow-documentation.git">文档仓库</a>中的<a href="https://github.com/Oneflow-Inc/oneflow-documentation/blob/master/cn/docs/code/quick_start/mlp_mnist.py">mlp_mnist.py</a>脚本，并运行。</p>
-<div class="highlight"><pre><span></span><code>wget https://docs.oneflow.org/master/code/quick_start/mlp_mnist.py #下载脚本
-python3 mlp_mnist.py #运行脚本
-</code></pre></div>
+<p><code>wget https://docs.oneflow.org/master/code/quick_start/mlp_mnist.py #下载脚本
+python3 mlp_mnist.py #运行脚本</code></p>
 <p>我们将得到类似以下输出：
-<div class="highlight"><pre><span></span><code>Epoch [1/20], Loss: 2.3155
+<code>Epoch [1/20], Loss: 2.3155
 Epoch [1/20], Loss: 0.7955
 Epoch [1/20], Loss: 0.4653
 Epoch [1/20], Loss: 0.2064
 Epoch [1/20], Loss: 0.2683
 Epoch [1/20], Loss: 0.3167
-...
-</code></pre></div></p>
+...</code></p>
 <p>输出的是一串数字，每个数字代表了训练的损失值，训练的目标是损失值越小越好。到此我们已经用 OneFlow 完成了一个完整的神经网络的训练。</p>
 <h2 id="_2">代码解读<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <p>以下是完整代码，我们将对其关键部分进行解读。
-<div class="highlight"><pre><span></span><code><span class="c1"># mlp_mnist.py</span>
-<span class="kn">from</span> <span class="nn">oneflow.compatible</span> <span class="kn">import</span> <span class="n">single_client</span> <span class="k">as</span> <span class="n">flow</span>
-<span class="kn">from</span> <span class="nn">oneflow.compatible.single_client</span> <span class="kn">import</span> <span class="n">typing</span> <span class="k">as</span> <span class="n">tp</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+```python</p>
+<h1 id="mlp_mnistpy">mlp_mnist.py<a class="headerlink" href="#mlp_mnistpy" title="Permanent link">&para;</a></h1>
+<p>from oneflow.compatible import single_client as flow
+from oneflow.compatible.single_client import typing as tp
+import numpy as np</p>
+<p>BATCH_SIZE = 100</p>
+<p><a class="magiclink magiclink-github magiclink-mention" href="https://github.com/flow" title="GitHub User: flow">@flow</a>.global_function(type="train")
+def train_job(
+    images: tp.Numpy.Placeholder((BATCH_SIZE, 1, 28, 28), dtype=flow.float),
+    labels: tp.Numpy.Placeholder((BATCH_SIZE,), dtype=flow.int32),
+) -&gt; tp.Numpy:
+    with flow.scope.placement("cpu", "0:0"):
+        reshape = flow.reshape(images, [images.shape[0], -1])
+        initializer1 = flow.random_uniform_initializer(-1/28.0, 1/28.0)
+        hidden = flow.layers.dense(
+            reshape,
+            500,
+            activation=flow.nn.relu,
+            kernel_initializer=initializer1,
+            bias_initializer=initializer1,
+            name="dense1",
+        )
+        initializer2 = flow.random_uniform_initializer(
+            -np.sqrt(1/500.0), np.sqrt(1/500.0))
+        logits = flow.layers.dense(
+            hidden, 10, kernel_initializer=initializer2, bias_initializer=initializer2, name="dense2"
+        )
+        loss = flow.nn.sparse_softmax_cross_entropy_with_logits(labels, logits)</p>
+<div class="codehilite"><pre><span></span><code>lr_scheduler = flow.optimizer.PiecewiseConstantScheduler([], [0.001])
+flow.optimizer.Adam(lr_scheduler).minimize(loss)
+return loss
+</code></pre></div>
 
-<span class="n">BATCH_SIZE</span> <span class="o">=</span> <span class="mi">100</span>
-
-<span class="nd">@flow</span><span class="o">.</span><span class="n">global_function</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">train_job</span><span class="p">(</span>
-    <span class="n">images</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">float</span><span class="p">),</span>
-    <span class="n">labels</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">:</span>
-    <span class="k">with</span> <span class="n">flow</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">placement</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;0:0&quot;</span><span class="p">):</span>
-        <span class="n">reshape</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="p">[</span><span class="n">images</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-        <span class="n">initializer1</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">random_uniform_initializer</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="mf">28.0</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mf">28.0</span><span class="p">)</span>
-        <span class="n">hidden</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span>
-            <span class="n">reshape</span><span class="p">,</span>
-            <span class="mi">500</span><span class="p">,</span>
-            <span class="n">activation</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span>
-            <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer1</span><span class="p">,</span>
-            <span class="n">bias_initializer</span><span class="o">=</span><span class="n">initializer1</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;dense1&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">initializer2</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">random_uniform_initializer</span><span class="p">(</span>
-            <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mf">500.0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mf">500.0</span><span class="p">))</span>
-        <span class="n">logits</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span>
-            <span class="n">hidden</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer2</span><span class="p">,</span> <span class="n">bias_initializer</span><span class="o">=</span><span class="n">initializer2</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;dense2&quot;</span>
-        <span class="p">)</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">sparse_softmax_cross_entropy_with_logits</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">logits</span><span class="p">)</span>
-
-    <span class="n">lr_scheduler</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">PiecewiseConstantScheduler</span><span class="p">([],</span> <span class="p">[</span><span class="mf">0.001</span><span class="p">])</span>
-    <span class="n">flow</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">lr_scheduler</span><span class="p">)</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">loss</span>
-
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="p">(</span><span class="n">train_images</span><span class="p">,</span> <span class="n">train_labels</span><span class="p">),</span> <span class="p">(</span><span class="n">test_images</span><span class="p">,</span> <span class="n">test_labels</span><span class="p">)</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">load_mnist</span><span class="p">(</span>
-        <span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="n">BATCH_SIZE</span>
-    <span class="p">)</span>
-    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">train_images</span><span class="p">,</span> <span class="n">train_labels</span><span class="p">)):</span>
-            <span class="n">loss</span> <span class="o">=</span> <span class="n">train_job</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">20</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Epoch [</span><span class="si">{}</span><span class="s1">/</span><span class="si">{}</span><span class="s1">], Loss: </span><span class="si">{:.4f}</span><span class="s1">&#39;</span>
-                      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">loss</span><span class="o">.</span><span class="n">mean</span><span class="p">()))</span>
-</code></pre></div></p>
+<p>if <strong>name</strong> == "<strong>main</strong>":
+    (train_images, train_labels), (test_images, test_labels) = flow.data.load_mnist(
+        BATCH_SIZE, BATCH_SIZE
+    )
+    for epoch in range(20):
+        for i, (images, labels) in enumerate(zip(train_images, train_labels)):
+            loss = train_job(images, labels)
+            if i % 20 == 0:
+                print('Epoch [{}/{}], Loss: {:.4f}'
+                      .format(epoch + 1, 20, loss.mean()))
+```</p>
 <p>接下来让我们简单介绍下这段代码。</p>
 <p>OneFlow 相对其他深度学习框架较特殊的地方是这里：
-<div class="highlight"><pre><span></span><code><span class="nd">@flow</span><span class="o">.</span><span class="n">global_function</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">train_job</span><span class="p">(</span>
-    <span class="n">images</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">float</span><span class="p">),</span>
-    <span class="n">labels</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">:</span>
-</code></pre></div>
+<code>python
+@flow.global_function(type="train")
+def train_job(
+    images: tp.Numpy.Placeholder((BATCH_SIZE, 1, 28, 28), dtype=flow.float),
+    labels: tp.Numpy.Placeholder((BATCH_SIZE,), dtype=flow.int32),
+) -&gt; tp.Numpy:</code>
 <code>train_job</code> 是一个被 <code>@flow.global_function</code> 修饰的函数，通常称为 <strong>作业函数</strong> (job function)。只有作业函数才能够被 OneFlow 识别，进行训练或者预测。通过 type 来指定 job 的类型：<code>type="train"</code> 为训练作业；<code>type="predict"</code> 为预测作业。</p>
 <p>在 OneFlow 中，神经网络的训练或者预测需要两部分信息：</p>
 <ul>
@@ -1062,9 +1082,9 @@ Epoch [1/20], Loss: 0.3167
 </li>
 <li>
 <p>另外一部分是使用什么样的配置去训练这个网络，比如 <code>learning rate</code> 、模型优化更新的方法。这些在 job function 里配置如下：
-<div class="highlight"><pre><span></span><code>    <span class="n">lr_scheduler</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">PiecewiseConstantScheduler</span><span class="p">([],</span> <span class="p">[</span><span class="mf">0.001</span><span class="p">])</span>
-    <span class="n">flow</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">lr_scheduler</span><span class="p">)</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
-</code></pre></div></p>
+<code>python
+    lr_scheduler = flow.optimizer.PiecewiseConstantScheduler([], [0.001])
+    flow.optimizer.Adam(lr_scheduler).minimize(loss)</code></p>
 </li>
 </ul>
 <p>本文例子中包含了训练一个神经网络的所有元素，除了上面说的作业函数及其配置之外，还有：</p>
@@ -1088,11 +1108,10 @@ Epoch [1/20], Loss: 0.3167
 <p>运行本文脚本时，为什么一直卡着不动？</p>
 <blockquote>
 <p>可能是环境变量中设置了错误的代理。可以先通过运行命令取消代理
-<div class="highlight"><pre><span></span><code>unset http_proxy
+<code>unset http_proxy
 unset https_proxy
 unset HTTP_PROXY
-unset HTTPS_PROXY
-</code></pre></div>
+unset HTTPS_PROXY</code>
 然后再进行尝试</p>
 </blockquote>
 </li>

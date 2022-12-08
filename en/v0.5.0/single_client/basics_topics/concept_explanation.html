@@ -1253,21 +1253,21 @@
 <h3 id="1placeholder">1.Placeholder<a class="headerlink" href="#1placeholder" title="Permanent link">&para;</a></h3>
 <p>Placeholder is <strong>data placeholder</strong>. This concept is used to store the shape of input or output data. There is no actual data in Placeholder. </p>
 <p>For example:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">oneflow.typing</span> <span class="k">as</span> <span class="nn">tp</span>
-<span class="k">def</span> <span class="nf">test_job</span><span class="p">(</span>
-    <span class="n">images</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="mi">32</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">float</span><span class="p">),</span>
-    <span class="n">labels</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="mi">32</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">,</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">]:</span>
-    <span class="c1"># do something with images or labels</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
-</code></pre></div>
+<p><code>python
+import oneflow.typing as tp
+def test_job(
+    images: tp.Numpy.Placeholder((32, 1, 28, 28), dtype=flow.float),
+    labels: tp.Numpy.Placeholder((32,), dtype=flow.int32),
+) -&gt; Tuple[tp.Numpy, tp.Numpy]:
+    # do something with images or labels
+    return (images, labels)</code></p>
 <p>The code above shows that the <code>images</code> shape is (32, 1, 28, 28) and <code>images</code> data type is <code>flow.float32</code> , the <code>labels</code> shape is (32,) and <code>labels</code> data type is <code>flow.int32</code>.</p>
 <h3 id="2tensor-and-blob">2.Tensor and Blob<a class="headerlink" href="#2tensor-and-blob" title="Permanent link">&para;</a></h3>
 <p>Tensor is a common concept in other framework. In PyTorch, Tensor contains the data, data type, grad, storing device and other attributes. Tensor can be used to create and describe the computation graph in forward and backward process. </p>
 <p>OneFlow Tensor is basically the same, but there are some difference. In order to provide sufficient support for distributed system and parallelism, the Tensor in OneFlow is more complex and have more types and attributes (Such as logical, physical, devices and attributes of distribution). The Tensor at logical level could be divided to different devices. In order to simplify description, OneFlow hides the different types of Tensor, all the things are defined by a higher level concept named Blob.</p>
 <p>In OneFlow, Blob has a base class <code>BlobDef</code>. You can print the attributes of  <code>Blob</code> when building network. As in the following code, we can print  <code>conv1</code>'s <code>shape</code> and <code>dtype</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="n">conv1</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">conv1</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
-</code></pre></div>
+<p><code>python
+print(conv1.shape, conv1.dtype)</code></p>
 <p>Blob can be Placeholder at compile time, but can also contains values at running time. </p>
 <h3 id="3job-function">3.Job Function<a class="headerlink" href="#3job-function" title="Permanent link">&para;</a></h3>
 <p>In OneFlow, we call the training, evaluating, predicting and inference tasks as job function. Job function connects logic of user and computing resources that managed by OneFlow.</p>
@@ -1275,44 +1275,44 @@
 <h3 id="4layer-and-operator">4.Layer and Operator<a class="headerlink" href="#4layer-and-operator" title="Permanent link">&para;</a></h3>
 <h4 id="layer">Layer<a class="headerlink" href="#layer" title="Permanent link">&para;</a></h4>
 <p>The layer concept in OneFlow is basically the same as the layer in TensorFlow, PyTorch and other popular deep learning framework. It is used to describe a layer in neural network such as convolution layer, batch normalization layer, fully connected layer and normalization layer. Layer can simplify the process of building neural network. For example you can use just few lines of code to build LeNet:</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">lenet</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="n">initializer</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">truncated_normal</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
-    <span class="n">conv1</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">conv2d</span><span class="p">(</span>
-        <span class="n">data</span><span class="p">,</span>
-        <span class="mi">32</span><span class="p">,</span>
-        <span class="mi">5</span><span class="p">,</span>
-        <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;SAME&quot;</span><span class="p">,</span>
-        <span class="n">activation</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;conv1&quot;</span><span class="p">,</span>
-        <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">pool1</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">max_pool2d</span><span class="p">(</span>
-        <span class="n">conv1</span><span class="p">,</span> <span class="n">ksize</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">strides</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;SAME&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;pool1&quot;</span><span class="p">,</span> <span class="n">data_format</span><span class="o">=</span><span class="s2">&quot;NCHW&quot;</span>
-    <span class="p">)</span>
-    <span class="n">conv2</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">conv2d</span><span class="p">(</span>
-        <span class="n">pool1</span><span class="p">,</span>
-        <span class="mi">64</span><span class="p">,</span>
-        <span class="mi">5</span><span class="p">,</span>
-        <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;SAME&quot;</span><span class="p">,</span>
-        <span class="n">activation</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;conv2&quot;</span><span class="p">,</span>
-        <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">pool2</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">max_pool2d</span><span class="p">(</span>
-        <span class="n">conv2</span><span class="p">,</span> <span class="n">ksize</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">strides</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;SAME&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;pool2&quot;</span><span class="p">,</span> <span class="n">data_format</span><span class="o">=</span><span class="s2">&quot;NCHW&quot;</span>
-    <span class="p">)</span>
-    <span class="n">reshape</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">pool2</span><span class="p">,</span> <span class="p">[</span><span class="n">pool2</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">hidden</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span>
-        <span class="n">reshape</span><span class="p">,</span>
-        <span class="mi">512</span><span class="p">,</span>
-        <span class="n">activation</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span>
-        <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;dense1&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="k">if</span> <span class="n">train</span><span class="p">:</span>
-        <span class="n">hidden</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">hidden</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;dropout&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span><span class="n">hidden</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;dense2&quot;</span><span class="p">)</span>
-</code></pre></div>
+<p><code>python
+def lenet(data, train=False):
+    initializer = flow.truncated_normal(0.1)
+    conv1 = flow.layers.conv2d(
+        data,
+        32,
+        5,
+        padding="SAME",
+        activation=flow.nn.relu,
+        name="conv1",
+        kernel_initializer=initializer,
+    )
+    pool1 = flow.nn.max_pool2d(
+        conv1, ksize=2, strides=2, padding="SAME", name="pool1", data_format="NCHW"
+    )
+    conv2 = flow.layers.conv2d(
+        pool1,
+        64,
+        5,
+        padding="SAME",
+        activation=flow.nn.relu,
+        name="conv2",
+        kernel_initializer=initializer,
+    )
+    pool2 = flow.nn.max_pool2d(
+        conv2, ksize=2, strides=2, padding="SAME", name="pool2", data_format="NCHW"
+    )
+    reshape = flow.reshape(pool2, [pool2.shape[0], -1])
+    hidden = flow.layers.dense(
+        reshape,
+        512,
+        activation=flow.nn.relu,
+        kernel_initializer=initializer,
+        name="dense1",
+    )
+    if train:
+        hidden = flow.nn.dropout(hidden, rate=0.5, name="dropout")
+    return flow.layers.dense(hidden, 10, kernel_initializer=initializer, name="dense2")</code></p>
 <p>Layer is composed by operators. For example: <code>layers.conv2d</code> is composed by  <code>conv2d</code> and <code>variable</code>.</p>
 <h4 id="operator">Operator<a class="headerlink" href="#operator" title="Permanent link">&para;</a></h4>
 <p>Operator is the <strong>basic calculation unit</strong> in OneFlow. The calculation in above example is completed by operators. <code>flow.nn.max_pool2d</code> and <code>flow.reshape</code> are two kinds of operators.</p>

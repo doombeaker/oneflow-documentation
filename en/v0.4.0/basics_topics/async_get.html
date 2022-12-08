@@ -1135,26 +1135,26 @@
 <h2 id="get-result-synchronously">Get Result Synchronously<a class="headerlink" href="#get-result-synchronously" title="Permanent link">&para;</a></h2>
 <p>When we define a job function, if the annotation of the return type of the job function is <code>oneflow.typing.Numpy</code>, the job function will be called synchronously.</p>
 <p>For example, when we define a job function like this:
-<div class="highlight"><pre><span></span><code><span class="nd">@flow</span><span class="o">.</span><span class="n">global_function</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">train_job</span><span class="p">(</span>
-    <span class="n">images</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">float</span><span class="p">),</span>
-    <span class="n">labels</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">:</span>
-    <span class="k">with</span> <span class="n">flow</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">placement</span><span class="p">(</span><span class="s2">&quot;gpu&quot;</span><span class="p">,</span> <span class="s2">&quot;0:0&quot;</span><span class="p">):</span>
-        <span class="n">logits</span> <span class="o">=</span> <span class="n">lenet</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">sparse_softmax_cross_entropy_with_logits</span><span class="p">(</span>
-            <span class="n">labels</span><span class="p">,</span> <span class="n">logits</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;softmax_loss&quot;</span>
-        <span class="p">)</span>
-    <span class="n">lr_scheduler</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">PiecewiseConstantScheduler</span><span class="p">([],</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">])</span>
-    <span class="n">flow</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">lr_scheduler</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">loss</span>
-</code></pre></div></p>
+<code>python
+@flow.global_function(type="train")
+def train_job(
+    images: tp.Numpy.Placeholder((BATCH_SIZE, 1, 28, 28), dtype=flow.float),
+    labels: tp.Numpy.Placeholder((BATCH_SIZE,), dtype=flow.int32),
+) -&gt; tp.Numpy:
+    with flow.scope.placement("gpu", "0:0"):
+        logits = lenet(images, train=True)
+        loss = flow.nn.sparse_softmax_cross_entropy_with_logits(
+            labels, logits, name="softmax_loss"
+        )
+    lr_scheduler = flow.optimizer.PiecewiseConstantScheduler([], [0.1])
+    flow.optimizer.SGD(lr_scheduler, momentum=0).minimize(loss)
+    return loss</code></p>
 <p>Through Python annotations, OneFlow knows the type of the job function's return is <code>oneflow.typing.Numpy</code>, which corresponds to <code>ndarray</code> in <code>Numpy</code>.
 Then when we call the job function, it will simply return the <code>ndarray</code> object:</p>
-<div class="highlight"><pre><span></span><code><span class="n">loss</span> <span class="o">=</span> <span class="n">train_job</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
-<span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">20</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
-</code></pre></div>
+<p><code>python
+loss = train_job(images, labels)
+if i % 20 == 0:
+    print(loss.mean())</code></p>
 <p>From the example above, it should be noted that:</p>
 <ul>
 <li>
@@ -1201,150 +1201,150 @@ Then when we call the job function, it will simply return the <code>ndarray</cod
 <p>The first three steps are completed by users of OneFlow. When the program runs, the registered callback function is called by OneFlow and the return values of the job function are passed as parameters to the callback function.</p>
 <h3 id="prepare-a-callback-function">Prepare a Callback Function<a class="headerlink" href="#prepare-a-callback-function" title="Permanent link">&para;</a></h3>
 <p>Suppose the prototype of the callback function is:</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">cb_func</span><span class="p">(</span><span class="n">result</span><span class="p">:</span><span class="n">T</span><span class="p">):</span>
-    <span class="c1">#...</span>
-</code></pre></div>
+<p><code>python
+def cb_func(result:T):
+    #...</code></p>
 <p>Among them, the <code>result</code> needs to be annotated to specify its type <code>T</code>, that is, numpy, listnumpy, etc. mentioned above, or their composite type. We will have corresponding examples below.</p>
 <p>The <code>result</code> of callback function is actually the return value of job function. Therefore, it must be consistent with the annotation of the return value of the job function</p>
 <p>For example, when we define a job function below:
-<div class="highlight"><pre><span></span><code><span class="nd">@flow</span><span class="o">.</span><span class="n">global_function</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">train_job</span><span class="p">(</span>
-    <span class="n">images</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">float</span><span class="p">),</span>
-    <span class="n">labels</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tp</span><span class="o">.</span><span class="n">Callback</span><span class="p">[</span><span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">]:</span>
-    <span class="c1"># mlp</span>
-    <span class="n">initializer</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">truncated_normal</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
-    <span class="n">reshape</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="p">[</span><span class="n">images</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">hidden</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span>
-        <span class="n">reshape</span><span class="p">,</span>
-        <span class="mi">512</span><span class="p">,</span>
-        <span class="n">activation</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span>
-        <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;hidden&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">logits</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span>
-        <span class="n">hidden</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;output&quot;</span>
-    <span class="p">)</span>
+```python
+<a class="magiclink magiclink-github magiclink-mention" href="https://github.com/flow" title="GitHub User: flow">@flow</a>.global_function(type="train")
+def train_job(
+    images: tp.Numpy.Placeholder((BATCH_SIZE, 1, 28, 28), dtype=flow.float),
+    labels: tp.Numpy.Placeholder((BATCH_SIZE,), dtype=flow.int32),
+) -&gt; tp.Callback[tp.Numpy]:
+    # mlp
+    initializer = flow.truncated_normal(0.1)
+    reshape = flow.reshape(images, [images.shape[0], -1])
+    hidden = flow.layers.dense(
+        reshape,
+        512,
+        activation=flow.nn.relu,
+        kernel_initializer=initializer,
+        name="hidden",
+    )
+    logits = flow.layers.dense(
+        hidden, 10, kernel_initializer=initializer, name="output"
+    )</p>
+<div class="codehilite"><pre><span></span><code>loss = flow.nn.sparse_softmax_cross_entropy_with_logits(
+    labels, logits, name=&quot;softmax_loss&quot;
+)
+lr_scheduler = flow.optimizer.PiecewiseConstantScheduler([], [0.1])
+flow.optimizer.SGD(lr_scheduler, momentum=0).minimize(loss)
+return loss
+</code></pre></div>
 
-    <span class="n">loss</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">sparse_softmax_cross_entropy_with_logits</span><span class="p">(</span>
-        <span class="n">labels</span><span class="p">,</span> <span class="n">logits</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;softmax_loss&quot;</span>
-    <span class="p">)</span>
-    <span class="n">lr_scheduler</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">PiecewiseConstantScheduler</span><span class="p">([],</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">])</span>
-    <span class="n">flow</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">lr_scheduler</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">loss</span>
-</code></pre></div></p>
+<p>```</p>
 <p>Annotation <code>-&gt; tp.Callback[tp.Numpy]</code> means that this job function returns a <code>oneflow.typing.Numpy</code> type, and need to be called asynchronously.</p>
 <p>Thus, the callback function we defined should accept a numpy parameter:
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">cb_print_loss</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">):</span>
-    <span class="k">global</span> <span class="n">g_i</span>
-    <span class="k">if</span> <span class="n">g_i</span> <span class="o">%</span> <span class="mi">20</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
-    <span class="n">g_i</span> <span class="o">+=</span> <span class="mi">1</span>
-</code></pre></div></p>
+<code>python
+def cb_print_loss(result: tp.Numpy):
+    global g_i
+    if g_i % 20 == 0:
+        print(result.mean())
+    g_i += 1</code></p>
 <p>Let's take a look at another example. If the job function is defined as below:</p>
-<div class="highlight"><pre><span></span><code><span class="nd">@flow</span><span class="o">.</span><span class="n">global_function</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;predict&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">eval_job</span><span class="p">(</span>
-    <span class="n">images</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">float</span><span class="p">),</span>
-    <span class="n">labels</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tp</span><span class="o">.</span><span class="n">Callback</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">,</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">]]:</span>
-    <span class="k">with</span> <span class="n">flow</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">placement</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;0:0&quot;</span><span class="p">):</span>
-        <span class="n">logits</span> <span class="o">=</span> <span class="n">mlp</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">sparse_softmax_cross_entropy_with_logits</span><span class="p">(</span>
-            <span class="n">labels</span><span class="p">,</span> <span class="n">logits</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;softmax_loss&quot;</span>
-        <span class="p">)</span>
-
-    <span class="k">return</span> <span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">logits</span><span class="p">)</span>
+<p>```python
+<a class="magiclink magiclink-github magiclink-mention" href="https://github.com/flow" title="GitHub User: flow">@flow</a>.global_function(type="predict")
+def eval_job(
+    images: tp.Numpy.Placeholder((BATCH_SIZE, 1, 28, 28), dtype=flow.float),
+    labels: tp.Numpy.Placeholder((BATCH_SIZE,), dtype=flow.int32),
+) -&gt; tp.Callback[Tuple[tp.Numpy, tp.Numpy]]:
+    with flow.scope.placement("cpu", "0:0"):
+        logits = mlp(images)
+        loss = flow.nn.sparse_softmax_cross_entropy_with_logits(
+            labels, logits, name="softmax_loss"
+        )</p>
+<div class="codehilite"><pre><span></span><code>return (labels, logits)
 </code></pre></div>
+
+<p>```</p>
 <p>Annotation <code>-&gt; tp.Callback[Tuple[tp.Numpy, tp.Numpy]]</code> means that this job function returns a <code>tuple</code> and each element is <code>tp.Numpy</code>. The job function needs to be called asynchronously.</p>
 <p>Thus, the parameter annotation of the corresponding callback function should be:</p>
-<p><div class="highlight"><pre><span></span><code><span class="n">g_total</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">g_correct</span> <span class="o">=</span> <span class="mi">0</span>
-
-
-<span class="k">def</span> <span class="nf">acc</span><span class="p">(</span><span class="n">arguments</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">,</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">]):</span>
-    <span class="k">global</span> <span class="n">g_total</span>
-    <span class="k">global</span> <span class="n">g_correct</span>
-
-    <span class="n">labels</span> <span class="o">=</span> <span class="n">arguments</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">logits</span> <span class="o">=</span> <span class="n">arguments</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">predictions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">right_count</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">predictions</span> <span class="o">==</span> <span class="n">labels</span><span class="p">)</span>
-    <span class="n">g_total</span> <span class="o">+=</span> <span class="n">labels</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">g_correct</span> <span class="o">+=</span> <span class="n">right_count</span>
+<p>```python
+g_total = 0
+g_correct = 0</p>
+<p>def acc(arguments: Tuple[tp.Numpy, tp.Numpy]):
+    global g_total
+    global g_correct</p>
+<div class="codehilite"><pre><span></span><code>labels = arguments[0]
+logits = arguments[1]
+predictions = np.argmax(logits, 1)
+right_count = np.sum(predictions == labels)
+g_total += labels.shape[0]
+g_correct += right_count
 </code></pre></div>
-The <code>arguments</code> corresponds to the return type of the above job function.</p>
+
+<p><code>``
+The</code>arguments` corresponds to the return type of the above job function.</p>
 <h3 id="registration-of-callback-function">Registration of Callback Function<a class="headerlink" href="#registration-of-callback-function" title="Permanent link">&para;</a></h3>
 <p>When we call the job function asynchronously, the job function will return a 'callback' object, and we register the prepared callback function by passing it to that object.</p>
 <p>OneFlow will automatically call the registered callback function when it gets the training results.</p>
-<p><div class="highlight"><pre><span></span><code><span class="n">callbacker</span> <span class="o">=</span> <span class="n">train_job</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
-<span class="n">callbacker</span><span class="p">(</span><span class="n">cb_print_loss</span><span class="p">)</span>
-</code></pre></div>
+<p><code>python
+callbacker = train_job(images, labels)
+callbacker(cb_print_loss)</code>
 But the above code is redundant, we recommend:</p>
-<div class="highlight"><pre><span></span><code><span class="n">train_job</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">labels</span><span class="p">)(</span><span class="n">cb_print_loss</span><span class="p">)</span>
-</code></pre></div>
+<p><code>python
+train_job(images, labels)(cb_print_loss)</code></p>
 <h2 id="code">Code<a class="headerlink" href="#code" title="Permanent link">&para;</a></h2>
 <h3 id="get-single-result-synchronously">Get single result synchronously<a class="headerlink" href="#get-single-result-synchronously" title="Permanent link">&para;</a></h3>
 <p>We use LeNet as an example here to show how to get the return value <code>loss</code> synchronously and print the loss every 20 iterations.</p>
 <p>Code example: <a href="../code/basics_topics/synchronize_single_job.py">synchronize_single_job.py</a></p>
 <p>Run:</p>
-<div class="highlight"><pre><span></span><code>wget https://docs.oneflow.org/code/basics_topics/synchronize_single_job.py
-python3 synchronize_single_job.py
-</code></pre></div>
+<p><code>wget https://docs.oneflow.org/code/basics_topics/synchronize_single_job.py
+python3 synchronize_single_job.py</code></p>
 <p>There will be outputs like:</p>
-<div class="highlight"><pre><span></span><code>File mnist.npz already exist, path: ./mnist.npz
+<p><code>text
+File mnist.npz already exist, path: ./mnist.npz
 7.3258467
 2.1435719
 1.1712438
 0.7531896
 ...
 ...
-model saved
-</code></pre></div>
+model saved</code></p>
 <h3 id="_1"><a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
 <h3 id="get-mutiple-results-synchronously">Get Mutiple Results Synchronously<a class="headerlink" href="#get-mutiple-results-synchronously" title="Permanent link">&para;</a></h3>
 <p>In this case, the job function returns a <code>tuple</code>. We get the results <code>labels</code> and <code>logits</code> in tuple synchronously. Also, we evaluate the trained model in the above example, then output the accuracy rate.</p>
 <p>Code: <a href="../code/basics_topics/synchronize_batch_job.py">synchronize_batch_job.py</a></p>
 <p>The trained model can be downloaded from <a href="https://oneflow-public.oss-cn-beijing.aliyuncs.com/online_document/docs/basics_topics/lenet_models_1.zip">lenet_models_1.zip</a>
 Run:</p>
-<div class="highlight"><pre><span></span><code>wget https://oneflow-public.oss-cn-beijing.aliyuncs.com/online_document/docs/quick_start/lenet_models_1.zip
+<p><code>wget https://oneflow-public.oss-cn-beijing.aliyuncs.com/online_document/docs/quick_start/lenet_models_1.zip
 unzip lenet_models_1.zip
 wget https://docs.oneflow.org/code/basics_topics/synchronize_batch_job.py
-python3 synchronize_batch_job.py
-</code></pre></div>
+python3 synchronize_batch_job.py</code></p>
 <p>There will be outputs like:</p>
-<div class="highlight"><pre><span></span><code>accuracy: 99.3%
-</code></pre></div>
+<p><code>text
+accuracy: 99.3%</code></p>
 <h3 id="_2"><a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
 <h3 id="get-single-result-asynchronously">Get Single Result Asynchronously<a class="headerlink" href="#get-single-result-asynchronously" title="Permanent link">&para;</a></h3>
 <p>In this case, we take MLP as example to get the single return result loss from job function asynchronously, and the loss is printed every 20 rounds.</p>
 <p>Code: <a href="../code/basics_topics/async_single_job.py">async_single_job.py</a></p>
 <p>Run:</p>
-<div class="highlight"><pre><span></span><code>wget https://docs.oneflow.org/code/basics_topics/async_single_job.py
-python3 async_single_job.py
-</code></pre></div>
+<p><code>wget https://docs.oneflow.org/code/basics_topics/async_single_job.py
+python3 async_single_job.py</code></p>
 <p>There will be outputs like:</p>
-<div class="highlight"><pre><span></span><code>File mnist.npz already exist, path: ./mnist.npz
+<p><code>text
+File mnist.npz already exist, path: ./mnist.npz
 3.0865736
 0.8949808
 0.47858357
 0.3486296
-...
-</code></pre></div>
+...</code></p>
 <h3 id="get-multiple-results-asynchronously">Get Multiple Results Asynchronously<a class="headerlink" href="#get-multiple-results-asynchronously" title="Permanent link">&para;</a></h3>
 <p>In the following example, we will show how to get multiple return results of the job function asynchronously, evaluate the trained model in the above example, and get the accuracy.</p>
 <p>Code: <a href="../code/basics_topics/async_batch_job.py">async_batch_job.py</a></p>
 <p>The trained model can be downloaded from <a href="https://oneflow-public.oss-cn-beijing.aliyuncs.com/online_document/docs/basics_topics/mlp_models_1.zip">mlp_models_1.zip</a></p>
 <p>](<a href="https://oneflow-public.oss-cn-beijing.aliyuncs.com/online_document/docs/basics_topics/mlp_models_1.zip">https://oneflow-public.oss-cn-beijing.aliyuncs.com/online_document/docs/basics_topics/mlp_models_1.zip</a>)</p>
 <p>Run:</p>
-<div class="highlight"><pre><span></span><code>wget https://oneflow-public.oss-cn-beijing.aliyuncs.com/online_document/docs/basics_topics/mlp_models_1.zip
+<p><code>wget https://oneflow-public.oss-cn-beijing.aliyuncs.com/online_document/docs/basics_topics/mlp_models_1.zip
 unzip mlp_models_1.zip
 wget https://docs.oneflow.org/code/basics_topics/async_batch_job.py
-python3 async_batch_job.py
-</code></pre></div>
+python3 async_batch_job.py</code></p>
 <p>There would be outputs like:</p>
-<div class="highlight"><pre><span></span><code>File mnist.npz already exist, path: ./mnist.npz
-accuracy: 97.6%
-</code></pre></div>
+<p><code>text
+File mnist.npz already exist, path: ./mnist.npz
+accuracy: 97.6%</code></p>
                 
               
               

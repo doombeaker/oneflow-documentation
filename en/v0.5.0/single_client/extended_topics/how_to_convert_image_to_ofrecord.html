@@ -1014,19 +1014,17 @@
 <ul>
 <li>Download and unzip the relevant zip file</li>
 </ul>
-<div class="highlight"><pre><span></span><code>$ wget https://oneflow-static.oss-cn-beijing.aliyuncs.com/oneflow-tutorial-attachments/img2ofrecord.zip
-$ unzip img2ofrecord.zip
-</code></pre></div>
+<p><code>$ wget https://oneflow-static.oss-cn-beijing.aliyuncs.com/oneflow-tutorial-attachments/img2ofrecord.zip
+$ unzip img2ofrecord.zip</code></p>
 <ul>
 <li>Change directory to corresponding path and run OFRecord production script <code>img2ofrecord.py</code></li>
 </ul>
-<div class="highlight"><pre><span></span><code>$ cd ./img_to_ofrecord
-$ python img2ofrecord.py --part_num=5 --save_dir=./dataset/ --img_format=.png --image_root=./images/train_set/
-</code></pre></div>
+<p><code>$ cd ./img_to_ofrecord
+$ python img2ofrecord.py --part_num=5 --save_dir=./dataset/ --img_format=.png --image_root=./images/train_set/</code></p>
 <ul>
 <li>The following output will display as the script runs.</li>
 </ul>
-<div class="highlight"><pre><span></span><code>The image root is:  ./images/train_set/
+<p><code>The image root is:  ./images/train_set/
 The amount of OFRecord data part is:  5
 The directory of Labels is:  ./images/train_label/label.txt
 The image format is:  .png
@@ -1037,12 +1035,11 @@ Start Processing......
 ./images/train_set/00000026_4.png feature saved
 ./images/train_set/00000043_9.png feature saved
 ......
-Process image successfully !!!
-</code></pre></div>
+Process image successfully !!!</code></p>
 <p>Thus far, we have created the OFRecord file and saved it under <code>./dataset</code>.</p>
 <h3 id="code-explanation">Code Explanation<a class="headerlink" href="#code-explanation" title="Permanent link">&para;</a></h3>
 <p>The hierarchy of code directory is:</p>
-<div class="highlight"><pre><span></span><code>img_to_ofrecord
+<p><code>img_to_ofrecord
 ├── images
     ├── train_set
         ├── 00000000_5.png
@@ -1052,20 +1049,18 @@ Process image successfully !!!
     ├── train_label
         ├── label.txt
 ├── img2ofrecord.py
-├── lenet_train.py
-</code></pre></div>
+├── lenet_train.py</code></p>
 <ul>
 <li><code>images</code> directory holds the original training dataset and label file.</li>
 </ul>
 <p>The label file is stored as <code>json</code> here in following format：</p>
-<div class="highlight"><pre><span></span><code>{&quot;00000030_3.png&quot;: 3}
-{&quot;00000034_0.png&quot;: 0}
-{&quot;00000026_4.png&quot;: 4}
-{&quot;00000043_9.png&quot;: 9}
-{&quot;00000047_5.png&quot;: 5}
-{&quot;00000003_1.png&quot;: 1}
-......
-</code></pre></div>
+<p><code>{"00000030_3.png": 3}
+{"00000034_0.png": 0}
+{"00000026_4.png": 4}
+{"00000043_9.png": 9}
+{"00000047_5.png": 5}
+{"00000003_1.png": 1}
+......</code></p>
 <ul>
 <li><a href="../code/extended_topics/img_to_ofrecord/img2ofrecord.py">img2ofrecord.py</a> is the script which converts image files in train_set to OFRecord dataset.</li>
 <li><a href="../code/extended_topics/img_to_ofrecord/lenet_train.py">lenet_train.py</a> is the script loading OFRecord we just made for training.</li>
@@ -1079,11 +1074,11 @@ Process image successfully !!!
 <h2 id="how-ofrecord-reader-is-encoded">How OFRecord Reader is Encoded<a class="headerlink" href="#how-ofrecord-reader-is-encoded" title="Permanent link">&para;</a></h2>
 <p>The code associated with the encoding of OFRecord files is in <code>img2ofrecord.py</code>. The encoding process is as follows：</p>
 <p>First, encoding the incoming image data.</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">encode_img_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">&quot;.jpg&quot;</span><span class="p">):</span>
-    <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-    <span class="n">encoded_data</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imencode</span><span class="p">(</span><span class="n">ext</span><span class="p">,</span> <span class="n">img</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">encoded_data</span><span class="o">.</span><span class="n">tostring</span><span class="p">()</span>
-</code></pre></div>
+<p><code>python
+def encode_img_file(filename, ext=".jpg"):
+    img = cv2.imread(filename)
+    encoded_data = cv2.imencode(ext, img)[1]
+    return encoded_data.tostring()</code></p>
 <p>The <code>ext</code> is the image encoding format. Currently, The format supported by ONEFLOW image encoding and decoding is consistent with that of OpenCV, which can be refered in <a href="https://docs.opencv.org/3.4/d4/da8/group__imgcodecs.html#ga292d81be8d76901bff7988d18d2b42ac">cv::ImwriteFlags</a> for details.</p>
 <ul>
 <li>JPEG, one of the most common lossy code formats. Please refer to  <a href="http://www.wikiwand.com/en/JPEG">JPEG</a>.</li>
@@ -1091,19 +1086,19 @@ Process image successfully !!!
 <li>TIFF, a extensible compressed encoding format. Please refer to <a href="http://www.wikiwand.com/en/TIFF">Tagged Image File Format</a>.</li>
 </ul>
 <p>Second, data is converted to the form of Feature, serialized, and the data length is written to the file.
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">ndarray2ofrecords</span><span class="p">(</span><span class="n">dsfile</span><span class="p">,</span> <span class="n">dataname</span><span class="p">,</span> <span class="n">encoded_data</span><span class="p">,</span> <span class="n">labelname</span><span class="p">,</span> <span class="n">encoded_label</span><span class="p">):</span>
-    <span class="n">topack</span> <span class="o">=</span> <span class="p">{</span><span class="n">dataname</span><span class="p">:</span> <span class="n">bytes_feature</span><span class="p">(</span><span class="n">encoded_data</span><span class="p">),</span>
-              <span class="n">labelname</span><span class="p">:</span> <span class="n">int32_feature</span><span class="p">(</span><span class="n">encoded_label</span><span class="p">)}</span>
-    <span class="n">ofrecord_features</span> <span class="o">=</span> <span class="n">ofrecord</span><span class="o">.</span><span class="n">OFRecord</span><span class="p">(</span><span class="n">feature</span><span class="o">=</span><span class="n">topack</span><span class="p">)</span>
-    <span class="n">serilizedBytes</span> <span class="o">=</span> <span class="n">ofrecord_features</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">()</span>
-    <span class="n">length</span> <span class="o">=</span> <span class="n">ofrecord_features</span><span class="o">.</span><span class="n">ByteSize</span><span class="p">()</span>
-    <span class="n">dsfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="n">length</span><span class="p">))</span>
-    <span class="n">dsfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">serilizedBytes</span><span class="p">)</span>
-</code></pre></div></p>
+<code>python
+def ndarray2ofrecords(dsfile, dataname, encoded_data, labelname, encoded_label):
+    topack = {dataname: bytes_feature(encoded_data),
+              labelname: int32_feature(encoded_label)}
+    ofrecord_features = ofrecord.OFRecord(feature=topack)
+    serilizedBytes = ofrecord_features.SerializeToString()
+    length = ofrecord_features.ByteSize()
+    dsfile.write(struct.pack("q", length))
+    dsfile.write(serilizedBytes)</code></p>
 <h2 id="training-on-ofrecord-dataset">Training on OFRecord Dataset<a class="headerlink" href="#training-on-ofrecord-dataset" title="Permanent link">&para;</a></h2>
 <p>We run <a href="../code/extended_topics/img_to_ofrecord/lenet_train.py">lenet_train.py</a>. It will read the OFRecord dataset that we have just created and train it on the LeNet model.</p>
 <p>The outputs of training script should like below:</p>
-<div class="highlight"><pre><span></span><code>[6.778578]
+<p><code>[6.778578]
 [2.0212684]
 [1.3814741]
 [0.47514156]
@@ -1111,8 +1106,7 @@ Process image successfully !!!
 [0.16388433]
 [0.03788032]
 [0.01225162]
-......
-</code></pre></div>
+......</code></p>
 <p>At this point, we have successfully completed the whole process of dataset production, reading and training.</p>
                 
               

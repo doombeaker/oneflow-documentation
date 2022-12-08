@@ -1113,24 +1113,26 @@
 <h2 id="python">Python 层次<a class="headerlink" href="#python" title="Permanent link">&para;</a></h2>
 <p>我们在使用 OneFlow 的过程中已经知道，OneFlow 需要使用<code>@oneflow.global_function</code>装饰器来修饰一个python编写的“作业函数”。
 比如：
-<div class="highlight"><pre><span></span><code><span class="nd">@flow</span><span class="o">.</span><span class="n">global_function</span><span class="p">(</span><span class="n">get_train_config</span><span class="p">())</span>
-<span class="k">def</span> <span class="nf">train_job</span><span class="p">():</span>
-  <span class="c1"># ...</span>
-</code></pre></div></p>
+<code>python
+@flow.global_function(get_train_config())
+def train_job():
+  # ...</code></p>
 <p>在<code>oneflow/python/framework/function_util.py</code>中可以找到<code>global_function</code>装饰器对应的内部代码：
-<div class="highlight"><pre><span></span><code>    <span class="k">def</span> <span class="nf">Decorator</span><span class="p">(</span><span class="n">job_func</span><span class="p">):</span>
-        <span class="c1">#...</span>
-        <span class="n">sess</span> <span class="o">=</span> <span class="n">session_ctx</span><span class="o">.</span><span class="n">GetDefaultSession</span><span class="p">()</span>
+```python
+    def Decorator(job_func):
+        #...
+        sess = session_ctx.GetDefaultSession()</p>
+<div class="codehilite"><pre><span></span><code>    @functools.wraps(job_func)
+    def Func(*args, **kwargs):
+        return _RunLazyJob(sess, job_func, *args, **kwargs)
 
-        <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">job_func</span><span class="p">)</span>
-        <span class="k">def</span> <span class="nf">Func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">_RunLazyJob</span><span class="p">(</span><span class="n">sess</span><span class="p">,</span> <span class="n">job_func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-        <span class="n">sess</span><span class="o">.</span><span class="n">AddJob</span><span class="p">(</span><span class="n">_CloneFunctionDesc</span><span class="p">(</span><span class="n">function_config</span><span class="o">.</span><span class="n">function_desc</span><span class="p">,</span> <span class="n">job_func</span><span class="p">))</span>
-        <span class="c1">#...</span>
-        <span class="k">return</span> <span class="n">Func</span>
+    sess.AddJob(_CloneFunctionDesc(function_config.function_desc, job_func))
+    #...
+    return Func
 </code></pre></div>
-可以看到，装饰器返回的是 <code>Func</code> 函数，我们在训练过程中调用的作业函数，其实真正执行的是此处的 <code>Func</code>。</p>
+
+<p><code>``
+可以看到，装饰器返回的是</code>Func<code>函数，我们在训练过程中调用的作业函数，其实真正执行的是此处的</code>Func`。</p>
 <p>装饰器的主要作用有：</p>
 <ul>
 <li>
@@ -1143,154 +1145,155 @@
 <p>以下，我们来展开讨论<code>sess.AddJob</code>与<code>_RunLazyJob</code>的细节。</p>
 <h3 id="_1">作业函数的序列化<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
 <p>在<code>/oneflow/python/framework/session_util.py</code>中可以看到<code>AddJob</code>的实现：
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">Session</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="c1">#...</span>
-    <span class="k">def</span> <span class="nf">AddJob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function_desc</span><span class="p">):</span>
-        <span class="c1">#...</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">job_name2function_desc_</span><span class="p">[</span><span class="n">function_desc</span><span class="o">.</span><span class="n">job_func</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">function_desc</span>
-</code></pre></div>
+<code>python
+class Session(object):
+    #...
+    def AddJob(self, function_desc):
+        #...
+        self.job_name2function_desc_[function_desc.job_func.__name__] = function_desc</code>
 可以看到， <code>session</code>中有一个名为 <code>job_name2function_desc_</code> 的字典，<code>AddJob</code> 将作业函数的名字作为 key，配置信息作(<code>function_desc</code>)为 value 放置进去，配置信息可以在 <code>oneflow/core/job/job.proto</code>中查看。</p>
 <p>将训练配置信息加入到 <code>session</code> 中的主要原因，是 OneFlow 在编译时需要这些信息来进行推理、优化。接下来我们来分析 OneFlow 在 Python层次是如何触发编译过程的。</p>
 <p>我们观察 <code>_RunLazyJob</code> 的内部实现，可以找到 OneFlow 进行序列化并触发 OneFlow C++ 层编译的代码位置：
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_RunLazyJob</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">job_func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">session</span><span class="o">.</span><span class="n">TryInit</span><span class="p">()</span><span class="o">.</span><span class="n">LazyRun</span><span class="p">(</span><span class="n">job_func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-</code></pre></div>
+<code>python
+def _RunLazyJob(session, job_func, *args, **kwargs):
+    return session.TryInit().LazyRun(job_func, *args, **kwargs)</code>
 跟进 <code>session</code> 对象的 <code>TryInit</code> 方法，可以发现，<code>session.TryInit</code> 会根据当前 session 的状态，决定是否触发编译：
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">Session</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="c1">#...</span>
-    <span class="k">def</span> <span class="nf">TryInit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">status_</span> <span class="ow">is</span> <span class="n">SessionStatus</span><span class="o">.</span><span class="n">OPEN</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">Init</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">self</span>
-
-    <span class="k">def</span> <span class="nf">Init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">status_</span> <span class="ow">is</span> <span class="n">SessionStatus</span><span class="o">.</span><span class="n">OPEN</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">status_</span> <span class="o">=</span> <span class="n">SessionStatus</span><span class="o">.</span><span class="n">RUNNING</span>
-        <span class="c1">#...</span>
-        <span class="n">_TryCompleteConfigProto</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_proto</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">job_name</span><span class="p">,</span> <span class="n">func_desc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">job_name2function_desc_</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">compiler</span><span class="o">.</span><span class="n">Compile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func_desc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_proto</span><span class="p">)</span>
-        <span class="c1">#...</span>
-        <span class="n">c_api_util</span><span class="o">.</span><span class="n">StartGlobalSession</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">self</span>
+```python
+class Session(object):
+    #...
+    def TryInit(self):
+        if self.status_ is SessionStatus.OPEN:
+            self.Init()
+        return self</p>
+<div class="codehilite"><pre><span></span><code>def Init(self):
+    assert self.status_ is SessionStatus.OPEN
+    self.status_ = SessionStatus.RUNNING
+    #...
+    _TryCompleteConfigProto(self.config_proto)
+        for job_name, func_desc in self.job_name2function_desc_.items():
+            compiler.Compile(self, func_desc, self.config_proto)
+    #...
+    c_api_util.StartGlobalSession()
+    return self
 </code></pre></div>
-从以上代码可以看到，如果当前 Session 处于 "OPEN" 状态，那么 session 会调用 <code>Init</code>， 遍历之前通过 <code>AddJob</code> 设置在 session 中的 <code>job_name2function_desc_</code> 中的各个 job ，并且调用 <code>compiler.Compile</code> 编译，<code>compiler.Compile</code>的内部实现为：
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">Compile</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">function_desc</span><span class="p">,</span> <span class="n">config_proto</span><span class="p">):</span>
-    <span class="k">with</span> <span class="n">InterpretScope</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">function_desc</span><span class="p">,</span> <span class="n">config_proto</span><span class="p">):</span>
-        <span class="n">_CompileJob</span><span class="p">(</span><span class="n">function_desc</span><span class="p">)</span>
-        <span class="n">c_api_util</span><span class="o">.</span><span class="n">CurJobBuildAndInferCtx_Complete</span><span class="p">()</span>
-</code></pre></div></p>
+
+<p><code>从以上代码可以看到，如果当前 Session 处于 "OPEN" 状态，那么 session 会调用 `Init`， 遍历之前通过 `AddJob` 设置在 session 中的 `job_name2function_desc_` 中的各个 job ，并且调用 `compiler.Compile` 编译，`compiler.Compile`的内部实现为：</code>python
+def Compile(session, function_desc, config_proto):
+    with InterpretScope(session, function_desc, config_proto):
+        _CompileJob(function_desc)
+        c_api_util.CurJobBuildAndInferCtx_Complete()
+```</p>
 <p>其中<code>_CompileJob</code>中将对<code>function_desc</code>所描述的作业函数进行序列化并在内部调用 C++ 层代码进行构图优化。再通过 <code>c_api_util.CurJobBuildAndInferCtx_Complete</code> 告之 C++ 层序列化完成。</p>
 <p>完成<code>compiler.Compile</code>的工作后，将通过<code>c_api_util.StartGlobalSession()</code> 触发 C++ 层，创建 session，开始 C++ 层的编译 Plan 的工作。</p>
 <h3 id="_2">作业函数的调用<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
 <p>回顾上文提到到的<code>_RunLazyJob</code>代码：
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_RunLazyJob</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">job_func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">session</span><span class="o">.</span><span class="n">TryInit</span><span class="p">()</span><span class="o">.</span><span class="n">LazyRun</span><span class="p">(</span><span class="n">job_func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-</code></pre></div>
+<code>python
+def _RunLazyJob(session, job_func, *args, **kwargs):
+    return session.TryInit().LazyRun(job_func, *args, **kwargs)</code>
 我们已经知道在<code>TryInit()</code>中完成了作业函数的序列化，并通知 编译时完成编译构图工作。</p>
 <p>而<code>LazyRun</code>内部，就对应了用户调用作业函数时，Python层如何运行作业函数。</p>
-<p><div class="highlight"><pre><span></span><code>    <span class="k">def</span> <span class="nf">LazyRun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job_func</span><span class="p">,</span> <span class="o">*</span><span class="n">arg</span><span class="p">):</span>
-        <span class="c1">#...</span>
-        <span class="n">remote_blobs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">LaunchUserJob</span><span class="p">(</span><span class="n">job_func</span><span class="p">,</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span>
-        <span class="c1">#...</span>
-        <span class="k">return</span> <span class="n">LazyFutureRemoteBlobs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">SetResult</span><span class="p">(</span><span class="n">remote_blobs</span><span class="p">)</span><span class="o">.</span><span class="n">Inited</span><span class="p">()</span>
-</code></pre></div>
+<p><code>python
+    def LazyRun(self, job_func, *arg):
+        #...
+        remote_blobs = self.LaunchUserJob(job_func, *arg)
+        #...
+        return LazyFutureRemoteBlobs(self).SetResult(remote_blobs).Inited()</code>
 其中 <code>LaunchUserJob</code> 接受的参数 <code>job_func</code> 与 <code>arg</code> 就分别是用户调用作业函数时的作业函数以及传递的参数。</p>
 <p><code>LaunchUserJob</code> 会遍历 <code>job_func</code> 中需要执行的计算单元，并最终通在<code>session.LaunchJob</code>(<code>/oneflow/python/framework/session_util.py</code>)中通过调用<code>c_api_util.LaunchJob(job_instance)</code>执行计算。</p>
 <p>值得一提的是，因为当用户调用作业函数时，OneFlow 已经完成了作业函数的编译构图，得到了执行计划(Execution Plan)，1个 Plan 由多个描述任务的<code>TaskProto</code>组成。以上<code>c_api_util.LaunchJob(job_instance)</code>所接受的参数<code>job_instance</code>，并不是作业函数本身，而是 Plan中的 <code>Task</code> 实例化对象，一个作业函数，将对应多个<code>job_instance</code>。</p>
 <h2 id="_3">编译期阶段<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <p>上文提到的 Python 层的 <code>c_api_util.StartGlobalSession()</code> 会触发 C++ 代码中的 <code>StartGlobalSession</code> 并最终触发 OneFlow 编译时的入口函数 <code>Oneflow::Init</code> (<code>/oneflow/core/job/oneflow.cpp</code>)：
-<div class="highlight"><pre><span></span><code><span class="n">Maybe</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Oneflow</span><span class="o">::</span><span class="n">Init</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">oneflow</span><span class="o">::</span><span class="n">JobSet</span><span class="o">&amp;</span><span class="w"> </span><span class="n">job_set</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="c1">// Runtime</span>
-<span class="w">  </span><span class="n">JUST</span><span class="p">(</span><span class="n">CompileAndMergePlanOnMaster</span><span class="p">(</span><span class="n">job_set</span><span class="p">.</span><span class="n">job</span><span class="p">(),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">plan_</span><span class="p">));</span><span class="w"></span>
-<span class="w">  </span><span class="c1">// ...</span>
-<span class="p">}</span><span class="w"></span>
-</code></pre></div>
+<code>c++
+Maybe&lt;void&gt; Oneflow::Init(const oneflow::JobSet&amp; job_set) {
+  // Runtime
+  JUST(CompileAndMergePlanOnMaster(job_set.job(), &amp;plan_));
+  // ...
+}</code>
 可以看到，OneFlow 通过 <code>CompileAndMergePlanOnMaster</code> 完成编译构图，其中的<code>job_set.job()</code>是这个阶段的输入，它是包含了由 Python 接口所定义的神经网络结构及超参配置信息的序列化字节流，而 <code>plan_</code> 是输出，称为 <strong>执行计划</strong> (Execution Plan)。</p>
 <p>执行计划由一系列对于任务的描述(<code>oneflow/core/job/task.proto</code>)组成，每个任务自身都是一个图结构，描述了内部计算类型、内存配额、上游生产者和下游消费者等信息。这些信息包含了 OneFlow 运行时所需要的一切信息。</p>
 <p>以下是一个编译后的得到的 <code>Execution Plan</code>的图示(<a href="imgs/plan_illustration.svg">点击查看大图</a>)：</p>
 <p><img alt="Execution Plan" src="imgs/plan_illustration.svg" /></p>
 <h3 id="_4">执行计划的生成过程<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
 <p>进入到 <code>CompileAndMergePlanOnMaster</code> 中可以看到，首先，会调用一系列的 <code>MakeXXXJob(s)</code> 整合序列化后的作业函数信息， 加入到 <code>jobs</code> 中：
-<div class="highlight"><pre><span></span><code><span class="n">Maybe</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">CompileAndMergePlanOnMaster</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">PbRpf</span><span class="o">&lt;</span><span class="n">Job</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">conf_jobs</span><span class="p">,</span><span class="w"> </span><span class="n">Plan</span><span class="o">*</span><span class="w"> </span><span class="n">plan</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">Job</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">jobs</span><span class="p">(</span><span class="n">conf_jobs</span><span class="p">.</span><span class="n">size</span><span class="p">());</span><span class="w"></span>
-<span class="w">  </span><span class="c1">//... </span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="cm">/*...*/</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">      </span><span class="n">MakeModelIoV2Jobs</span><span class="p">(</span><span class="n">jobs</span><span class="p">,</span><span class="w"> </span><span class="n">var_op_name2parallel_blob_conf</span><span class="p">,</span><span class="w"> </span><span class="n">AppendJob</span><span class="p">);</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">      </span><span class="n">MakeModelIoJobs</span><span class="p">(</span><span class="n">jobs</span><span class="p">,</span><span class="w"> </span><span class="n">var_op_name2parallel_blob_conf</span><span class="p">,</span><span class="w"> </span><span class="n">AppendJob</span><span class="p">);</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="w">  </span><span class="p">}</span><span class="w"></span>
-<span class="w">  </span><span class="c1">//...</span>
-<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">pair</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">push_op_name2parallel_blob_conf</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">      </span><span class="c1">//...</span>
-<span class="w">      </span><span class="n">MakePushJob</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="p">(</span><span class="s">&quot;System-Push-&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">first</span><span class="p">,</span><span class="w"> </span>
-<span class="w">      </span><span class="c1">//...</span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">pair</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">pull_op_name2parallel_blob_conf</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">      </span><span class="c1">//...</span>
-<span class="w">      </span><span class="n">MakePullJob</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="p">(</span><span class="s">&quot;System-Pull-&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">first</span><span class="p">,</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">first</span><span class="p">,</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">second</span><span class="p">,</span><span class="w"></span>
-<span class="w">                  </span><span class="n">pull_job</span><span class="p">.</span><span class="n">get</span><span class="p">());</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="w">  </span><span class="c1">//...</span>
-<span class="p">}</span><span class="w"></span>
-</code></pre></div>
+<code>cpp
+Maybe&lt;void&gt; CompileAndMergePlanOnMaster(const PbRpf&lt;Job&gt;&amp; conf_jobs, Plan* plan) {
+  std::vector&lt;std::shared_ptr&lt;Job&gt;&gt; jobs(conf_jobs.size());
+  //... 
+    if (/*...*/) {
+      MakeModelIoV2Jobs(jobs, var_op_name2parallel_blob_conf, AppendJob);
+    } else {
+      MakeModelIoJobs(jobs, var_op_name2parallel_blob_conf, AppendJob);
+    }
+  }
+  //...
+    for (const auto&amp; pair : push_op_name2parallel_blob_conf) {
+      //...
+      MakePushJob(std::string("System-Push-") + pair.first, 
+      //...
+    }
+    for (const auto&amp; pair : pull_op_name2parallel_blob_conf) {
+      //...
+      MakePullJob(std::string("System-Pull-") + pair.first, pair.first, pair.second,
+                  pull_job.get());
+    }
+  //...
+}</code>
 然后通过 <code>CompileCurJobOnMaster</code> 将 <code>jobs</code> 编译为 Plan，值得注意的是 <code>AddJobName2JobId</code> 会为每个 <code>job</code> 分配一个全局唯一的ID，用于运行时区分任务：
-<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="n">FOR_RANGE</span><span class="p">(</span><span class="kt">int64_t</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">jobs</span><span class="p">.</span><span class="n">size</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">AddJobName2JobId</span><span class="p">(</span><span class="n">jobs</span><span class="p">.</span><span class="n">at</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">job_conf</span><span class="p">().</span><span class="n">job_name</span><span class="p">(),</span><span class="w"> </span><span class="n">i</span><span class="p">);</span><span class="w"></span>
-<span class="w">    </span><span class="c1">//...</span>
-<span class="w">    </span><span class="n">JUST</span><span class="p">(</span><span class="n">CompileCurJobOnMaster</span><span class="p">(</span><span class="n">jobs</span><span class="p">.</span><span class="n">at</span><span class="p">(</span><span class="n">i</span><span class="p">).</span><span class="n">get</span><span class="p">(),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">sub_plans</span><span class="p">.</span><span class="n">at</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="nb">true</span><span class="p">));</span><span class="w"></span>
-<span class="w">  </span><span class="p">}</span><span class="w"></span>
-</code></pre></div>
+<code>c++
+  FOR_RANGE(int64_t, i, 0, jobs.size()) {
+    AddJobName2JobId(jobs.at(i)-&gt;job_conf().job_name(), i);
+    //...
+    JUST(CompileCurJobOnMaster(jobs.at(i).get(), &amp;sub_plans.at(i), true));
+  }</code>
 以上的编译过程，最终会调用 <code>Compiler::Compile</code>，在其内部完成 <code>TaskProto</code>的构建，并添加到 Plan 中(<code>oneflow/core/job/compiler.cpp</code>)：
-<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="n">task_gph</span><span class="o">-&gt;</span><span class="n">ForEachNode</span><span class="p">([</span><span class="o">&amp;</span><span class="p">](</span><span class="n">TaskNode</span><span class="o">*</span><span class="w"> </span><span class="n">task_node</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">task_node</span><span class="o">-&gt;</span><span class="n">IsMeaningLess</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="p">;</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
-<span class="w">    </span><span class="n">task_node</span><span class="o">-&gt;</span><span class="n">ToProto</span><span class="p">(</span><span class="n">plan</span><span class="o">-&gt;</span><span class="n">mutable_task</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">Add</span><span class="p">());</span><span class="w"></span>
-<span class="w">  </span><span class="p">});</span><span class="w"></span>
-</code></pre></div></p>
+<code>c++
+  task_gph-&gt;ForEachNode([&amp;](TaskNode* task_node) {
+    if (task_node-&gt;IsMeaningLess()) { return; }
+    task_node-&gt;ToProto(plan-&gt;mutable_task()-&gt;Add());
+  });</code></p>
 <p>不过，以上步骤完成后，得到的 Plan 还不是最终完整的 Plan，OneFlow 还会增加 <code>main_plan</code>， 它对应了本节开始 Plan 图示中的 "System-Main-Tick-CriticalSection" 系列节点，具有同步与调度功能，将作为各项任务的入口：
-<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="n">Plan</span><span class="w"> </span><span class="n">main_plan</span><span class="p">;</span><span class="w"></span>
-<span class="w">    </span><span class="c1">//...</span>
-<span class="w">    </span><span class="p">{</span><span class="w"></span>
-<span class="w">      </span><span class="c1">//...</span>
-<span class="w">      </span><span class="n">MakeMainJob</span><span class="p">(</span><span class="o">&amp;</span><span class="n">main_job</span><span class="p">,</span><span class="w"> </span><span class="cm">/*...*/</span><span class="p">);</span><span class="w"></span>
-<span class="w">      </span><span class="c1">//...</span>
-<span class="w">      </span><span class="n">JUST</span><span class="p">(</span><span class="n">CompileMainJob</span><span class="p">(</span><span class="o">&amp;</span><span class="n">main_job</span><span class="p">,</span><span class="w"> </span><span class="cm">/*...*/</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">main_plan</span><span class="p">));</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
-</code></pre></div>
+<code>c++
+    Plan main_plan;
+    //...
+    {
+      //...
+      MakeMainJob(&amp;main_job, /*...*/);
+      //...
+      JUST(CompileMainJob(&amp;main_job, /*...*/, &amp;main_plan));
+    }</code>
 以上一切完成后，通过调用 <code>LinkMainPlan</code> 将各个 Plan 链接起来，得到这节开始的图片所示 Execution Plan：
-<div class="highlight"><pre><span></span><code><span class="n">LinkMainPlan</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span><span class="w"> </span><span class="n">main_plan</span><span class="p">,</span><span class="w"> </span><span class="n">identity_tick_op_names</span><span class="p">);</span><span class="w"></span>
-</code></pre></div></p>
+<code>c++
+LinkMainPlan(plan, main_plan, identity_tick_op_names);</code></p>
 <p>执行计划是编译阶段与运行时的分界线，在得到执行计划后，OneFlow 将启动运行时，并根据执行计划中的信息执行任务。</p>
 <h2 id="_5">运行时阶段<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
 <p>完成<code>CompileAndMergePlanOnMaster</code>后，OneFlow 会实例化<code>Runtime</code>，按照 <code>plan</code> 中的信息执行任务：</p>
-<p><div class="highlight"><pre><span></span><code><span class="n">Maybe</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Oneflow</span><span class="o">::</span><span class="n">Init</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">oneflow</span><span class="o">::</span><span class="n">JobSet</span><span class="o">&amp;</span><span class="w"> </span><span class="n">job_set</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="c1">// Runtime</span>
-<span class="w">  </span><span class="n">JUST</span><span class="p">(</span><span class="n">CompileAndMergePlanOnMaster</span><span class="p">(</span><span class="n">job_set</span><span class="p">.</span><span class="n">job</span><span class="p">(),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">plan_</span><span class="p">));</span><span class="w"></span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Global</span><span class="o">&lt;</span><span class="n">MachineCtx</span><span class="o">&gt;::</span><span class="n">Get</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">IsThisMachineMaster</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">runtime_buffers_scope_</span><span class="p">.</span><span class="n">reset</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">RuntimeBuffersScope</span><span class="p">(</span><span class="n">plan_</span><span class="p">));</span><span class="w"></span>
-<span class="w">  </span><span class="p">}</span><span class="w"></span>
-<span class="w">  </span><span class="n">runtime_</span><span class="p">.</span><span class="n">reset</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Runtime</span><span class="p">(</span><span class="n">plan_</span><span class="p">,</span><span class="w"> </span><span class="n">GetMaxVal</span><span class="o">&lt;</span><span class="kt">size_t</span><span class="o">&gt;</span><span class="p">(),</span><span class="w"> </span><span class="nb">false</span><span class="p">));</span><span class="w"></span>
-<span class="w">  </span><span class="c1">//...</span>
-<span class="p">}</span><span class="w"></span>
-</code></pre></div>
+<p><code>c++
+Maybe&lt;void&gt; Oneflow::Init(const oneflow::JobSet&amp; job_set) {
+  // Runtime
+  JUST(CompileAndMergePlanOnMaster(job_set.job(), &amp;plan_));
+  if (Global&lt;MachineCtx&gt;::Get()-&gt;IsThisMachineMaster()) {
+    runtime_buffers_scope_.reset(new RuntimeBuffersScope(plan_));
+  }
+  runtime_.reset(new Runtime(plan_, GetMaxVal&lt;size_t&gt;(), false));
+  //...
+}</code>
 在 <code>Runtime</code> (<code>oneflow/core/job/runtime.cpp</code>)的构造中，将 <code>Plan</code> 中的 task 分成了三类：
-<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="k">const</span><span class="w"> </span><span class="n">TaskProto</span><span class="o">*&gt;</span><span class="w"> </span><span class="n">mdupdt_tasks</span><span class="p">;</span><span class="w"></span>
-<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="k">const</span><span class="w"> </span><span class="n">TaskProto</span><span class="o">*&gt;</span><span class="w"> </span><span class="n">source_tasks</span><span class="p">;</span><span class="w"></span>
-<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="k">const</span><span class="w"> </span><span class="n">TaskProto</span><span class="o">*&gt;</span><span class="w"> </span><span class="n">other_tasks</span><span class="p">;</span><span class="w"></span>
-<span class="w">  </span><span class="kt">int64_t</span><span class="w"> </span><span class="n">this_machine_task_num</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">TaskProto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">task</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">plan</span><span class="p">.</span><span class="n">task</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">task</span><span class="p">.</span><span class="n">machine_id</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">Global</span><span class="o">&lt;</span><span class="n">MachineCtx</span><span class="o">&gt;::</span><span class="n">Get</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">this_machine_id</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">continue</span><span class="p">;</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IsMdUpdtTaskType</span><span class="p">(</span><span class="n">task</span><span class="p">.</span><span class="n">task_type</span><span class="p">()))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">      </span><span class="n">mdupdt_tasks</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="o">&amp;</span><span class="n">task</span><span class="p">);</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">HasNonCtrlConsumedRegstDescId</span><span class="p">(</span><span class="n">task</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">      </span><span class="n">source_tasks</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="o">&amp;</span><span class="n">task</span><span class="p">);</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">      </span><span class="n">other_tasks</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="o">&amp;</span><span class="n">task</span><span class="p">);</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="w">    </span><span class="n">this_machine_task_num</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
-<span class="w">  </span><span class="p">}</span><span class="w"></span>
-</code></pre></div></p>
+<code>c++
+  std::vector&lt;const TaskProto*&gt; mdupdt_tasks;
+  std::vector&lt;const TaskProto*&gt; source_tasks;
+  std::vector&lt;const TaskProto*&gt; other_tasks;
+  int64_t this_machine_task_num = 0;
+  for (const TaskProto&amp; task : plan.task()) {
+    if (task.machine_id() != Global&lt;MachineCtx&gt;::Get()-&gt;this_machine_id()) { continue; }
+    if (IsMdUpdtTaskType(task.task_type())) {
+      mdupdt_tasks.push_back(&amp;task);
+    } else if (!HasNonCtrlConsumedRegstDescId(task)) {
+      source_tasks.push_back(&amp;task);
+    } else {
+      other_tasks.push_back(&amp;task);
+    }
+    this_machine_task_num += 1;
+  }</code></p>
 <ul>
 <li>
 <p>mdupdt_tasks：【……】</p>
@@ -1305,13 +1308,13 @@
 <p>如前文所描述，在 task 中包含了内部计算类型、内存配额、上游生产者和下游消费者 <strong>运行时所需要的全部信息</strong> ，因此 OneFlow 可以通过解析 Task 启动线程执行任务。</p>
 <p>OneFlow 使用 <code>Actor</code> 执行线程，在 OneFlow 中 <strong>数据是一等公民</strong> ，编译阶段产生的 <code>Plan</code> 中的每个 <code>Task</code>，记录了自己数据的上游与下游，执行引擎会根据 <code>Task</code> 的记录，为每个 <code>Task</code> 实例化对应的 <code>Actor</code>， <code>Actor</code> 负责执行 <code>Task</code> 规定的数据处理或数据搬运任务。</p>
 <p>以下代码根据 <code>Task</code> 构建 <code>Actor</code>：</p>
-<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="n">RuntimeCtx</span><span class="o">*</span><span class="w"> </span><span class="n">runtime_ctx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Global</span><span class="o">&lt;</span><span class="n">RuntimeCtx</span><span class="o">&gt;::</span><span class="n">Get</span><span class="p">();</span><span class="w"></span>
-<span class="w">  </span><span class="n">runtime_ctx</span><span class="o">-&gt;</span><span class="n">NewCounter</span><span class="p">(</span><span class="s">&quot;constructing_actor_cnt&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">this_machine_task_num</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="n">HandoutTasks</span><span class="p">(</span><span class="n">mdupdt_tasks</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="n">HandoutTasks</span><span class="p">(</span><span class="n">source_tasks</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="n">HandoutTasks</span><span class="p">(</span><span class="n">other_tasks</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="n">runtime_ctx</span><span class="o">-&gt;</span><span class="n">WaitUntilCntEqualZero</span><span class="p">(</span><span class="s">&quot;constructing_actor_cnt&quot;</span><span class="p">);</span><span class="w"></span>
-</code></pre></div>
+<p><code>c++
+  RuntimeCtx* runtime_ctx = Global&lt;RuntimeCtx&gt;::Get();
+  runtime_ctx-&gt;NewCounter("constructing_actor_cnt", this_machine_task_num);
+  HandoutTasks(mdupdt_tasks);
+  HandoutTasks(source_tasks);
+  HandoutTasks(other_tasks);
+  runtime_ctx-&gt;WaitUntilCntEqualZero("constructing_actor_cnt");</code></p>
 <p>OneFlow 执行引擎采用去中心化调度机制，每个 <code>Actor</code> 只需要与自己的上下游进行通信， <strong>不需要</strong> 所谓的 master 节点进行中转，actor之间使用消息(message)来实现生产者和消费者之间的握手协议。</p>
 <h2 id="oneflow_3">OneFlow 各模块的技术特色<a class="headerlink" href="#oneflow_3" title="Permanent link">&para;</a></h2>
 <p>以上，我们只是结合 OneFlow 的 Python 接口，简要介绍了 OneFlow 框架的运行流程。以下文章，分专题更深入介绍 OneFlow 框架内部的各个模块：</p>

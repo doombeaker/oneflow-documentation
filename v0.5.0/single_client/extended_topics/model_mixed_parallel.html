@@ -1215,30 +1215,30 @@
 <ul>
 <li>
 <p>通过 <code>oneflow.config.gpu_device_num</code> 接口设置参与训练的GPU数目：
-<div class="highlight"><pre><span></span><code>  <span class="n">flow</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">gpu_device_num</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</code></pre></div></p>
+<code>python
+  flow.config.gpu_device_num(2)</code></p>
 </li>
 <li>
 <p><code>reshape</code> 及 <code>hidden</code> 采用默认的数据并行，不需要修改；输出层通过设置 <code>model_distribute</code> 为 <code>flow.distribute.split(axis=0)</code> 变为模型并行：
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">mlp</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-    <span class="n">initializer</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">truncated_normal</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
-    <span class="n">reshape</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">hidden</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span>
-        <span class="n">reshape</span><span class="p">,</span>
-        <span class="mi">512</span><span class="p">,</span>
-        <span class="n">activation</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span>
-        <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;dense1&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span>
-        <span class="n">hidden</span><span class="p">,</span>
-        <span class="mi">10</span><span class="p">,</span>
-        <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer</span><span class="p">,</span>
-        <span class="c1"># dense为列存储，进行split(0)切分</span>
-        <span class="n">model_distribute</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">distribute</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;dense2&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-</code></pre></div>
+<code>python
+def mlp(data):
+    initializer = flow.truncated_normal(0.1)
+    reshape = flow.reshape(data, [data.shape[0], -1])
+    hidden = flow.layers.dense(
+        reshape,
+        512,
+        activation=flow.nn.relu,
+        kernel_initializer=initializer,
+        name="dense1",
+    )
+    return flow.layers.dense(
+        hidden,
+        10,
+        kernel_initializer=initializer,
+        # dense为列存储，进行split(0)切分
+        model_distribute=flow.distribute.split(axis=0),
+        name="dense2",
+    )</code>
 有读者可能好奇为什么<code>split(axis=0)</code>是列切分？需要说明的是，OneFlow 中的 <code>dense</code> 内部采用列存储，因此以上代码的<code>flow.distribute.split(axis=0)</code>确实是在做列切分。</p>
 </li>
 </ul>
@@ -1256,23 +1256,23 @@
 <ul>
 <li>
 <p>通过 <code>oneflow.scope.placement</code> ，指定 <code>hidden</code> 层的 op 计算运行在0号 GPU 上
-<div class="highlight"><pre><span></span><code>  <span class="k">with</span> <span class="n">flow</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">placement</span><span class="p">(</span><span class="s2">&quot;gpu&quot;</span><span class="p">,</span> <span class="s2">&quot;0:0&quot;</span><span class="p">):</span>
-        <span class="n">hidden</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span>
-            <span class="n">reshape</span><span class="p">,</span>
-            <span class="mi">512</span><span class="p">,</span>
-            <span class="n">activation</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span>
-            <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;hidden&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
-</code></pre></div></p>
+<code>python
+  with flow.scope.placement("gpu", "0:0"):
+        hidden = flow.layers.dense(
+            reshape,
+            512,
+            activation=flow.nn.relu,
+            kernel_initializer=initializer,
+            name="hidden",
+        )</code></p>
 </li>
 <li>
 <p>通过 <code>oneflow.scope.placement</code> ，指定 <code>output</code> 层的op计算运行在第0号主机的1号 GPU 上
-<div class="highlight"><pre><span></span><code>  <span class="k">with</span> <span class="n">flow</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">placement</span><span class="p">(</span><span class="s2">&quot;gpu&quot;</span><span class="p">,</span> <span class="s2">&quot;0:1&quot;</span><span class="p">):</span>
-        <span class="n">output</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span>
-            <span class="n">hidden</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;outlayer&quot;</span>
-        <span class="p">)</span>
-</code></pre></div></p>
+<code>python
+  with flow.scope.placement("gpu", "0:1"):
+        output = flow.layers.dense(
+            hidden, 10, kernel_initializer=initializer, name="outlayer"
+        )</code></p>
 </li>
 </ul>
 <p><code>scope.placement</code> 的具体使用，可参阅 <a href="https://oneflow.readthedocs.io/en/master/scope.html#oneflow.scope.placement">API 文档</a>。</p>

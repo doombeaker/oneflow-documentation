@@ -799,21 +799,35 @@
 <p>本文将在读者掌握 1D SBP 的基础上，介绍 2D SBP，它能够更灵活地应对更复杂的分布式训练场景。</p>
 <h2 id="2d">2D 设备阵列<a class="headerlink" href="#2d" title="Permanent link">&para;</a></h2>
 <p>我们已经熟悉 1D SBP 的 placement 配置，在 1D SBP 的场景下，通过 <a href="https://start.oneflow.org/oneflow-api-cn/placement.html#oneflow.placement">oneflow.placement</a> 接口配置集群，比如使用集群中的第 0~3 号 GPU 显卡：</p>
-<div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">placement1</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">placement</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">ranks</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
-</code></pre></div>
+<p>```python</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>placement1 = flow.placement("cuda", ranks=[0, 1, 2, 3])
+```</p>
+</blockquote>
+</blockquote>
+</blockquote>
 <p>以上的 <code>"cuda"</code> 指定了设备类型，<code>ranks=[0, 1, 2, 3]</code> 指定了集群中的计算设备。其实，<code>ranks</code> 不仅可以是一维的int list，还可以是多维的int数组：</p>
-<div class="highlight"><pre><span></span><code><span class="n">placement2</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">placement</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">ranks</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]])</span>
-</code></pre></div>
+<p><code>python
+placement2 = flow.placement("cuda", ranks=[[0, 1], [2, 3]])</code></p>
 <p>当 <code>ranks</code> 是 <code>ranks=[0, 1, 2, 3]</code> 这种一维list的形式时，集群中的所有设备组成了一个 1D 设备向量，这也是 1D SBP 名称的由来。</p>
 <p>当 <code>ranks</code> 是多维数组的形式时，集群中的设备被分组为一个多维的设备阵列。<code>ranks=[[0, 1], [2, 3]]</code> 表示集群中的四个计算设备被划分为了 <span class="arithmatex">\(2 \times 2\)</span> 的设备阵列。</p>
 <h2 id="2d-sbp_1">2D SBP<a class="headerlink" href="#2d-sbp_1" title="Permanent link">&para;</a></h2>
 <p>我们已经知道，构造 Global Tensor 时，需要同时指定 <code>placement</code> 与 <code>SBP</code>。当 <code>placement</code> 中的集群是 2 维的设备阵列时；SBP 也必需与之对应，是一个长度为 2 的 <code>tuple</code>，这个<code>tuple</code>中的第 0 个、第 1 个 元素，分别描述了 Global Tensor 张量在设备阵列第 0 维、第 1 维的分布。</p>
 <p>比如，以下代码，配置了 <span class="arithmatex">\(2 \times 2\)</span> 的设备阵列，并且设置 2D SBP 为 <code>(broadcast, split(0))</code>。</p>
-<div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">a</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">Tensor</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]])</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">placement</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">placement</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">ranks</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]])</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">sbp</span> <span class="o">=</span> <span class="p">(</span><span class="n">flow</span><span class="o">.</span><span class="n">sbp</span><span class="o">.</span><span class="n">broadcast</span><span class="p">,</span> <span class="n">flow</span><span class="o">.</span><span class="n">sbp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">a_to_global</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">to_global</span><span class="p">(</span><span class="n">placement</span><span class="o">=</span><span class="n">placement</span><span class="p">,</span> <span class="n">sbp</span><span class="o">=</span><span class="n">sbp</span><span class="p">)</span>
-</code></pre></div>
+<p>```python</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>a = flow.Tensor([[1,2],[3,4]])
+placement = flow.placement("cuda", ranks=[[0, 1], [2, 3]])
+sbp = (flow.sbp.broadcast, flow.sbp.split(0))
+a_to_global = a.to_global(placement=placement, sbp=sbp)
+```</p>
+</blockquote>
+</blockquote>
+</blockquote>
 <p>它意味着，逻辑上的数据，在整个设备阵列上，在第 0 维度（“竖着看”）做 <code>broadcast</code>；在第 1 维度（“横着看”）做 <code>split(0)</code>。</p>
 <p>我们通过下图做阐述：</p>
 <p><img alt="" src="imgs/2d-sbp.png" /></p>

@@ -1097,30 +1097,25 @@
 <p>掌握它们后，有助于我们学习<a href="how_to_make_ofdataset.html">加载与准备 OFRecord 数据集</a>。</p>
 <h2 id="ofrecord">OFRecord 相关数据类型<a class="headerlink" href="#ofrecord" title="Permanent link">&para;</a></h2>
 <p>OneFlow 内部采用<a href="https://developers.google.com/protocol-buffers/">Protocol Buffers</a> 描述 <code>OFRecord</code> 的序列化格式。相关的 <code>.proto</code> 文件在 <code>oneflow/core/record/record.proto</code> 中，具体定义如下：</p>
-<div class="highlight"><pre><span></span><code>syntax = &quot;proto2&quot;;
-package oneflow;
-
-message BytesList {
+<p>```
+syntax = "proto2";
+package oneflow;</p>
+<p>message BytesList {
   repeated bytes value = 1;
-}
-
-message FloatList {
+}</p>
+<p>message FloatList {
   repeated float value = 1 [packed = true];
-}
-
-message DoubleList {
+}</p>
+<p>message DoubleList {
   repeated double value = 1 [packed = true];
-}
-
-message Int32List {
+}</p>
+<p>message Int32List {
   repeated int32 value = 1 [packed = true];
-}
-
-message Int64List {
+}</p>
+<p>message Int64List {
   repeated int64 value = 1 [packed = true];
-}
-
-message Feature {
+}</p>
+<p>message Feature {
   oneof kind {
     BytesList bytes_list = 1;
     FloatList float_list = 2;
@@ -1128,12 +1123,11 @@ message Feature {
     Int32List int32_list = 4;
     Int64List int64_list = 5;
   }
+}</p>
+<p>message OFRecord {
+  map<string, Feature> feature = 1;
 }
-
-message OFRecord {
-  map&lt;string, Feature&gt; feature = 1;
-}
-</code></pre></div>
+```</p>
 <p>我们先对以上的重要数据类型进行解释：</p>
 <ul>
 <li>
@@ -1148,58 +1142,50 @@ message OFRecord {
 </ul>
 <h2 id="feature">转化数据为 Feature 格式<a class="headerlink" href="#feature" title="Permanent link">&para;</a></h2>
 <p>我们可以通过调用 <code>ofrecord.xxxList</code> 及 <code>ofrecord.Feature</code> 将数据转为 <code>Feature</code> 格式，但是为了更加方便，我们需要对 <code>protocol buffers</code> 生成的接口进行简单封装：</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">oneflow.core.record.record_pb2</span> <span class="k">as</span> <span class="nn">ofrecord</span>
-
-<span class="k">def</span> <span class="nf">int32_feature</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
-        <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">ofrecord</span><span class="o">.</span><span class="n">Feature</span><span class="p">(</span><span class="n">int32_list</span><span class="o">=</span><span class="n">ofrecord</span><span class="o">.</span><span class="n">Int32List</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">))</span>
-
-
-<span class="k">def</span> <span class="nf">int64_feature</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
-        <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">ofrecord</span><span class="o">.</span><span class="n">Feature</span><span class="p">(</span><span class="n">int64_list</span><span class="o">=</span><span class="n">ofrecord</span><span class="o">.</span><span class="n">Int64List</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">))</span>
-
-
-<span class="k">def</span> <span class="nf">float_feature</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
-        <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">ofrecord</span><span class="o">.</span><span class="n">Feature</span><span class="p">(</span><span class="n">float_list</span><span class="o">=</span><span class="n">ofrecord</span><span class="o">.</span><span class="n">FloatList</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">))</span>
-
-
-<span class="k">def</span> <span class="nf">double_feature</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
-        <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">ofrecord</span><span class="o">.</span><span class="n">Feature</span><span class="p">(</span><span class="n">double_list</span><span class="o">=</span><span class="n">ofrecord</span><span class="o">.</span><span class="n">DoubleList</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">))</span>
-
-
-<span class="k">def</span> <span class="nf">bytes_feature</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
-        <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="p">]</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">six</span><span class="o">.</span><span class="n">PY2</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">value</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">ofrecord</span><span class="o">.</span><span class="n">Feature</span><span class="p">(</span><span class="n">bytes_list</span><span class="o">=</span><span class="n">ofrecord</span><span class="o">.</span><span class="n">BytesList</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">))</span>
-</code></pre></div>
+<p>```python
+import oneflow.core.record.record_pb2 as ofrecord</p>
+<p>def int32_feature(value):
+    if not isinstance(value, (list, tuple)):
+        value = [value]
+    return ofrecord.Feature(int32_list=ofrecord.Int32List(value=value))</p>
+<p>def int64_feature(value):
+    if not isinstance(value, (list, tuple)):
+        value = [value]
+    return ofrecord.Feature(int64_list=ofrecord.Int64List(value=value))</p>
+<p>def float_feature(value):
+    if not isinstance(value, (list, tuple)):
+        value = [value]
+    return ofrecord.Feature(float_list=ofrecord.FloatList(value=value))</p>
+<p>def double_feature(value):
+    if not isinstance(value, (list, tuple)):
+        value = [value]
+    return ofrecord.Feature(double_list=ofrecord.DoubleList(value=value))</p>
+<p>def bytes_feature(value):
+    if not isinstance(value, (list, tuple)):
+        value = [value]
+    if not six.PY2:
+        if isinstance(value[0], str):
+            value = [x.encode() for x in value]
+    return ofrecord.Feature(bytes_list=ofrecord.BytesList(value=value))
+```</p>
 <h2 id="ofrecord_1">创建 OFRecord 对象并序列化<a class="headerlink" href="#ofrecord_1" title="Permanent link">&para;</a></h2>
 <p>在下例子中，我们将创建有2个 feature 的 OFRecord 对象，并且调用它的 <code>SerializeToString</code> 方法序列化。</p>
-<div class="highlight"><pre><span></span><code>  <span class="n">obserations</span> <span class="o">=</span> <span class="mi">28</span> <span class="o">*</span> <span class="mi">28</span>
+<p>```python
+  obserations = 28 * 28</p>
+<p>f = open("./dataset/part-0", "wb")</p>
+<p>for loop in range(0, 3):
+      image = [random.random() for x in range(0, obserations)]
+      label = [random.randint(0, 9)]</p>
+<div class="codehilite"><pre><span></span><code>  topack = {
+      &quot;images&quot;: float_feature(image),
+      &quot;labels&quot;: int64_feature(label),
+  }
 
-  <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;./dataset/part-0&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span>
-
-  <span class="k">for</span> <span class="n">loop</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
-      <span class="n">image</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">obserations</span><span class="p">)]</span>
-      <span class="n">label</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">9</span><span class="p">)]</span>
-
-      <span class="n">topack</span> <span class="o">=</span> <span class="p">{</span>
-          <span class="s2">&quot;images&quot;</span><span class="p">:</span> <span class="n">float_feature</span><span class="p">(</span><span class="n">image</span><span class="p">),</span>
-          <span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="n">int64_feature</span><span class="p">(</span><span class="n">label</span><span class="p">),</span>
-      <span class="p">}</span>
-
-      <span class="n">ofrecord_features</span> <span class="o">=</span> <span class="n">ofrecord</span><span class="o">.</span><span class="n">OFRecord</span><span class="p">(</span><span class="n">feature</span><span class="o">=</span><span class="n">topack</span><span class="p">)</span>
-      <span class="n">serilizedBytes</span> <span class="o">=</span> <span class="n">ofrecord_features</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">()</span>
+  ofrecord_features = ofrecord.OFRecord(feature=topack)
+  serilizedBytes = ofrecord_features.SerializeToString()
 </code></pre></div>
+
+<p>```</p>
 <p>通过以上例子，我们可以总结序列化数据的步骤：</p>
 <ul>
 <li>
@@ -1220,15 +1206,14 @@ message OFRecord {
 <p>将 OFRecord 对象序列化后按 OneFlow 约定的格式存文件，就得到 <strong>OFRecord文件</strong> 。</p>
 <p>1个 OFRecord 文件中可存储多个 OFRecord 对象，OFRecord 文件可用于 <code>OneFlow 数据流水线</code>，具体操作可见<a href="how_to_make_ofdataset.html">加载与准备 OFRecord 数据集</a></p>
 <p>OneFlow 约定，对于 <strong>每个</strong> OFRecord 对象，用以下格式存储：</p>
-<div class="highlight"><pre><span></span><code>uint64 length
-byte   data[length]
-</code></pre></div>
+<p><code>uint64 length
+byte   data[length]</code></p>
 <p>即头8个字节存入数据长度，然后存入序列化数据本身。</p>
-<div class="highlight"><pre><span></span><code><span class="n">length</span> <span class="o">=</span> <span class="n">ofrecord_features</span><span class="o">.</span><span class="n">ByteSize</span><span class="p">()</span>
-
-<span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="n">length</span><span class="p">))</span>
-<span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">serilizedBytes</span><span class="p">)</span>
-</code></pre></div>
+<p>```python
+length = ofrecord_features.ByteSize()</p>
+<p>f.write(struct.pack("q", length))
+f.write(serilizedBytes)
+```</p>
 <h2 id="_1">代码<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>以下完整代码展示如何生成 OFRecord 文件，并调用 <code>protobuf</code> 生成的 <code>OFRecord</code> 接口手工读取 OFRecord 文件中的数据。</p>
 <p>实际上，OneFlow 提供了 <code>flow.data.decode_ofrecord</code> 等接口，可以更方便地提取 OFRecord 文件（数据集）中的内容。详细内容请参见<a href="how_to_make_ofdataset.html">加载与准备 OFRecord 数据集</a>。</p>

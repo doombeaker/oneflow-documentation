@@ -1155,26 +1155,26 @@
 <h2 id="_3">同步获取结果<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <p>定义作业函数时，通过注解指定作业函数的返回结果为 <code>flow.typing.Numpy</code> 时，作业函数为一个同步作业函数。</p>
 <p>比如，如果我们定义了如下的作业函数：
-<div class="highlight"><pre><span></span><code><span class="nd">@flow</span><span class="o">.</span><span class="n">global_function</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">train_job</span><span class="p">(</span>
-    <span class="n">images</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">float</span><span class="p">),</span>
-    <span class="n">labels</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">:</span>
-    <span class="k">with</span> <span class="n">flow</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">placement</span><span class="p">(</span><span class="s2">&quot;gpu&quot;</span><span class="p">,</span> <span class="s2">&quot;0:0&quot;</span><span class="p">):</span>
-        <span class="n">logits</span> <span class="o">=</span> <span class="n">lenet</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">sparse_softmax_cross_entropy_with_logits</span><span class="p">(</span>
-            <span class="n">labels</span><span class="p">,</span> <span class="n">logits</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;softmax_loss&quot;</span>
-        <span class="p">)</span>
-    <span class="n">lr_scheduler</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">PiecewiseConstantScheduler</span><span class="p">([],</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">])</span>
-    <span class="n">flow</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">lr_scheduler</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">loss</span>
-</code></pre></div></p>
+<code>python
+@flow.global_function(type="train")
+def train_job(
+    images: tp.Numpy.Placeholder((BATCH_SIZE, 1, 28, 28), dtype=flow.float),
+    labels: tp.Numpy.Placeholder((BATCH_SIZE,), dtype=flow.int32),
+) -&gt; tp.Numpy:
+    with flow.scope.placement("gpu", "0:0"):
+        logits = lenet(images, train=True)
+        loss = flow.nn.sparse_softmax_cross_entropy_with_logits(
+            labels, logits, name="softmax_loss"
+        )
+    lr_scheduler = flow.optimizer.PiecewiseConstantScheduler([], [0.1])
+    flow.optimizer.SGD(lr_scheduler, momentum=0).minimize(loss)
+    return loss</code></p>
 <p>以上代码，通过 python 注解的方式告知 OneFlow ，返回的是 <code>tp.Numpy</code> （ <code>tp</code> 是 脚本中 <code>oneflow.typing</code> 的别名）类型，它对应了 <code>NumPy</code> 中的 <code>ndarray</code>。</p>
 <p>那么，当我们调用作业函数时，作业函数会直接返回 <code>ndarray</code> 对象：</p>
-<div class="highlight"><pre><span></span><code><span class="n">loss</span> <span class="o">=</span> <span class="n">train_job</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
-<span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">20</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
-</code></pre></div>
+<p><code>python
+loss = train_job(images, labels)
+if i % 20 == 0:
+    print(loss.mean())</code></p>
 <p>从以上示例中，应该注意到：</p>
 <ul>
 <li>
@@ -1214,146 +1214,145 @@
 <p>以上三个步骤由 OneFlow 的用户完成，在程序运行时，注册的回调函数会被 OneFlow 调用，并将作业函数的返回值作为参数传递给回调函数。</p>
 <h3 id="_5">编写回调函数<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
 <p>回调函数的原型如下：</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">cb_func</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">T</span><span class="p">):</span>
-    <span class="c1">#...</span>
-</code></pre></div>
+<p><code>python
+def cb_func(result: T):
+    #...</code></p>
 <p>其中的 <code>result</code> ，需要通过注解，指定其类型 <code>T</code>，即上文中提到的 <code>Numpy</code>、<code>ListNumpy</code>等，也可以是它们的复合类型，下文我们将有对应的实例。</p>
 <p>参数 <code>result</code> 对应了作业函数的返回值，因此必须与作业函数返回值所注解的一致。</p>
 <p>比如，我们定义了一个作业函数：
-<div class="highlight"><pre><span></span><code><span class="nd">@flow</span><span class="o">.</span><span class="n">global_function</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">train_job</span><span class="p">(</span>
-    <span class="n">images</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">float</span><span class="p">),</span>
-    <span class="n">labels</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tp</span><span class="o">.</span><span class="n">Callback</span><span class="p">[</span><span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">]:</span>
-    <span class="c1"># mlp</span>
-    <span class="n">initializer</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">truncated_normal</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
-    <span class="n">reshape</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="p">[</span><span class="n">images</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">hidden</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span>
-        <span class="n">reshape</span><span class="p">,</span>
-        <span class="mi">512</span><span class="p">,</span>
-        <span class="n">activation</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span>
-        <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;hidden&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">logits</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span>
-        <span class="n">hidden</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">initializer</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;output&quot;</span>
-    <span class="p">)</span>
-
-    <span class="n">loss</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">sparse_softmax_cross_entropy_with_logits</span><span class="p">(</span>
-        <span class="n">labels</span><span class="p">,</span> <span class="n">logits</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;softmax_loss&quot;</span>
-    <span class="p">)</span>
-    <span class="n">lr_scheduler</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">PiecewiseConstantScheduler</span><span class="p">([],</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">])</span>
-    <span class="n">flow</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">lr_scheduler</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">loss</span>
+```python
+<a class="magiclink magiclink-github magiclink-mention" href="https://github.com/flow" title="GitHub User: flow">@flow</a>.global_function(type="train")
+def train_job(
+    images: tp.Numpy.Placeholder((BATCH_SIZE, 1, 28, 28), dtype=flow.float),
+    labels: tp.Numpy.Placeholder((BATCH_SIZE,), dtype=flow.int32),
+) -&gt; tp.Callback[tp.Numpy]:
+    # mlp
+    initializer = flow.truncated_normal(0.1)
+    reshape = flow.reshape(images, [images.shape[0], -1])
+    hidden = flow.layers.dense(
+        reshape,
+        512,
+        activation=flow.nn.relu,
+        kernel_initializer=initializer,
+        name="hidden",
+    )
+    logits = flow.layers.dense(
+        hidden, 10, kernel_initializer=initializer, name="output"
+    )</p>
+<div class="codehilite"><pre><span></span><code>loss = flow.nn.sparse_softmax_cross_entropy_with_logits(
+    labels, logits, name=&quot;softmax_loss&quot;
+)
+lr_scheduler = flow.optimizer.PiecewiseConstantScheduler([], [0.1])
+flow.optimizer.SGD(lr_scheduler, momentum=0).minimize(loss)
+return loss
 </code></pre></div>
-注解<code>-&gt; tp.Callback[tp.Numpy]</code> 表示此作业函数返回一个 <code>tp.Numpy</code> 类型的对象，并且需要异步调用。</p>
-<p>那么，我们定义的回调函数，就应该接受一个 <code>Numpy</code> 类型的参数：
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">cb_print_loss</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">):</span>
-    <span class="k">global</span> <span class="n">g_i</span>
-    <span class="k">if</span> <span class="n">g_i</span> <span class="o">%</span> <span class="mi">20</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
-    <span class="n">g_i</span> <span class="o">+=</span> <span class="mi">1</span>
-</code></pre></div></p>
-<p>类似的，如果作业函数的定义为：
-<div class="highlight"><pre><span></span><code><span class="nd">@flow</span><span class="o">.</span><span class="n">global_function</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;predict&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">eval_job</span><span class="p">(</span>
-    <span class="n">images</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">float</span><span class="p">),</span>
-    <span class="n">labels</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tp</span><span class="o">.</span><span class="n">Callback</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">,</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">]]:</span>
-    <span class="k">with</span> <span class="n">flow</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">placement</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;0:0&quot;</span><span class="p">):</span>
-        <span class="n">logits</span> <span class="o">=</span> <span class="n">mlp</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">sparse_softmax_cross_entropy_with_logits</span><span class="p">(</span>
-            <span class="n">labels</span><span class="p">,</span> <span class="n">logits</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;softmax_loss&quot;</span>
-        <span class="p">)</span>
 
-    <span class="k">return</span> <span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">logits</span><span class="p">)</span>
-</code></pre></div></p>
+<p><code>``
+注解</code>-&gt; tp.Callback[tp.Numpy]<code>表示此作业函数返回一个</code>tp.Numpy` 类型的对象，并且需要异步调用。</p>
+<p>那么，我们定义的回调函数，就应该接受一个 <code>Numpy</code> 类型的参数：
+<code>python
+def cb_print_loss(result: tp.Numpy):
+    global g_i
+    if g_i % 20 == 0:
+        print(result.mean())
+    g_i += 1</code></p>
+<p>类似的，如果作业函数的定义为：
+```python
+<a class="magiclink magiclink-github magiclink-mention" href="https://github.com/flow" title="GitHub User: flow">@flow</a>.global_function(type="predict")
+def eval_job(
+    images: tp.Numpy.Placeholder((BATCH_SIZE, 1, 28, 28), dtype=flow.float),
+    labels: tp.Numpy.Placeholder((BATCH_SIZE,), dtype=flow.int32),
+) -&gt; tp.Callback[Tuple[tp.Numpy, tp.Numpy]]:
+    with flow.scope.placement("cpu", "0:0"):
+        logits = mlp(images)
+        loss = flow.nn.sparse_softmax_cross_entropy_with_logits(
+            labels, logits, name="softmax_loss"
+        )</p>
+<div class="codehilite"><pre><span></span><code>return (labels, logits)
+</code></pre></div>
+
+<p>```</p>
 <p>其中 <code>-&gt; tp.Callback[Tuple[tp.Numpy, tp.Numpy]]</code> 表示此作业函数返回一个包含2个元素的 <code>tuple</code>，且每个元素都是 <code>tp.Numpy</code> 类型，并且作业函数需要异步调用。</p>
 <p>那么，对应的回调函数的参数注解应该为：
-<div class="highlight"><pre><span></span><code><span class="n">g_total</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">g_correct</span> <span class="o">=</span> <span class="mi">0</span>
-
-
-<span class="k">def</span> <span class="nf">acc</span><span class="p">(</span><span class="n">arguments</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">,</span> <span class="n">tp</span><span class="o">.</span><span class="n">Numpy</span><span class="p">]):</span>
-    <span class="k">global</span> <span class="n">g_total</span>
-    <span class="k">global</span> <span class="n">g_correct</span>
-
-    <span class="n">labels</span> <span class="o">=</span> <span class="n">arguments</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">logits</span> <span class="o">=</span> <span class="n">arguments</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">predictions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">right_count</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">predictions</span> <span class="o">==</span> <span class="n">labels</span><span class="p">)</span>
-    <span class="n">g_total</span> <span class="o">+=</span> <span class="n">labels</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">g_correct</span> <span class="o">+=</span> <span class="n">right_count</span>
+```python
+g_total = 0
+g_correct = 0</p>
+<p>def acc(arguments: Tuple[tp.Numpy, tp.Numpy]):
+    global g_total
+    global g_correct</p>
+<div class="codehilite"><pre><span></span><code>labels = arguments[0]
+logits = arguments[1]
+predictions = np.argmax(logits, 1)
+right_count = np.sum(predictions == labels)
+g_total += labels.shape[0]
+g_correct += right_count
 </code></pre></div>
-<code>arguments</code> 对应了以上作业函数的返回类型。</p>
+
+<p><code>``</code>arguments` 对应了以上作业函数的返回类型。</p>
 <h3 id="_6">注册回调函数<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
 <p>当我们异步调用作业函数时，返回一个 <code>Callback</code> 对象，我们将准备好的回调函数传递给它，就完成了注册。</p>
 <p>OneFlow 会在获取到训练结果时，自动调用注册的回调。
-<div class="highlight"><pre><span></span><code><span class="n">callbacker</span> <span class="o">=</span> <span class="n">train_job</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
-<span class="n">callbacker</span><span class="p">(</span><span class="n">cb_print_loss</span><span class="p">)</span>
-</code></pre></div></p>
+<code>python
+callbacker = train_job(images, labels)
+callbacker(cb_print_loss)</code></p>
 <p>不过以上的写法比较冗余，推荐使用：</p>
-<div class="highlight"><pre><span></span><code><span class="n">train_job</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">labels</span><span class="p">)(</span><span class="n">cb_print_loss</span><span class="p">)</span>
-</code></pre></div>
+<p><code>python
+train_job(images, labels)(cb_print_loss)</code></p>
 <h2 id="_7">完整代码<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
 <h3 id="_8">同步获取一个结果<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
 <p>在本例中，使用一个 LeNet 网络，通过同步方式获取唯一的返回结果 <code>loss</code> ，并每隔20轮打印一次 <code>loss.mean()</code>。</p>
 <p>代码链接：<a href="../code/basics_topics/synchronize_single_job.py">synchronize_single_job.py</a></p>
 <p>运行：
-<div class="highlight"><pre><span></span><code>wget https://docs.oneflow.org/master/code/basics_topics/synchronize_single_job.py
-python3 synchronize_single_job.py
-</code></pre></div></p>
+<code>wget https://docs.oneflow.org/master/code/basics_topics/synchronize_single_job.py
+python3 synchronize_single_job.py</code></p>
 <p>会有类似输出：</p>
-<div class="highlight"><pre><span></span><code>File mnist.npz already exist, path: ./mnist.npz
+<p><code>text
+File mnist.npz already exist, path: ./mnist.npz
 7.3258467
 2.1435719
 1.1712438
 0.7531896
 ...
 ...
-model saved
-</code></pre></div>
+model saved</code></p>
 <h3 id="_9">同步获取多个返回结果<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
 <p>在本例中，作业函数返回一个 <code>tuple</code> ，我们通过同步方式获取 <code>tuple</code> 中 <code>labels</code> 与 <code>logits</code> ，并对上例中训练好的模型进行评估，输出准确率。</p>
 <p>代码链接：<a href="../code/basics_topics/synchronize_batch_job.py">synchronize_batch_job.py</a></p>
 <p>其中，预训练模型文件可以点此处下载：<a href="https://oneflow-public.oss-cn-beijing.aliyuncs.com/online_document/docs/basics_topics/lenet_models_1.zip">lenet_models_1.zip</a></p>
 <p>运行：
-<div class="highlight"><pre><span></span><code>wget https://oneflow-public.oss-cn-beijing.aliyuncs.com/online_document/docs/quick_start/lenet_models_1.zip
+<code>wget https://oneflow-public.oss-cn-beijing.aliyuncs.com/online_document/docs/quick_start/lenet_models_1.zip
 unzip lenet_models_1.zip
 wget https://docs.oneflow.org/master/code/basics_topics/synchronize_batch_job.py
-python3 synchronize_batch_job.py
-</code></pre></div></p>
+python3 synchronize_batch_job.py</code></p>
 <p>会有输出：
-<div class="highlight"><pre><span></span><code>accuracy: 99.3%
-</code></pre></div></p>
+<code>text
+accuracy: 99.3%</code></p>
 <h3 id="_10">异步获取一个返回结果<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h3>
 <p>在本例中，使用 mlp 训练，通过异步方式获取唯一的返回结果 <code>loss</code> ，并每隔20轮打印一次 <code>loss.mean()</code>。</p>
 <p>代码下载：<a href="../code/basics_topics/async_single_job.py">async_single_job.py</a></p>
 <p>运行：
-<div class="highlight"><pre><span></span><code>wget https://docs.oneflow.org/master/code/basics_topics/async_single_job.py
-python3 async_single_job.py
-</code></pre></div></p>
+<code>wget https://docs.oneflow.org/master/code/basics_topics/async_single_job.py
+python3 async_single_job.py</code></p>
 <p>会有类似输出：</p>
-<div class="highlight"><pre><span></span><code>File mnist.npz already exist, path: ./mnist.npz
+<p><code>text
+File mnist.npz already exist, path: ./mnist.npz
 3.0865736
 0.8949808
 0.47858357
 0.3486296
-...
-</code></pre></div>
+...</code></p>
 <h3 id="_11">异步获取多个返回结果<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h3>
 <p>在以下的例子中，我们展示了如何通过异步方式获取作业函数的多个返回结果，并对上例中训练好的模型进行评估，输出准确率。</p>
 <p>代码下载：<a href="../code/basics_topics/async_batch_job.py">async_batch_job.py</a></p>
 <p>其中，预训练模型文件可以点此处下载：<a href="https://oneflow-public.oss-cn-beijing.aliyuncs.com/online_document/docs/basics_topics/mlp_models_1.zip">mlp_models_1.zip</a></p>
-<div class="highlight"><pre><span></span><code>wget https://oneflow-public.oss-cn-beijing.aliyuncs.com/online_document/docs/basics_topics/mlp_models_1.zip
+<p><code>wget https://oneflow-public.oss-cn-beijing.aliyuncs.com/online_document/docs/basics_topics/mlp_models_1.zip
 unzip mlp_models_1.zip
 wget https://docs.oneflow.org/master/code/basics_topics/async_batch_job.py
-python3 async_batch_job.py
-</code></pre></div>
+python3 async_batch_job.py</code></p>
 <p>输出：</p>
-<div class="highlight"><pre><span></span><code>File mnist.npz already exist, path: ./mnist.npz
-accuracy: 97.6%
-</code></pre></div>
+<p><code>text
+File mnist.npz already exist, path: ./mnist.npz
+accuracy: 97.6%</code></p>
                 
               
               
